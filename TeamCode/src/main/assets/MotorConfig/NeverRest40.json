@@ -1,0 +1,16 @@
+{
+  "TicksPerRev":"1120",
+  "MAX_RPM":"315",
+  "MAX_MOTOR_RPM":"160",
+  "WHEEL_DIAMETER":"4.00",
+  "GEAR_RATIO":"1",
+  "P":".1",
+  "I":".01",
+  "D":".01",
+  "I_LIMIT":".5",
+  //"MOTOR_POWER_VELOCITY_CONVERSION":".02",
+  "MAX_RPMM":"5000",
+  "MAX_VELOCITY":"40",
+  "POWER_OFFSET":"0.1",
+  "POWER_SCALE":"0.02" //in % per in per sec
+}
