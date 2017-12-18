@@ -48,7 +48,7 @@ public class CryptoBoxCenterOn extends LinearOpMode{
         nav.brake();
         Bitmap curImage = null;
         ArrayList<Integer> centers;
-        curImage = vuforia.getImage();
+        curImage = vuforia.getImage(171,244);
         if(curImage == null){
             //implement a try here for a couple seconds...
             throw new RuntimeException("image captured failed...");
@@ -57,7 +57,7 @@ public class CryptoBoxCenterOn extends LinearOpMode{
         centers = cryptoBoxFinder.findColumnCenters(curImage,false);
         while(centers.size() == 0 && opModeIsActive()){
             nav.driveOnHeadingIMU(WEST, 5, this);
-            curImage = vuforia.getImage();
+            curImage = vuforia.getImage(171,244);
             centers = cryptoBoxFinder.findColumnCenters(curImage,false);
         }
         nav.brake();
@@ -65,7 +65,7 @@ public class CryptoBoxCenterOn extends LinearOpMode{
         long startMillis = System.currentTimeMillis();
         while(centerOnCryptoBox(0, centers, JennyNavigation.WEST) == false && opModeIsActive()){
             long timeCaptureStart = System.currentTimeMillis();
-            curImage = vuforia.getImage();
+            curImage = vuforia.getImage(171,244);
             long algorithmStart = System.currentTimeMillis();
             centers = cryptoBoxFinder.findColumnCenters(curImage,false);
             telemetry.addData("WantedColumnLoc","" + centers.get(0).intValue());

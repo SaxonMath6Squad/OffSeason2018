@@ -82,7 +82,7 @@ public class CenterColumnAndScoreGlyph extends LinearOpMode {
         waitForStart();
         runtime.reset();
         while(opModeIsActive() && !finished){
-            bmp = vuforia.getImage();
+            bmp = vuforia.getImage(171,244);
             if(bmp != null){
                 columnLocations = columnFinder.findColumns(bmp, false);
                 if(columnLocations != null){

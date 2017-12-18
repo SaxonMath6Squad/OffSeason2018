@@ -34,30 +34,39 @@ public class VuforiaHelper {
             vuLoc = ClassFactory.createVuforiaLocalizer(params);
             Vuforia.setFrameFormat(PIXEL_FORMAT.RGB565, true); //enables RGB565 format for the image
             vuLoc.setFrameQueueCapacity(1); //tells VuforiaLocalizer to only store one frame at a time
+
         } catch (Exception e){
             throw new RuntimeException(e);
         }
     }
 
-    public Bitmap getImage() {
+    public Bitmap getImage(int wantedWidth, int wantedHeight) {
         Image i = null;
+        long timeStart = System.currentTimeMillis();
         try{
             i = takeImage();
 
         }catch (Exception e){
             throw new RuntimeException(e);
         }
+        Log.d("VH IMG TAKE TIME", "" + (System.currentTimeMillis() - timeStart));
 
         if(i != null) {
+            long conversionStart = System.currentTimeMillis();
             Bitmap bmp = convertImageToBmp(i);
+            Log.d("VH IMG Convert", "" + (System.currentTimeMillis() - conversionStart));
+            long copyStart = System.currentTimeMillis();
             Bitmap orig = bmp.copy(Bitmap.Config.ARGB_8888,true);
+            Log.d("VH IMG ORIG","Height: " + orig.getHeight() + " Width: " + orig.getWidth());
+            Log.d("VH IMG CPY", "" + (System.currentTimeMillis() - copyStart));
+            long rotationStart = System.currentTimeMillis();
             Matrix matrix = new Matrix();
-
             matrix.postRotate(90);
 
-            Bitmap scaledBitmap = Bitmap.createScaledBitmap(orig,orig.getWidth(),orig.getHeight(),true);
-
+            Bitmap scaledBitmap = Bitmap.createScaledBitmap(orig,wantedWidth,wantedHeight,true);
+            Log.d("VH IMG Scale", "" + (System.currentTimeMillis() - rotationStart));
             Bitmap rotatedBitmap = Bitmap.createBitmap(scaledBitmap , 0, 0, scaledBitmap .getWidth(), scaledBitmap .getHeight(), matrix, true);
+            Log.d("VH IMG Rotation", "" + (System.currentTimeMillis() - rotationStart));
             return rotatedBitmap;
         }
         return null;
@@ -75,7 +84,7 @@ public class VuforiaHelper {
         VuforiaLocalizer.CloseableFrame frame = vuLoc.getFrameQueue().take(); //takes the frame at the head of the queue
         long numImages = frame.getNumImages();
         for (int i = 0; i < numImages; i++) {
-            Log.d("Format","" + frame.getImage(i).getFormat());
+            //Log.d("Format","" + frame.getImage(i).getFormat());
             if (frame.getImage(i).getFormat() == PIXEL_FORMAT.RGB565) {
                 img = frame.getImage(i);
                 break;

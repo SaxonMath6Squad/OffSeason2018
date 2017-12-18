@@ -26,24 +26,27 @@ public class VuforiaImageCaptureTest extends LinearOpMode{
 
         /*To access the image: you need to iterate through the images of the frame object:*/
         VuforiaHelper vuforia = new VuforiaHelper();
-        cryptoFinder = new CryptoBoxColumnImageProcessor(171,244,.1,1);
+        cryptoFinder = new CryptoBoxColumnImageProcessor(100,120,.1,1);
         telemetry.addData("Status","Initialized");
         telemetry.update();
         waitForStart();
         Bitmap bmp;
         ArrayList<Integer> columnLocations = new ArrayList<Integer>();
         while(opModeIsActive()){
-            bmp = vuforia.getImage();
+            long timeStart = System.currentTimeMillis();
+            bmp = vuforia.getImage(120,100);
             if(bmp != null){
                 //vuforia.saveBMP(bmp);
+                long algorithmStart = System.currentTimeMillis();
                 columnLocations = cryptoFinder.findColumns(bmp,false);
+                telemetry.addData("Algorithm Time", "" + (System.currentTimeMillis() - algorithmStart));
                 if(columnLocations != null){
                     for(int i = 0; i < columnLocations.size(); i ++){
                         telemetry.addData("Column " + i, " " + columnLocations.get(i).intValue());
                     }
-                    telemetry.update();
-
                 }
+                telemetry.addData("Loop Time", "" + (System.currentTimeMillis() - timeStart));
+                telemetry.update();
             }
             else{
                 Log.d("BMP","NULL!");

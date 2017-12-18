@@ -56,6 +56,18 @@ public class CryptoBoxColumnImageProcessor {
         return interestingColumns;
     }
 
+    private ArrayList<Integer> getColumnsWithRequiredBlueCount(int [] blueFrequencyByColumn){
+        ArrayList<Integer> interestingColumns = new ArrayList<Integer>();
+        //look for columns that have the minimum required % of a color
+        int minimumPixelCount = (int)(percentRequiredInColumnToCheck * imageHeight + .5);
+        for(int i = 0; i < blueFrequencyByColumn.length; i++){
+            if(blueFrequencyByColumn[i] >= minimumPixelCount){
+                interestingColumns.add(Integer.valueOf(i));
+            }
+        }
+        return interestingColumns;
+    }
+
     private ArrayList<Integer> getColumnBounds(ArrayList<Integer> columnsWithRequiredBluePercent){
         ArrayList<Integer> columnBounds = new ArrayList<Integer>();
         if(columnsWithRequiredBluePercent.size() > 0) {
@@ -98,13 +110,18 @@ public class CryptoBoxColumnImageProcessor {
     }
 
     public ArrayList<Integer> findColumns(Bitmap bmp, boolean shouldModifyImage){
-        bmp = scaleBmp(bmp);
+        Log.d("CF IMG ","Height: " + bmp.getHeight() + " Width: " + bmp.getWidth());
+        if(bmp.getHeight() > imageHeight && bmp.getWidth() > imageWidth){
+            bmp = scaleBmp(bmp);
+        }
         ArrayList<Integer> columnCenters = new ArrayList<Integer>();
         int width = bmp.getWidth(), height = bmp.getHeight();
         int[] pixels = new int[width * height];
         bmp.getPixels(pixels, 0, width, 0, 0, width, height);
-        double [] blueFrequencyByColumn = collapseVerticallyByBluePercent(pixels,width,height);
-        ArrayList<Integer> interestingColumns = getColumnsWithRequiredPercentBlue(blueFrequencyByColumn);
+        long collapseStart = System.currentTimeMillis();
+        int [] blueFrequencyByColumn = collapseVerticallyByBlueCount(pixels,width,height);
+        Log.d("CF IMG PROC", "Collapse Time: " + (System.currentTimeMillis() - collapseStart));
+        ArrayList<Integer> interestingColumns = getColumnsWithRequiredBlueCount(blueFrequencyByColumn);
         ArrayList<Integer> columnBounds = getColumnBounds(interestingColumns);
         for (int i = 0; i < columnBounds.size(); i++) {
             Log.d("Bound", columnBounds.get(i).toString());
@@ -122,6 +139,37 @@ public class CryptoBoxColumnImageProcessor {
         return columnCenters;
     }
 
+    /*
+    public ArrayList<Integer> findColumns(Bitmap bmp, boolean shouldModifyImage){
+        Log.d("CF IMG ","Height: " + bmp.getHeight() + " Width: " + bmp.getWidth());
+        if(bmp.getHeight() > imageHeight && bmp.getWidth() > imageWidth){
+            bmp = scaleBmp(bmp);
+        }
+        ArrayList<Integer> columnCenters = new ArrayList<Integer>();
+        int width = bmp.getWidth(), height = bmp.getHeight();
+        int[] pixels = new int[width * height];
+        bmp.getPixels(pixels, 0, width, 0, 0, width, height);
+        long collapseStart = System.currentTimeMillis();
+        double [] blueFrequencyByColumn = collapseVerticallyByBluePercent(pixels,width,height);
+        Log.d("CF IMG PROC", "Collapse Time: " + (System.currentTimeMillis() - collapseStart));
+        ArrayList<Integer> interestingColumns = getColumnsWithRequiredPercentBlue(blueFrequencyByColumn);
+        ArrayList<Integer> columnBounds = getColumnBounds(interestingColumns);
+        for (int i = 0; i < columnBounds.size(); i++) {
+            Log.d("Bound", columnBounds.get(i).toString());
+        }
+        //get average column locations
+        columnCenters = getColumnCenters(columnBounds);
+        for (int i = 0; i < columnCenters.size(); i++) {
+            Log.d("Centers", columnCenters.get(i).toString());
+        }
+        Log.d("# of Columns", "" + columnCenters.size());
+        if(shouldModifyImage){
+            showBluePixels(pixels,height,width, Color.GREEN);
+            showColumnCenters(pixels,height,width,columnCenters,Color.RED);
+        }
+        return columnCenters;
+    }
+     */
 
     private void showColumnCenters(int [] pixels, int height, int width, ArrayList<Integer> columnCenters, int colorToShowWith){
         for (int i = 0; i < columnCenters.size(); i++) {
@@ -165,52 +213,19 @@ public class CryptoBoxColumnImageProcessor {
         return centered;
     }
 
-    public void manipulateImage(Bitmap bmp) {
-        int width = bmp.getWidth(), height = bmp.getHeight();
-        int[] pixels = new int[width * height];
-        bmp.getPixels(pixels, 0, width, 0, 0, width, height);
-        int[] columnsWithBlue = new int[width];
-        int numberOfColumnsWithBlue = 0;
-        for (int c = 0; c < width; c++) {
-            int numberOfBluePixels = 0;
-            for (int r = 0; r < height; r++) {
-                int color = pixels[r * width + c];
-                int[] rgba = {Color.red(color), Color.blue(color), Color.green(color), Color.alpha(color)};
-                float[] hsv = new float[3];
-                Color.colorToHSV(color, hsv);
-                //check for blue
-                if(checkIfBlue(hsv)){
-                    rgba[0] = 0;
-                    rgba[1] = 250;
-                    rgba[2] = 250;
-                    pixels[r * width + c] = Color.argb(rgba[3], rgba[0], rgba[1], rgba[2]);
-                    numberOfBluePixels++;
+
+    public int [] collapseVerticallyByBlueCount(int [] pixels, int imageWidth, int imageHeight){
+        //collapse into a single, frequency based
+        int [] toReturn = new int[imageWidth];
+        for(int c = 0; c < imageWidth; c ++){
+            for(int r = 0; r < imageHeight; r ++){
+                int color = pixels[r*imageWidth + c];
+                if(checkIfBlue(color)){
+                    toReturn[c] ++;
                 }
             }
-            if (numberOfBluePixels / (double) height > .3) {
-                columnsWithBlue[numberOfColumnsWithBlue] = c;
-                numberOfColumnsWithBlue++;
-            }
         }
-        Log.d("Blue Columns", " " + numberOfColumnsWithBlue);
-        //go through and find the number of columns
-        int [][] columnBounds = new int [numberOfColumnsWithBlue][2];
-        columnBounds[0][0] = columnsWithBlue[0];
-        int numberOfCryptoboxColumns = 1;
-        for(int i = 0; i < numberOfColumnsWithBlue - 1; i ++) {
-            if(columnsWithBlue[i + 1] - columnsWithBlue[i] > width/100.0 * 5) {
-                columnBounds[numberOfCryptoboxColumns - 1][1] = columnsWithBlue[i];
-                columnBounds[numberOfCryptoboxColumns][0] = columnsWithBlue[i + 1];
-                numberOfCryptoboxColumns ++;
-            }
-        }
-        columnBounds[numberOfCryptoboxColumns-1][1] = columnsWithBlue[numberOfColumnsWithBlue - 1];
-
-        for(int i = 0; i < numberOfCryptoboxColumns; i ++){
-            Log.d("Start Col:" + i, " " + columnBounds[i][0]);
-            Log.d("End Col:" + i, " " + columnBounds[i][1]);
-        }
-        bmp.setPixels(pixels, 0, width, 0, 0, width, height);
+        return toReturn;
     }
 
     public double [] collapseVerticallyByBluePercent(int [] pixels, int imageWidth, int imageHeight){
