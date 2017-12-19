@@ -1,19 +1,17 @@
 package Autonomous.OpModes;
 
 import android.graphics.Bitmap;
-import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor;
+import Autonomous.VuforiaHelper;
 import DriveEngine.JennyNavigation;
 import Systems.JennyV2PickAndExtend;
-import Autonomous.VuforiaHelper;
 
 import static DriveEngine.JennyNavigation.EAST;
 import static DriveEngine.JennyNavigation.NORTH;
@@ -24,9 +22,9 @@ import static DriveEngine.JennyNavigation.WEST;
  * Created by robotics on 12/15/17.
  */
 
-@Autonomous(name = "cryptoBox Column Aligner", group = "visual autonomous")
+@Autonomous(name = "Preloaded score - reversed bot", group = "visual autonomous")
 //@Disabled
-public class CryptoBoxCenterOn extends LinearOpMode{
+public class ReversedBotPreloadedScore extends LinearOpMode{
 
     JennyNavigation nav;
     JennyV2PickAndExtend glyphSystem;
@@ -47,8 +45,7 @@ public class CryptoBoxCenterOn extends LinearOpMode{
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         waitForStart();
-        nav.driveDistance(2*12,WEST,30,this);
-        nav.brake();
+        nav.driveDistance(2*12,EAST,30,this);
         Bitmap curImage = null;
         ArrayList<Integer> centers;
         curImage = vuforia.getImage(171,244);
@@ -74,17 +71,20 @@ public class CryptoBoxCenterOn extends LinearOpMode{
             telemetry.addData("WantedColumnLoc","" + centers.get(0).intValue());
             telemetry.addData("CurLoc", "" + cryptoBoxFinder.imageWidth/2);
             telemetry.addData("Total Time", "" + (System.currentTimeMillis() - startMillis));
-            Log.d("WantedColumnLoc","" + centers.get(0).intValue());
-            Log.d("CurLoc", "" + cryptoBoxFinder.imageWidth/2);
-            Log.d("Total Time", "" + (System.currentTimeMillis() - startMillis));
             //telemetry.addData("Image Capture Time", "" + (algorithmStart - timeCaptureStart));
             //telemetry.addData("Algorithm Time","" + (System.currentTimeMillis() - algorithmStart));
             telemetry.update();
             startMillis = System.currentTimeMillis();
         }
         nav.brake();
-        nav.driveDistance(5,NORTH,20,this);
-//        nav.brake(); // Drive distance brakes for us
+        nav.driveDistance(5,SOUTH,20,this);
+//        glyphSystem.lift();
+//        sleep(750);
+//        glyphSystem.pauseLift();
+//        glyphSystem.reverseGlyphBelt();
+//        sleep(750);
+//        glyphSystem.pauseBelt();
+//        nav.driveDistance(3, NORTH, 10, this);
     }
 
 
@@ -98,14 +98,14 @@ public class CryptoBoxCenterOn extends LinearOpMode{
     public boolean centerOnCryptoBox(int column, ArrayList<Integer> centers, int dirHint){
         if(cryptoBoxFinder.imageWidth/2 < centers.get(column).intValue()){
             if(cryptoBoxFinder.imageWidth/2  - centers.get(column).intValue() < centers.get(column).intValue()/10){
-                nav.driveOnHeadingIMU(WEST, 5, this);
+                nav.driveOnHeadingIMU(EAST, 5, this);
             } else {
                 nav.brake();
                 return true;
             }
         } else if(cryptoBoxFinder.imageWidth/2  > centers.get(column).intValue()){
             if(centers.get(column).intValue() - cryptoBoxFinder.imageWidth/2  > centers.get(column).intValue()/10){
-                nav.driveOnHeadingIMU(EAST, 5, this);
+                nav.driveOnHeadingIMU(WEST, 5, this);
             } else {
                 nav.brake();
                 return true;

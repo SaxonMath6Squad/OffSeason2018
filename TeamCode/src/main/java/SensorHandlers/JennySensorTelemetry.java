@@ -2,7 +2,14 @@ package SensorHandlers;
 
 import android.util.Log;
 
+import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.TouchSensor;
+
+import org.firstinspires.ftc.robotcontroller.external.samples.SensorDigitalTouch;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import MotorControllers.JsonConfigReader;
 import Autonomous.Location;
@@ -13,9 +20,12 @@ import Autonomous.Location;
  * Created by Jeremy on 8/26/2017.
  */
 
-public class BettySensorTelemetry implements RobotSensorTelemetry {
+public class JennySensorTelemetry implements RobotSensorTelemetry {
 //    private JennyWithExtendotronHardware robot;
     private JsonConfigReader reader;
+    private ColorSensor colorSensor;
+    private DistanceSensor distanceSensor;
+    private DigitalChannel[] limitSwitches = new DigitalChannel[4];
     private ImuHandler imu;
     private boolean shouldRun;
     private long loopTime = 100;
@@ -28,11 +38,15 @@ public class BettySensorTelemetry implements RobotSensorTelemetry {
     private double wheelDiameter;
     private double ticksPerRev;
     private double ftToTicksFactor = 12;
-    public BettySensorTelemetry(HardwareMap h, int positionX, int positionY){
+    public final int EXTEND_LIMIT = 0;
+    public JennySensorTelemetry(HardwareMap h, int positionX, int positionY){
         hardwareMap = h;
 //        robot = new JennyWithExtendotronHardware(hardwareMap);
         startPositionX = positionX;
         startPositionY = positionY;
+        colorSensor = hardwareMap.colorSensor.get("colorSensor");
+        distanceSensor = hardwareMap.get(DistanceSensor.class, "colorSensor");
+        limitSwitches[EXTEND_LIMIT] = hardwareMap.digitalChannel.get("extendLimit");
         try {
             reader = new JsonConfigReader(h.appContext.getAssets().open("MotorConfig/DriveMotors/HolonomicDriveMotorConfig.json"));
         } catch (Exception e){
@@ -96,5 +110,20 @@ public class BettySensorTelemetry implements RobotSensorTelemetry {
     @Override
     public void resetTelemetryLogging() {
 
+    }
+
+    @Override
+    public double getDistance(DistanceUnit unit){
+        double distance = 0;
+        double curDist = distanceSensor.getDistance(unit);
+        if(curDist > 0 && curDist < 40 && !Double.isNaN(curDist)){
+            distance = curDist;
+        }
+        return distance;
+    }
+
+    @Override
+    public boolean getState(int sensor){
+        return limitSwitches[sensor].getState();
     }
 }

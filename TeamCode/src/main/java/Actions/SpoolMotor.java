@@ -52,6 +52,10 @@ public class SpoolMotor implements ActionHandler{
         motor.setInchesPerSecondVelocity(0);
     }
 
+    public void setPower(double power){
+        motor.setMotorPower(power);
+    }
+
     public void setExtendSpeed(double speed){
         extendSpeedInPerSecond = speed;
     }
@@ -62,6 +66,18 @@ public class SpoolMotor implements ActionHandler{
 
     public void resetCurrentPositionToZero(){
         //todo implement
+    }
+
+    public void setPosition(double positionInInches){
+        motor.setPosition(positionInInches);
+    }
+
+    public long getPosition(){
+        return motor.getCurrentTick();
+    }
+
+    public void setMode(DcMotor.RunMode mode){
+        motor.setMotorMode(mode);
     }
 
 //    public int extendToPosition(double inch){

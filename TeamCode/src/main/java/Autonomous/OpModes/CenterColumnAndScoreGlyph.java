@@ -33,10 +33,13 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
 import java.util.ArrayList;
 
 import Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor;
 import DriveEngine.JennyNavigation;
+import SensorHandlers.JennySensorTelemetry;
 import Systems.JennyV2PickAndExtend;
 import Autonomous.VuforiaHelper;
 
@@ -55,7 +58,8 @@ public class CenterColumnAndScoreGlyph extends LinearOpMode {
     JennyNavigation navigation;
     JennyV2PickAndExtend glyphSystem;
     VuforiaHelper vuforia;
-    CryptoBoxColumnImageProcessor columnFinder;
+    CryptoBoxColumnImageProcessor cryptoBoxFinder;
+    JennySensorTelemetry sensorTelemetry;
     //ImuHandler imuHandler;
     @Override
     public void runOpMode() {
@@ -63,14 +67,15 @@ public class CenterColumnAndScoreGlyph extends LinearOpMode {
         try {
             navigation = new JennyNavigation(hardwareMap,"RobotConfig/JennyV2.json");
             glyphSystem = new JennyV2PickAndExtend(hardwareMap);
+            sensorTelemetry = new JennySensorTelemetry(hardwareMap, 0, 0);
         }
         catch (Exception e){
             Log.e("Error!" , "Jenny Navigation: " + e.toString());
             throw new RuntimeException("Navigation Creation Error! " + e.toString());
         }
         vuforia = new VuforiaHelper();
-        columnFinder = new CryptoBoxColumnImageProcessor(171,244,.1,1);
-        Bitmap bmp;
+        cryptoBoxFinder = new CryptoBoxColumnImageProcessor(171,244,.1,1);
+        Bitmap bmp = null;
         ArrayList<Integer> columnLocations = new ArrayList<Integer>();
         boolean centered = false;
         boolean finished = false;
@@ -81,60 +86,57 @@ public class CenterColumnAndScoreGlyph extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
-        while(opModeIsActive() && !finished){
-            bmp = vuforia.getImage(171,244);
-            if(bmp != null){
-                columnLocations = columnFinder.findColumns(bmp, false);
-                if(columnLocations != null){
-                    for(int i = 0; i < columnLocations.size(); i ++){
-                        telemetry.addData("Column " + i, " " + columnLocations.get(i).intValue());
-                    }
-                    telemetry.update();
-                    if(!centered && columnLocations.size() > 2){
-                        int columnCenter = (int)((columnLocations.get(0) + columnLocations.get(1)) / 2 + .5);
-                        centerSelfOnColumn(columnCenter, bmp.getWidth() / 2);
-                        centered = columnFinder.isCentered(columnCenter, bmp.getWidth() / 2);
-                    }
-                    if(centered){
-                        navigation.driveDistance(3*12, NORTH, 15, this);
-                        sleep(75);
-                        glyphSystem.reverseGlyphBelt();
-                        glyphSystem.spit();
-                        sleep(250);
-                        glyphSystem.pauseBelt();
-                        glyphSystem.pauseGrabber();
-                        navigation.driveDistance(3, SOUTH, 15, this);
-                        sleep(75);
-                        navigation.driveDistance(6, EAST, 15, this);
-                        sleep(75);
-                        finished = true;
-                    }
-                }
-            } else {
-                Log.d("BMP", "NULL!");
-            }
+
+        navigation.driveDistance(2.25*12, EAST, 15, this);
+        bmp = vuforia.getImage(171, 244);
+        if(bmp == null){
+            throw new RuntimeException("Image capture failed!");
         }
-        
+        columnLocations = cryptoBoxFinder.findColumnCenters(bmp, false);
+        long startTime = System.currentTimeMillis();
+        while(opModeIsActive() && !centerOnCryptoBox(0, columnLocations, WEST));
+        Log.d("Time taken to center", Long.toString(System.currentTimeMillis() - startTime));
+        double distToWall = sensorTelemetry.getDistance(DistanceUnit.CM);
+        while (opModeIsActive() && (distToWall > 28 || distToWall == 0)){
+            Log.d("Distance to wall", Double.toString(sensorTelemetry.getDistance(DistanceUnit.CM)));
+            navigation.driveOnHeadingIMU(SOUTH, 5, this);
+            distToWall = sensorTelemetry.getDistance(DistanceUnit.CM);
+        }
+        navigation.brake();
+        glyphSystem.lift();
+        sleep(2500);
+        glyphSystem.pauseLift();
+        glyphSystem.startGlyphBelt();
+        sleep(3500);
+        glyphSystem.pauseBelt();
+        glyphSystem.drop();
+        while (!sensorTelemetry.getState(sensorTelemetry.EXTEND_LIMIT));
+        glyphSystem.pauseLift();
+        navigation.driveDistance(3, NORTH, 10, this);
         navigation.brake();
         navigation.stop();
         glyphSystem.stop();
     }
-    
-    private void centerSelfOnColumn(int desiredColumnCenter, int imageCenter){
-        if(imageCenter > desiredColumnCenter){
-            if(imageCenter - desiredColumnCenter > 20){
-                navigation.driveOnHeadingIMU(WEST, 10, this);
+
+    public boolean centerOnCryptoBox(int column, ArrayList<Integer> centers, int dirHint){
+        if(cryptoBoxFinder.imageWidth/2 < centers.get(column).intValue()){
+            if(cryptoBoxFinder.imageWidth/2  - centers.get(column).intValue() < centers.get(column).intValue()/10){
+                navigation.driveOnHeadingIMU(WEST, 5, this);
             } else {
                 navigation.brake();
+                return true;
             }
-        } else if(imageCenter < desiredColumnCenter){
-            if(desiredColumnCenter - imageCenter > 20){
-                navigation.driveOnHeadingIMU(EAST, 10, this);
+        } else if(cryptoBoxFinder.imageWidth/2  > centers.get(column).intValue()){
+            if(centers.get(column).intValue() - cryptoBoxFinder.imageWidth/2  > centers.get(column).intValue()/10){
+                navigation.driveOnHeadingIMU(EAST, 5, this);
             } else {
                 navigation.brake();
+                return true;
             }
         } else {
             navigation.brake();
+            return true;
         }
+        return false;
     }
 }

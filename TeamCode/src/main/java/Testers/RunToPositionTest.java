@@ -36,24 +36,26 @@ import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import DriveEngine.JennyNavigation;
 import SensorHandlers.JennySensorTelemetry;
-import UserControlled.JoystickHandler;
 
-@TeleOp(name="Jenny Drive Wiring Test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
+@TeleOp(name="Run To Position Test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
 //@Disabled
-public class JennyDriveMotorWiringTest extends LinearOpMode {
+public class RunToPositionTest extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
     JennyNavigation navigation;
+    JennySensorTelemetry sensorTelemetry;
     @Override
     public void runOpMode() {
         double [] drivePowers = {0,0,0,0};
         try {
             navigation = new JennyNavigation(hardwareMap,"RobotConfig/JennyV2.json");
+            sensorTelemetry = new JennySensorTelemetry(hardwareMap, 0,0);
         }
         catch (Exception e){
             Log.e("Error!" , "Jenny Navigation: " + e.toString());
@@ -71,34 +73,11 @@ public class JennyDriveMotorWiringTest extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            drivePowers[0] = 0;
-            drivePowers[1] = 0;
-            drivePowers[2] = 0;
-            drivePowers[3] = 0;
-            if(gamepad1.a){
-                drivePowers[JennyNavigation.BACK_LEFT_HOLONOMIC_DRIVE_MOTOR] = .5;
-            }
+            navigation.driveMotors[0].setMotorMode(DcMotor.RunMode.RUN_TO_POSITION);
+            navigation.driveMotors[0].setPosition(4*Math.PI);
+            navigation.driveMotors[0].setMotorPower(0.5);
 
-            if(gamepad1.b){
-                drivePowers[JennyNavigation.BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR] = .5;
-            }
-            if(gamepad1.x){
-                drivePowers[JennyNavigation.FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR] = .5;
-            }
-            if(gamepad1.y){
-                drivePowers[JennyNavigation.FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR] = .5;
-            }
-            navigation.applyMotorPowers(drivePowers);
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Front left tick", navigation.driveMotors[navigation.FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR].getCurrentTick());
-            telemetry.addData("Front right tick", navigation.driveMotors[navigation.FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR].getCurrentTick());
-            telemetry.addData("Back left tick", navigation.driveMotors[navigation.BACK_LEFT_HOLONOMIC_DRIVE_MOTOR].getCurrentTick());
-            telemetry.addData("Back right tick", navigation.driveMotors[navigation.BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR].getCurrentTick());
-            telemetry.addData("Front left INCH", navigation.driveMotors[navigation.FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR].convertTicksToInches(navigation.driveMotors[navigation.FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR].getCurrentTick()));
-            telemetry.addData("Front right INCH", navigation.driveMotors[navigation.FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR].convertTicksToInches(navigation.driveMotors[navigation.FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR].getCurrentTick()));
-            telemetry.addData("Back left INCH", navigation.driveMotors[navigation.BACK_LEFT_HOLONOMIC_DRIVE_MOTOR].convertTicksToInches(navigation.driveMotors[navigation.BACK_LEFT_HOLONOMIC_DRIVE_MOTOR].getCurrentTick()));
-            telemetry.addData("Back right INCH", navigation.driveMotors[navigation.BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR].convertTicksToInches(navigation.driveMotors[navigation.BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR].getCurrentTick()));
-            telemetry.update();
+           telemetry.update();
         }
         navigation.stop();
     }

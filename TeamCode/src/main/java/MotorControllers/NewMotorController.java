@@ -192,6 +192,9 @@ public class NewMotorController extends Thread {
         motor.setPower(0);
     }
 
-
-
+    public void setPosition(double positionInInches){
+        int positionInTicks = (int)(positionInInches/(wheelDiameterInInches*Math.PI)*ticksPerRevolution);
+        Log.d("Desired tick", Double.toString(positionInTicks));
+        motor.setTargetPosition(positionInTicks);
+    }
 }

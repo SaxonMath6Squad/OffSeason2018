@@ -1,25 +1,29 @@
 package Systems;
 
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import Actions.ArialDepositor;
 import Actions.WheelPickerDoubleMotor;
-import Autonomous.RelicRecoveryField;
+import Actions.WheelPickerSingleMotor;
 
 
 /**
  * Created by Jeremy on 8/23/2017.
  */
 
-public class JennyV2PickAndExtend {
+public class JennyO1APickAndExtend {
     ArialDepositor glyphPlacement;
-    WheelPickerDoubleMotor glyphGrabber;
+    WheelPickerSingleMotor glyphGrabber;
     HardwareMap hardwareMap;
 
-    public JennyV2PickAndExtend(HardwareMap hw) throws Exception{
+    public JennyO1APickAndExtend(HardwareMap hw) throws Exception{
         hardwareMap = hw;
-        glyphGrabber = new WheelPickerDoubleMotor(hardwareMap);
+        glyphGrabber = new WheelPickerSingleMotor(hardwareMap);
         glyphPlacement = new ArialDepositor(hardwareMap);
+        glyphPlacement.setBeltDirection(Servo.Direction.FORWARD);
+        glyphPlacement.setLiftDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     public int liftToPosition(double inInches){

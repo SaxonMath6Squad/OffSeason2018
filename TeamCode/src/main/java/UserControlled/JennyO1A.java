@@ -30,7 +30,7 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
 TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package Testers;
+package UserControlled;
 
 import android.util.Log;
 
@@ -39,19 +39,21 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import DriveEngine.JennyNavigation;
-import SensorHandlers.JennySensorTelemetry;
-import UserControlled.JoystickHandler;
+import Systems.JennyO1APickAndExtend;
+import Systems.JennyV2PickAndExtend;
 
-@TeleOp(name="Jenny Drive Wiring Test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
+@TeleOp(name="Jenny O1A User Controlled", group="Linear Opmode")  // @Autonomous(...) is the other common choice
 //@Disabled
-public class JennyDriveMotorWiringTest extends LinearOpMode {
+public class JennyO1A extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
     JennyNavigation navigation;
+    JoystickHandler leftJoystick, rightJoystick;
+    JennyO1APickAndExtend glyphSystem;
+
     @Override
     public void runOpMode() {
-        double [] drivePowers = {0,0,0,0};
         try {
             navigation = new JennyNavigation(hardwareMap,"RobotConfig/JennyV2.json");
         }
@@ -60,8 +62,17 @@ public class JennyDriveMotorWiringTest extends LinearOpMode {
             throw new RuntimeException("Navigation Creation Error! " + e.toString());
 
         }
-        //leftJoystick = new JoystickHandler(gamepad1,JoystickHandler.LEFT_JOYSTICK);
-        //rightJoystick = new JoystickHandler(gamepad1,JoystickHandler.RIGHT_JOYSTICK);
+        try{
+            glyphSystem = new JennyO1APickAndExtend(hardwareMap);
+
+        }
+        catch(Exception e){
+            Log.e("Error!","Jenny Wheel Picks: " + e.toString());
+            throw new RuntimeException("Navigation Creation Error! " + e.toString());
+        }
+
+        leftJoystick = new JoystickHandler(gamepad1,JoystickHandler.LEFT_JOYSTICK);
+        rightJoystick = new JoystickHandler(gamepad1,JoystickHandler.RIGHT_JOYSTICK);
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
@@ -71,35 +82,34 @@ public class JennyDriveMotorWiringTest extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            drivePowers[0] = 0;
-            drivePowers[1] = 0;
-            drivePowers[2] = 0;
-            drivePowers[3] = 0;
-            if(gamepad1.a){
-                drivePowers[JennyNavigation.BACK_LEFT_HOLONOMIC_DRIVE_MOTOR] = .5;
+            //DRIVE
+            if(rightJoystick.magnitude() < .1){
+                navigation.driveOnHeading(leftJoystick.angle(), leftJoystick.magnitude() * 50);
             }
+            else navigation.turn(rightJoystick.magnitude() * rightJoystick.x()/Math.abs(rightJoystick.x()));
 
-            if(gamepad1.b){
-                drivePowers[JennyNavigation.BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR] = .5;
-            }
-            if(gamepad1.x){
-                drivePowers[JennyNavigation.FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR] = .5;
-            }
-            if(gamepad1.y){
-                drivePowers[JennyNavigation.FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR] = .5;
-            }
-            navigation.applyMotorPowers(drivePowers);
+            //GLYPH GRABBER
+            if(gamepad1.a) glyphSystem.grab();
+            if(gamepad1.b) glyphSystem.spit();
+            if(!gamepad1.a && !gamepad1.b) glyphSystem.pauseGrabber();
+
+            //GLYPH LIFT
+            if(gamepad1.right_trigger > 0.1) glyphSystem.lift();
+            if(gamepad1.left_trigger > 0.1) glyphSystem.drop();
+            if(gamepad2.right_trigger > 0.1 && gamepad1.right_trigger < 0.1 && gamepad1.left_trigger < 0.1 && !gamepad1.right_bumper && !gamepad1.left_bumper) glyphSystem.lift();
+            if(gamepad2.left_trigger > 0.1 && gamepad1.right_trigger < 0.1 && gamepad1.left_trigger < 0.1 && !gamepad1.right_bumper && !gamepad1.left_bumper) glyphSystem.drop();
+            if(gamepad1.right_trigger < 0.1 && gamepad1.left_trigger < 0.1 && gamepad2.left_trigger < 0.1 && gamepad2.right_trigger < 0.1) glyphSystem.pauseLift();
+            //GLYPH ROLLER
+            if(gamepad1.right_bumper) glyphSystem.startGlyphBelt();
+            if(gamepad1.left_bumper) glyphSystem.reverseGlyphBelt();
+            if(gamepad2.right_bumper && gamepad1.right_trigger < 0.1 && gamepad1.left_trigger < 0.1 && !gamepad1.right_bumper && !gamepad1.left_bumper) glyphSystem.startGlyphBelt();
+            if(gamepad2.left_bumper && gamepad1.right_trigger < 0.1 && gamepad1.left_trigger < 0.1 && !gamepad1.right_bumper && !gamepad1.left_bumper) glyphSystem.reverseGlyphBelt();
+            if(!gamepad1.right_bumper && !gamepad1.left_bumper && !gamepad2.right_bumper && !gamepad2.left_bumper) glyphSystem.pauseBelt();
+
             telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Front left tick", navigation.driveMotors[navigation.FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR].getCurrentTick());
-            telemetry.addData("Front right tick", navigation.driveMotors[navigation.FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR].getCurrentTick());
-            telemetry.addData("Back left tick", navigation.driveMotors[navigation.BACK_LEFT_HOLONOMIC_DRIVE_MOTOR].getCurrentTick());
-            telemetry.addData("Back right tick", navigation.driveMotors[navigation.BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR].getCurrentTick());
-            telemetry.addData("Front left INCH", navigation.driveMotors[navigation.FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR].convertTicksToInches(navigation.driveMotors[navigation.FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR].getCurrentTick()));
-            telemetry.addData("Front right INCH", navigation.driveMotors[navigation.FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR].convertTicksToInches(navigation.driveMotors[navigation.FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR].getCurrentTick()));
-            telemetry.addData("Back left INCH", navigation.driveMotors[navigation.BACK_LEFT_HOLONOMIC_DRIVE_MOTOR].convertTicksToInches(navigation.driveMotors[navigation.BACK_LEFT_HOLONOMIC_DRIVE_MOTOR].getCurrentTick()));
-            telemetry.addData("Back right INCH", navigation.driveMotors[navigation.BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR].convertTicksToInches(navigation.driveMotors[navigation.BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR].getCurrentTick()));
             telemetry.update();
         }
         navigation.stop();
+        glyphSystem.stop();
     }
 }

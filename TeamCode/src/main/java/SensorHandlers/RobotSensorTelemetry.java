@@ -1,5 +1,10 @@
 package SensorHandlers;
 
+import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.TouchSensor;
+
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
 import Autonomous.Location;
 
 /**
@@ -16,4 +21,6 @@ public interface RobotSensorTelemetry {
     public void startTelemetryLogging();
     public void stopTelemetryLogging();
     public void resetTelemetryLogging();
+    public double getDistance(DistanceUnit unit);
+    public boolean getState(int sensor);
 }
