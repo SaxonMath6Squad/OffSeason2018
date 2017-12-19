@@ -59,12 +59,12 @@ public class VuforiaHelper {
             Bitmap orig = bmp.copy(Bitmap.Config.ARGB_8888,true);
             Log.d("VH IMG ORIG","Height: " + orig.getHeight() + " Width: " + orig.getWidth());
             Log.d("VH IMG CPY", "" + (System.currentTimeMillis() - copyStart));
-            long rotationStart = System.currentTimeMillis();
+            long scaleStart = System.currentTimeMillis();
             Matrix matrix = new Matrix();
             matrix.postRotate(90);
-
             Bitmap scaledBitmap = Bitmap.createScaledBitmap(orig,wantedWidth,wantedHeight,true);
-            Log.d("VH IMG Scale", "" + (System.currentTimeMillis() - rotationStart));
+            Log.d("VH IMG Scale", "" + (System.currentTimeMillis() - scaleStart));
+            long rotationStart = System.currentTimeMillis();
             Bitmap rotatedBitmap = Bitmap.createBitmap(scaledBitmap , 0, 0, scaledBitmap .getWidth(), scaledBitmap .getHeight(), matrix, true);
             Log.d("VH IMG Rotation", "" + (System.currentTimeMillis() - rotationStart));
             return rotatedBitmap;
