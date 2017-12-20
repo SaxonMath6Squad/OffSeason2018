@@ -22,6 +22,7 @@ public class RelicRecoveryField {
     final static double CRYPTOBOX_COLORED_COLUMN_WIDTHS = .3;
     final static double CRYPTOBOX_SCORING_COLUMN_WIDTHS = 0;
     final static Location [] cryptoBoxCenters = {new Location(0,0)};
+    public final static double GROUND = 0;
     public final static double ROW1 = 6;
     public final static double ROW2 = 11.5;
     public final static double ROW3 = 17.75;

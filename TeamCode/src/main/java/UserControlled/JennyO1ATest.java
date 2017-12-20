@@ -40,17 +40,25 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import DriveEngine.JennyNavigation;
 import Systems.JennyO1APickAndExtend;
-import Systems.JennyV2PickAndExtend;
 
-@TeleOp(name="Jenny O1A User Controlled", group="Linear Opmode")  // @Autonomous(...) is the other common choice
+import static Autonomous.RelicRecoveryField.GROUND;
+import static Autonomous.RelicRecoveryField.ROW1;
+import static Autonomous.RelicRecoveryField.ROW2;
+import static Autonomous.RelicRecoveryField.ROW3;
+import static Autonomous.RelicRecoveryField.ROW4;
+
+@TeleOp(name="Jenny O1A User Controlled - cycle modes", group="Linear Opmode")  // @Autonomous(...) is the other common choice
 //@Disabled
-public class JennyO1A extends LinearOpMode {
+public class JennyO1ATest extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
     JennyNavigation navigation;
     JoystickHandler leftJoystick, rightJoystick;
     JennyO1APickAndExtend glyphSystem;
+    boolean autoLiftPositionMode = true;
+    double[] liftPosition = {GROUND, ROW1, ROW2, ROW3, ROW4};
+    int position = 0;
 
     @Override
     public void runOpMode() {
@@ -105,11 +113,43 @@ public class JennyO1A extends LinearOpMode {
             if(!gamepad1.a && !gamepad1.b) glyphSystem.pauseGrabber();
 
             //GLYPH LIFT
-            if(gamepad1.right_trigger > 0.1) glyphSystem.lift();
-            if(gamepad1.right_bumper) glyphSystem.drop();
-            if(gamepad2.right_trigger > 0.1 && gamepad1.right_trigger < 0.1 && gamepad1.left_trigger < 0.1 && !gamepad1.right_bumper && !gamepad1.left_bumper) glyphSystem.lift();
-            if(gamepad2.right_bumper && gamepad1.right_trigger < 0.1 && gamepad1.left_trigger < 0.1 && !gamepad1.right_bumper && !gamepad1.left_bumper) glyphSystem.drop();
-            if(gamepad1.right_trigger < 0.1 && gamepad1.right_bumper && gamepad2.right_bumper && gamepad2.right_trigger < 0.1) glyphSystem.pauseLift();
+            if(!autoLiftPositionMode) {
+                if (gamepad1.right_trigger > 0.1) glyphSystem.lift();
+                if (gamepad1.right_bumper) glyphSystem.drop();
+                if (gamepad2.right_trigger > 0.1 && gamepad1.right_trigger < 0.1 && gamepad1.left_trigger < 0.1 && !gamepad1.right_bumper && !gamepad1.left_bumper)
+                    glyphSystem.lift();
+                if (gamepad2.right_bumper && gamepad1.right_trigger < 0.1 && gamepad1.left_trigger < 0.1 && !gamepad1.right_bumper && !gamepad1.left_bumper)
+                    glyphSystem.drop();
+                if (gamepad1.right_trigger < 0.1 && !gamepad1.right_bumper && !gamepad2.right_bumper && gamepad2.right_trigger < 0.1)
+                    glyphSystem.pauseLift();
+            } else {
+                if (gamepad1.right_trigger > 0.1) {
+                    position++;
+                    while (gamepad1.right_trigger > 0.1);
+                }
+                if (gamepad1.right_bumper) {
+                    position--;
+                    while (gamepad1.right_bumper);
+                }
+                if (gamepad2.right_trigger > 0.1 && gamepad1.right_trigger < 0.1 && gamepad1.left_trigger < 0.1 && !gamepad1.right_bumper && !gamepad1.left_bumper) {
+                    position++;
+                    while (gamepad2.right_trigger > 0.1);
+                }
+
+                if (gamepad2.right_bumper && gamepad1.right_trigger < 0.1 && gamepad1.left_trigger < 0.1 && !gamepad1.right_bumper && !gamepad1.left_bumper) {
+                    position--;
+                    while (gamepad2.right_bumper);
+                }
+
+                if(position <= 0) position = 0;
+                if(position >= liftPosition.length - 1) position = liftPosition.length - 1;
+                glyphSystem.liftToPosition(liftPosition[position]);
+            }
+            if(gamepad1.dpad_up) {
+                autoLiftPositionMode = (autoLiftPositionMode)? false:true;
+                while (gamepad1.dpad_up);
+            }
+
             //GLYPH ROLLER
             if(gamepad1.left_trigger > 0.1) glyphSystem.startGlyphBelt();
             if(gamepad1.left_bumper) glyphSystem.reverseGlyphBelt();

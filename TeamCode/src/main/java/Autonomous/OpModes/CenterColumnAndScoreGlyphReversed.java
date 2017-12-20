@@ -49,9 +49,9 @@ import static DriveEngine.JennyNavigation.NORTH;
 import static DriveEngine.JennyNavigation.SOUTH;
 import static DriveEngine.JennyNavigation.WEST;
 
-@Autonomous(name="Score glyph with camera test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
+@Autonomous(name="Camera autonomous reversed", group="Linear Opmode")  // @Autonomous(...) is the other common choice
 //@Disabled
-public class CenterColumnAndScoreGlyph extends LinearOpMode {
+public class CenterColumnAndScoreGlyphReversed extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
@@ -103,15 +103,15 @@ public class CenterColumnAndScoreGlyph extends LinearOpMode {
             distToWall = sensorTelemetry.getDistance(DistanceUnit.CM);
         }
         navigation.brake();
-        glyphSystem.lift();
+//        glyphSystem.lift();
         sleep(2500);
-        glyphSystem.pauseLift();
+//        glyphSystem.pauseLift();
         glyphSystem.startGlyphBelt();
         sleep(3500);
         glyphSystem.pauseBelt();
-        glyphSystem.drop();
-        while (!sensorTelemetry.getState(sensorTelemetry.EXTEND_LIMIT));
-        glyphSystem.pauseLift();
+//        glyphSystem.drop();
+//        while (!sensorTelemetry.getState(sensorTelemetry.EXTEND_LIMIT));
+//        glyphSystem.pauseLift();
         navigation.driveDistance(3, NORTH, 10, this);
         navigation.brake();
         navigation.stop();
