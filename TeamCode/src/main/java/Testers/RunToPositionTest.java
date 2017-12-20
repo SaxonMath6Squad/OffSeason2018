@@ -34,6 +34,7 @@ package Testers;
 
 import android.util.Log;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -43,7 +44,7 @@ import DriveEngine.JennyNavigation;
 import SensorHandlers.JennySensorTelemetry;
 
 @TeleOp(name="Run To Position Test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
-//@Disabled
+@Disabled
 public class RunToPositionTest extends LinearOpMode {
 
     /* Declare OpMode members. */

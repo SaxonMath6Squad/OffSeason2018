@@ -34,6 +34,7 @@ import android.graphics.Color;
 import android.util.Log;
 import android.view.View;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
@@ -45,7 +46,7 @@ import Autonomous.ColorModeController;
 import SensorHandlers.JennySensorTelemetry;
 
 @TeleOp(name = "Sensor Telemetry Test", group = "Sensor")
-//@Disabled
+@Disabled
 public class SensorTelemetryTest extends LinearOpMode {
 
     JennySensorTelemetry sensorTelemetry;

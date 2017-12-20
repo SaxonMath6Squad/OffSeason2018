@@ -35,6 +35,7 @@ package Autonomous.OpModes;
 import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -47,7 +48,7 @@ import static DriveEngine.JennyNavigation.SOUTH;
 import static DriveEngine.JennyNavigation.WEST;
 
 @Autonomous(name="Auto drive TTest", group="Linear Opmode")  // @Autonomous(...) is the other common choice
-//@Disabled
+@Disabled
 public class AutoDriveTest extends LinearOpMode {
 
     /* Declare OpMode members. */

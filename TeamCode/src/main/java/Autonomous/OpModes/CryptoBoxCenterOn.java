@@ -25,7 +25,7 @@ import static DriveEngine.JennyNavigation.WEST;
  */
 
 @Autonomous(name = "cryptoBox Column Aligner", group = "visual autonomous")
-//@Disabled
+@Disabled
 public class CryptoBoxCenterOn extends LinearOpMode{
 
     JennyNavigation nav;

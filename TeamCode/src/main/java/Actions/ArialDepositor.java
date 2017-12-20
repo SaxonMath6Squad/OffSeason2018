@@ -53,6 +53,10 @@ public class ArialDepositor implements ActionHandler {
         belt.setDirection(dir);
     }
 
+    public long getMotorPosition(){
+        return leftLiftMotor.getPosition();
+    }
+
     public void startBelt(){
         belt.setPosition(.9);
     }

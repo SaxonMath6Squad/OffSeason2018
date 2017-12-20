@@ -44,7 +44,7 @@ import SensorHandlers.ImuHandler;
 import UserControlled.JoystickHandler;
 
 @TeleOp(name="Turn test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
-//@Disabled
+@Disabled
 public class TurnToHeadingTest extends LinearOpMode {
 
     /* Declare OpMode members. */

@@ -79,14 +79,25 @@ public class JennyO1A extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
+        boolean isSlowMode = false;
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             //DRIVE
+
             if(rightJoystick.magnitude() < .1){
+                if(!isSlowMode)
                 navigation.driveOnHeading(leftJoystick.angle(), leftJoystick.magnitude() * 50);
+                else navigation.driveOnHeading(leftJoystick.angle(), leftJoystick.magnitude() * 10);
             }
-            else navigation.turn(rightJoystick.magnitude() * rightJoystick.x()/Math.abs(rightJoystick.x()));
+            else {
+                if(!isSlowMode) navigation.turn(rightJoystick.magnitude() * rightJoystick.x()/Math.abs(rightJoystick.x()));
+                else navigation.turn(.1 * rightJoystick.magnitude() * rightJoystick.x()/Math.abs(rightJoystick.x()));
+            }
+            if(gamepad1.start){
+                isSlowMode = !isSlowMode;
+                while(gamepad1.start);
+            }
 
             //GLYPH GRABBER
             if(gamepad1.a) glyphSystem.grab();

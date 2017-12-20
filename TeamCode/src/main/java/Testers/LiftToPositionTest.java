@@ -32,6 +32,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package Testers;
 
+import android.util.Log;
+
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -44,13 +46,13 @@ import Systems.JennyV2PickAndExtend;
 import static Autonomous.RelicRecoveryField.*;
 
 @TeleOp(name="Glyph lift test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
-//@Disabled
+@Disabled
 public class LiftToPositionTest extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
     JennyV2PickAndExtend glyphSystem;
-    double[] position = {ROW1, ROW2, ROW3, ROW4};
+    double[] position = {0, ROW1, ROW2, ROW3, ROW4};
     int curPos = 0;
     @Override
     public void runOpMode() {
@@ -78,8 +80,9 @@ public class LiftToPositionTest extends LinearOpMode {
             }
             if(curPos >= 4) curPos = 4;
             if(curPos <= 0) curPos = 0;
-            glyphSystem.liftToPosition(curPos);
+            glyphSystem.liftToPosition(position[curPos]);
 
+            telemetry.addData("tick", glyphSystem.getCurrentTick(RelicRecoveryField.LIFT_MOTOR));
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.update();
         }

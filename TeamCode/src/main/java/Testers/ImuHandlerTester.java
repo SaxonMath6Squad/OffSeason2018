@@ -39,7 +39,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import SensorHandlers.ImuHandler;
 
 @TeleOp(name="Imu handler tester", group="Linear Opmode")  // @Autonomous(...) is the other common choice
-//@Disabled
+@Disabled
 public class ImuHandlerTester extends LinearOpMode {
 
     /* Declare OpMode members. */

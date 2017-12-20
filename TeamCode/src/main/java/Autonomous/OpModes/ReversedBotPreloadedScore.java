@@ -23,7 +23,7 @@ import static DriveEngine.JennyNavigation.WEST;
  */
 
 @Autonomous(name = "Preloaded score - reversed bot", group = "visual autonomous")
-//@Disabled
+@Disabled
 public class ReversedBotPreloadedScore extends LinearOpMode{
 
     JennyNavigation nav;

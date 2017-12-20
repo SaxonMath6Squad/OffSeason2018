@@ -42,7 +42,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import DriveEngine.JennyNavigation;
 
 @TeleOp(name="Drive test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
-//@Disabled
+@Disabled
 public class JennyUserControlledDriveOnly extends LinearOpMode {
 
     /* Declare OpMode members. */
