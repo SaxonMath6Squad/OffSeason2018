@@ -12,10 +12,10 @@ public class Location {
         x = x1;
         y = y1;
     }
-    double getX(){
+    public double getX(){
         return x;
     }
-    double getY(){
+    public double getY(){
         return y;
     }
     public void setX(double nX){
@@ -32,7 +32,7 @@ public class Location {
 
     public double distanceToLocation(Location location){
         double distance = 0;
-        Math.sqrt(Math.pow((location.getX() - getX()), 2) + Math.pow((location.getY() - getY()), 2));
+        distance = Math.sqrt(Math.pow((location.getX() - getX()), 2) + Math.pow((location.getY() - getY()), 2));
         return distance;
     }
 }

@@ -22,5 +22,5 @@ public interface RobotSensorTelemetry {
     public void stopTelemetryLogging();
     public void resetTelemetryLogging();
     public double getDistance(DistanceUnit unit);
-    public boolean getState(int sensor);
+    public boolean isPressed(int sensor);
 }

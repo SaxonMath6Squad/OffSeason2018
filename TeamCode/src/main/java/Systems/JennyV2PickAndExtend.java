@@ -75,7 +75,7 @@ public class JennyV2PickAndExtend {
     public int getCurrentTick(int motor){
         switch (motor){
             case RelicRecoveryField.LIFT_MOTOR:
-                return (int)glyphPlacement.getMotorPosition();
+                return (int)glyphPlacement.getLiftMotorPosition();
             default:
                 break;
         }

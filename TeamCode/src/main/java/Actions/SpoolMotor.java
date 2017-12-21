@@ -16,6 +16,7 @@ public class SpoolMotor implements ActionHandler{
     HardwareMap hardwareMap;
     private double extendSpeedInPerSecond = 0;
     private double retractSpeedInPerSecond = 0;
+    private double extendPower = 1;
     private long startTickLocation = 0;
     private double maxExtendLoc;
 
@@ -52,6 +53,14 @@ public class SpoolMotor implements ActionHandler{
         motor.setInchesPerSecondVelocity(0);
     }
 
+    public void extendWithPower(){
+        motor.setMotorPower(extendPower);
+    }
+
+    public void retractWithPower(){
+        motor.setMotorPower(-extendPower);
+    }
+
     public void setPower(double power){
         motor.setMotorPower(power);
     }
@@ -62,6 +71,10 @@ public class SpoolMotor implements ActionHandler{
 
     public void setRetractSpeed(double speed){
         extendSpeedInPerSecond = speed;
+    }
+
+    public void setExtendPower(double power){
+        extendPower = power;
     }
 
     public void resetCurrentPositionToZero(){

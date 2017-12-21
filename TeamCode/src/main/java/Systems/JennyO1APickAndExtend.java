@@ -1,5 +1,6 @@
 package Systems;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -22,7 +23,7 @@ public class JennyO1APickAndExtend {
         hardwareMap = hw;
         glyphGrabber = new WheelPickerSingleMotor(hardwareMap);
         glyphPlacement = new ArialDepositor(hardwareMap);
-        glyphPlacement.setBeltDirection(Servo.Direction.FORWARD);
+        glyphPlacement.setBeltDirection(DcMotor.Direction.FORWARD);
         glyphPlacement.setLiftDirection(DcMotorSimple.Direction.REVERSE);
     }
 
@@ -43,6 +44,15 @@ public class JennyO1APickAndExtend {
 
     public int pauseLift(){
         glyphPlacement.stopLift();
+        return 0;
+    }
+
+    public long getLiftPosition(){
+        return glyphPlacement.getLiftMotorPosition();
+    }
+
+    public int setBeltPower(double power){
+        glyphPlacement.setBeltPower(power);
         return 0;
     }
 

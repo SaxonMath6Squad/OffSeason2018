@@ -23,10 +23,10 @@ import Autonomous.Location;
 public class JennySensorTelemetry implements RobotSensorTelemetry {
 //    private JennyWithExtendotronHardware robot;
     private JsonConfigReader reader;
-    private ColorSensor colorSensor;
-    private DistanceSensor distanceSensor;
-    private DigitalChannel[] limitSwitches = new DigitalChannel[4];
-    private ImuHandler imu;
+//    private ColorSensor colorSensor;
+//    private DistanceSensor distanceSensor;
+    private TouchSensor[] limitSwitches = new TouchSensor[4];
+//    private ImuHandler imu;
     private boolean shouldRun;
     private long loopTime = 100;
     private long lastLoopTime = 0;
@@ -44,9 +44,9 @@ public class JennySensorTelemetry implements RobotSensorTelemetry {
 //        robot = new JennyWithExtendotronHardware(hardwareMap);
         startPositionX = positionX;
         startPositionY = positionY;
-        colorSensor = hardwareMap.colorSensor.get("colorSensor");
-        distanceSensor = hardwareMap.get(DistanceSensor.class, "colorSensor");
-        limitSwitches[EXTEND_LIMIT] = hardwareMap.digitalChannel.get("extendLimit");
+//        colorSensor = hardwareMap.colorSensor.get("colorSensor");
+//        distanceSensor = hardwareMap.get(DistanceSensor.class, "colorSensor");
+        limitSwitches[EXTEND_LIMIT] = hardwareMap.touchSensor.get("extendLimit");
         try {
             reader = new JsonConfigReader(h.appContext.getAssets().open("MotorConfig/DriveMotors/HolonomicDriveMotorConfig.json"));
         } catch (Exception e){
@@ -115,15 +115,15 @@ public class JennySensorTelemetry implements RobotSensorTelemetry {
     @Override
     public double getDistance(DistanceUnit unit){
         double distance = 0;
-        double curDist = distanceSensor.getDistance(unit);
-        if(curDist > 0 && curDist < 40 && !Double.isNaN(curDist)){
-            distance = curDist;
-        }
+//        double curDist = distanceSensor.getDistance(unit);
+//        if(curDist > 0 && curDist < 40 && !Double.isNaN(curDist)){
+//            distance = curDist;
+//        }
         return distance;
     }
 
     @Override
-    public boolean getState(int sensor){
-        return limitSwitches[sensor].getState();
+    public boolean isPressed(int sensor){
+        return limitSwitches[sensor].isPressed();
     }
 }

@@ -20,7 +20,7 @@ public class WheelPickerSingleMotor implements ActionHandler {
         hardwareMap = hw;
         wheelMotor = new NewMotorController("glyphMotor", "MotorConfig/DriveMotors/NewHolonomicDriveMotorConfig.json", hardwareMap);
         wheelMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        wheelMotor.setMotorDirection(DcMotorSimple.Direction.REVERSE);
+        wheelMotor.setMotorDirection(DcMotorSimple.Direction.FORWARD);
     }
 
     public int pick(){

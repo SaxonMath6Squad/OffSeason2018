@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import java.io.InputStream;
 
+import Autonomous.Location;
 import MotorControllers.JsonConfigReader;
 import MotorControllers.NewMotorController;
 import MotorControllers.PIDController;
@@ -381,5 +382,21 @@ public class JennyNavigation {
             driveMotors[i].killMotorController();
         }
         orientation.stopIMU();
+    }
+
+    public static void driveToLocation(Location startLocation, Location targetLocation, double desiredSpeed, LinearOpMode mode){
+        double distanceToTravel = startLocation.distanceToLocation(targetLocation);
+        double deltaX = targetLocation.getX() - startLocation.getX();
+        double deltaY = targetLocation.getY() - startLocation.getY();
+        int heading = (int)Math.toDegrees(Math.atan2(deltaX, deltaY));
+//        if(deltaX == 0) heading = 0;
+        Log.d("start x", Double.toString(startLocation.getX()));
+        Log.d("start y", Double.toString(startLocation.getY()));
+        Log.d("target x", Double.toString(targetLocation.getX()));
+        Log.d("target y", Double.toString(targetLocation.getY()));
+        Log.d("dist to travel", Double.toString(distanceToTravel));
+        Log.d("heading", Double.toString(heading));
+//        driveDistance(distanceToTravel*12, heading, desiredSpeed, mode);
+
     }
 }

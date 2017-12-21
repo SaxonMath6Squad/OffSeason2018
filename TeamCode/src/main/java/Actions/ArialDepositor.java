@@ -1,6 +1,7 @@
 package Actions;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -12,15 +13,16 @@ import MotorControllers.NewMotorController;
 
 public class ArialDepositor implements ActionHandler {
     SpoolMotor leftLiftMotor;
-    ServoHandler belt;
+    SpoolMotor belt;
     HardwareMap hardwareMap;
 
     public ArialDepositor(HardwareMap hw) throws Exception{
         hardwareMap = hw;
-        leftLiftMotor = new SpoolMotor(new NewMotorController("liftMotor","MotorConfig/FunctionMotors/SpoolMotor.json", hardwareMap),10,10,100,hardwareMap);
+        leftLiftMotor = new SpoolMotor(new NewMotorController("liftMotor","MotorConfig/FunctionMotors/SpoolMotor.json", hardwareMap),10,50,100, hardwareMap);
 
-        belt = new ServoHandler("belt",hardwareMap);
-        belt.setDirection(Servo.Direction.REVERSE);
+        belt = new SpoolMotor(new NewMotorController("belt", "MotorConfig/FunctionMotors/BeltMotor.json", hardwareMap), 10, 10, 100, hardwareMap);
+        belt.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        belt.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     public void extend(){
@@ -29,8 +31,8 @@ public class ArialDepositor implements ActionHandler {
     }
 
     public void retract(){
-        leftLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftLiftMotor.retract();
+        leftLiftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftLiftMotor.setPower(-1);
     }
 
     public void stopLift(){
@@ -49,24 +51,28 @@ public class ArialDepositor implements ActionHandler {
         leftLiftMotor.setDirection(dir);
     }
 
-    public void setBeltDirection(Servo.Direction dir){
+    public void setBeltDirection(DcMotor.Direction dir){
         belt.setDirection(dir);
     }
 
-    public long getMotorPosition(){
+    public void setBeltPower(double power){
+        belt.setExtendPower(power);
+    }
+
+    public long getLiftMotorPosition(){
         return leftLiftMotor.getPosition();
     }
 
     public void startBelt(){
-        belt.setPosition(.9);
+        belt.extendWithPower();
     }
 
     public void stopBelt(){
-        belt.setPosition(.49);
+        belt.pause();
     }
 
     public void reverseBelt(){
-        belt.setPosition(.1);
+        belt.retractWithPower();
     }
 
     @Override
