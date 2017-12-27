@@ -74,6 +74,10 @@ public class NewMotorController extends Thread {
         this(hw.dcMotor.get(motorName), configFileLoc, hw);
     }
 
+    public DcMotor.RunMode getMotorMode(){
+        return motor.getMode();
+    }
+
     public void setZeroPowerBehavior(DcMotor.ZeroPowerBehavior b){
         motor.setZeroPowerBehavior(b);
     }

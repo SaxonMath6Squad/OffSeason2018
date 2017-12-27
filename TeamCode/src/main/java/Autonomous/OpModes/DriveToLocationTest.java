@@ -76,7 +76,7 @@ public class DriveToLocationTest extends LinearOpMode {
 
         JennyNavigation.driveToLocation(startLocation, targetLocation, 10, this);
 
-//        navigation.stop();
-//        glyphSystem.stop();
+//        navigation.stopNavigation();
+//        glyphSystem.stopNavigation();
     }
 }

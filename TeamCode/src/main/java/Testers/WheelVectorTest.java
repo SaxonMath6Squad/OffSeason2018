@@ -30,41 +30,41 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
 TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package Autonomous.OpModes;
+package Testers;
 
 import android.util.Log;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import Autonomous.HeadingVector;
 import DriveEngine.JennyNavigation;
-import Systems.JennyV2PickAndExtend;
 
-import static DriveEngine.JennyNavigation.NORTH;
-import static DriveEngine.JennyNavigation.SOUTH;
-import static DriveEngine.JennyNavigation.WEST;
+import static DriveEngine.JennyNavigation.BACK_LEFT_HOLONOMIC_DRIVE_MOTOR;
+import static DriveEngine.JennyNavigation.BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR;
+import static DriveEngine.JennyNavigation.FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR;
+import static DriveEngine.JennyNavigation.FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR;
 
-@Autonomous(name="Auto drive TTest", group="Linear Opmode")  // @Autonomous(...) is the other common choice
-@Disabled
-public class AutoDriveTest extends LinearOpMode {
+@TeleOp(name="Wheel vector test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
+//@Disabled
+public class WheelVectorTest extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
     JennyNavigation navigation;
-    JennyV2PickAndExtend glyphSystem;
+    HeadingVector[] vectors;
     //ImuHandler imuHandler;
     @Override
     public void runOpMode() {
         //imuHandler = new ImuHandler("imu", hardwareMap);
         try {
             navigation = new JennyNavigation(hardwareMap,"RobotConfig/JennyV2.json");
-            glyphSystem = new JennyV2PickAndExtend(hardwareMap);
         }
         catch (Exception e){
             Log.e("Error!" , "Jenny Navigation: " + e.toString());
             throw new RuntimeException("Navigation Creation Error! " + e.toString());
+
         }
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -72,25 +72,16 @@ public class AutoDriveTest extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
-        navigation.driveDistance(2.5*12, WEST, 15, this);
-        sleep(75);
-        navigation.driveDistance(3, NORTH, 15, this);
-        glyphSystem.spit();
-        sleep(75);
-        glyphSystem.pauseGrabber();
-        sleep(75);
-        navigation.driveDistance(5, WEST, 15, this);
-        sleep(75);
-        navigation.driveDistance(1, NORTH, 15, this);
-        sleep(75);
-        glyphSystem.reverseGlyphBelt();
-        glyphSystem.spit();
-        sleep(1500);
-        glyphSystem.pauseGrabber();
-        sleep(100);
-        navigation.driveDistance(5, SOUTH, 15, this);
-        sleep(75);
+        // run until the end of the match (driver presses STOP)
+        while (opModeIsActive()) {
+            vectors = navigation.getWheelVectors();
+
+            telemetry.addData("FL Vector", vectors[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR].x() + ", " + vectors[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR].y());
+            telemetry.addData("FR Vector", vectors[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR].x() + ", " + vectors[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR].y());
+            telemetry.addData("BL Vector", vectors[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR].x() + ", " + vectors[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR].y());
+            telemetry.addData("BR Vector", vectors[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR].x() + ", " + vectors[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR].y());
+            telemetry.update();
+        }
         navigation.stopNavigation();
-        glyphSystem.stop();
     }
 }

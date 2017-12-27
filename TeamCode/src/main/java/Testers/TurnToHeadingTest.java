@@ -40,8 +40,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import DriveEngine.JennyNavigation;
-import SensorHandlers.ImuHandler;
-import UserControlled.JoystickHandler;
 
 @TeleOp(name="Turn test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
 @Disabled
@@ -77,6 +75,6 @@ public class TurnToHeadingTest extends LinearOpMode {
             //telemetry.addData("Current Heading", imuHandler.getOrientation());
             telemetry.update();
         }
-        navigation.stop();
+        navigation.stopNavigation();
     }
 }

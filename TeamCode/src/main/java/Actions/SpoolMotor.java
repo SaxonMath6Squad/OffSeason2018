@@ -41,6 +41,10 @@ public class SpoolMotor implements ActionHandler{
         motor.setInchesPerSecondVelocity(extendSpeedInPerSecond);
     }
 
+    public DcMotor.RunMode getMotorControllerMode() {
+        return motor.getMotorMode();
+    }
+
     public void retract()
     {
 //        if(motor.getMotorControllerMode() != MotorController.MotorControllerMode.SPEED_CONTROLLER) motor.setMotorControllerMode(MotorController.MotorControllerMode.SPEED_CONTROLLER);

@@ -114,7 +114,7 @@ public class CenterColumnAndScoreGlyphReversed extends LinearOpMode {
 //        glyphSystem.pauseLift();
         navigation.driveDistance(3, NORTH, 10, this);
         navigation.brake();
-        navigation.stop();
+        navigation.stopNavigation();
         glyphSystem.stop();
     }
 

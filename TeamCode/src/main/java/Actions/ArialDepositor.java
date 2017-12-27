@@ -36,8 +36,12 @@ public class ArialDepositor implements ActionHandler {
     }
 
     public void stopLift(){
-        leftLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftLiftMotor.pause();
+        if(leftLiftMotor.getMotorControllerMode() == DcMotor.RunMode.RUN_USING_ENCODER || leftLiftMotor.getMotorControllerMode() == DcMotor.RunMode.RUN_WITHOUT_ENCODER) {
+            leftLiftMotor.pause();
+            leftLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            leftLiftMotor.setPosition(leftLiftMotor.getPosition());
+            leftLiftMotor.setPower(0.2);
+        }
     }
 
     public void goToLiftPosition(double positionInInches){

@@ -80,6 +80,6 @@ public class RunToPositionTest extends LinearOpMode {
 
            telemetry.update();
         }
-        navigation.stop();
+        navigation.stopNavigation();
     }
 }

@@ -78,6 +78,6 @@ public class JennyUserControlledDriveOnly extends LinearOpMode {
             telemetry.addData("Orientation", navigation.orientation.getOrientation());
             telemetry.update();
         }
-        navigation.stop();
+        navigation.stopNavigation();
     }
 }

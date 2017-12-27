@@ -58,7 +58,7 @@ public class JennyO1B extends LinearOpMode {
     JoystickHandler leftJoystick, rightJoystick;
     JennyO1APickAndExtend glyphSystem;
     JennySensorTelemetry sensorTelemetry;
-    boolean autoLiftPositionMode = true;
+    boolean autoLiftPositionMode = false;
     double[] liftPosition = {GROUND, ROW1, ROW2, ROW3, ROW4};
     int position = 0;
 
@@ -111,8 +111,10 @@ public class JennyO1B extends LinearOpMode {
 
             //GLYPH GRABBER
             if(gamepad1.a) glyphSystem.grab();
-            if(gamepad1.b) glyphSystem.spit();
-            if(!gamepad1.a && !gamepad1.b) glyphSystem.pauseGrabber();
+            else if(gamepad1.b) glyphSystem.spit();
+            else if(!gamepad1.a && !gamepad1.b && gamepad2.a) glyphSystem.grab();
+            else if(!gamepad1.a && !gamepad1.b && gamepad2.b) glyphSystem.spit();
+            else glyphSystem.pauseGrabber();
 
             //GLYPH LIFT
             if (!autoLiftPositionMode) {
@@ -179,7 +181,7 @@ public class JennyO1B extends LinearOpMode {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.update();
         }
-        navigation.stop();
+        navigation.stopNavigation();
         glyphSystem.stop();
     }
 }

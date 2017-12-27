@@ -41,9 +41,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import DriveEngine.JennyNavigation;
 import Systems.JennyV2PickAndExtend;
 
-@TeleOp(name="New MotorController Drive+Glyph Test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
+@TeleOp(name="JennyO1A", group="Linear Opmode")  // @Autonomous(...) is the other common choice
 //@Disabled
-public class JennyV2UserControlledPickAndExtend extends LinearOpMode {
+public class JennyO1A extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
@@ -108,7 +108,7 @@ public class JennyV2UserControlledPickAndExtend extends LinearOpMode {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.update();
         }
-        navigation.stop();
+        navigation.stopNavigation();
         glyphSystem.stop();
     }
 }

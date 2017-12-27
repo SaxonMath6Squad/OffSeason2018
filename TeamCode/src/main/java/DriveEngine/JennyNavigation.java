@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import java.io.InputStream;
 
+import Autonomous.HeadingVector;
 import Autonomous.Location;
 import MotorControllers.JsonConfigReader;
 import MotorControllers.NewMotorController;
@@ -20,23 +21,32 @@ import SensorHandlers.ImuHandler;
  * Created by Jeremy on 8/23/2017.
  */
 
-public class JennyNavigation {
-    public static int NORTH = 0;
-    public static int SOUTH = 180;
-    public static int WEST = 270;
-    public static int EAST = 90;
+public class JennyNavigation extends Thread{
+    public static final int NORTH = 0;
+    public static final int SOUTH = 180;
+    public static final int WEST = 270;
+    public static final int EAST = 90;
     public NewMotorController[] driveMotors = new NewMotorController[4];
-    public static int FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR = 0;
-    public static int FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR = 1;
-    public static int BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR = 2;
-    public static int BACK_LEFT_HOLONOMIC_DRIVE_MOTOR = 3;
+    public static final int FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR = 0;
+    public static final int FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR = 1;
+    public static final int BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR = 2;
+    public static final int BACK_LEFT_HOLONOMIC_DRIVE_MOTOR = 3;
+    private volatile long threadDelayMillis = 50;
+    public volatile double robotHeading = 0;
+    private volatile double [] lastMotorPositionsInInches = {0,0,0,0};
     private PIDController headingController, turnController;
+    private Location myLocation;
+
     public ImuHandler orientation;
     private long timeAtAccelerationStart;
     public volatile boolean shouldRun = true;
 
-    private double HEADING_THRESHOLD = 3;
-    private double WHEEL_BASE_RADIUS = 20;
+    private final double HEADING_THRESHOLD = 3;
+    private final double WHEEL_BASE_RADIUS = 20;
+    private final double FL_WHEEL_HEADING_OFFSET = 45;
+    private final double FR_WHEEL_HEADING_OFFSET = 315;
+    private final double BR_WHEEL_HEADING_OFFSET = 45;
+    private final double BL_WHEEL_HEADING_OFFSET = 315;
     private double acceleration = 0;
     private HardwareMap hardwareMap;
     public JennyNavigation(HardwareMap hw, String configFile) throws Exception{
@@ -45,7 +55,56 @@ public class JennyNavigation {
         hardwareMap = hw;
         initializeUsingConfigFile(configFile);
         orientation = new ImuHandler("imu", hardwareMap);
+//        myLocation.setX(0);
+//        myLocation.setY(0);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (shouldRun) {
+                    updateData();
+                    safetySleep(threadDelayMillis);
+                }
+            }
+        });
 
+    }
+
+    private void updateLastMotorPositionsInInches(){
+        for (int i = 0; i < driveMotors.length; i++){
+            lastMotorPositionsInInches[i] = driveMotors[i].getInchesFromStart();
+        }
+    }
+
+    private void updateHeading(){
+        robotHeading = orientation.getOrientation();
+    }
+
+    private void updateData(){
+        updateHeading();
+        HeadingVector [] wheelVectors = getWheelVectors();
+        HeadingVector travelVector = wheelVectors[0].addVectors(wheelVectors);
+        double headingOfRobot = travelVector.getHeading();
+        double magnitudeOfRobot = travelVector.getMagnitude();
+        double actualHeading = headingOfRobot + robotHeading;
+        HeadingVector actualVector = new HeadingVector();
+        actualVector.calculateVector(actualHeading, magnitudeOfRobot);
+        double deltaX = actualVector.x();
+        double deltaY = actualVector.y();
+        myLocation.addXY(deltaX, deltaY);
+        updateLastMotorPositionsInInches();
+    }
+
+    private void safetySleep(long time){
+        long start = System.currentTimeMillis();
+        while (System.currentTimeMillis() - start < time && shouldRun);
+    }
+
+    public void setThreadDelayMillis(long delayMillis){
+        threadDelayMillis = delayMillis;
+    }
+
+    public double getOrientation(){
+        return robotHeading;
     }
 
     public void initializeUsingConfigFile(String file){
@@ -376,7 +435,7 @@ public class JennyNavigation {
         applyMotorVelocities(new double []{0,0,0,0});
     }
 
-    public void stop(){
+    public void stopNavigation(){
         shouldRun = false;
         for(int i =0; i < driveMotors.length; i ++){
             driveMotors[i].killMotorController();
@@ -388,15 +447,31 @@ public class JennyNavigation {
         double distanceToTravel = startLocation.distanceToLocation(targetLocation);
         double deltaX = targetLocation.getX() - startLocation.getX();
         double deltaY = targetLocation.getY() - startLocation.getY();
-        int heading = (int)Math.toDegrees(Math.atan2(deltaX, deltaY));
-//        if(deltaX == 0) heading = 0;
+        int heading = (int)Math.toDegrees(Math.atan2(deltaY, deltaX)) - 90;
+        heading = 360 - heading;
+        if(heading >= 360) heading -= 360;
+        if(heading < 0) heading += 360;
         Log.d("start x", Double.toString(startLocation.getX()));
         Log.d("start y", Double.toString(startLocation.getY()));
         Log.d("target x", Double.toString(targetLocation.getX()));
         Log.d("target y", Double.toString(targetLocation.getY()));
         Log.d("dist to travel", Double.toString(distanceToTravel));
         Log.d("heading", Double.toString(heading));
-//        driveDistance(distanceToTravel*12, heading, desiredSpeed, mode);
 
+    }
+
+
+
+    public HeadingVector[] getWheelVectors(){
+        double [] deltaWheelPositions = {0,0,0,0};
+        for(int i = 0; i < driveMotors.length; i ++){
+            deltaWheelPositions[i] = driveMotors[i].getInchesFromStart() - lastMotorPositionsInInches[i];
+        }
+        HeadingVector [] wheelVectors = new HeadingVector[4];
+        wheelVectors[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR].calculateVector(FL_WHEEL_HEADING_OFFSET,deltaWheelPositions[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR]);
+        wheelVectors[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR].calculateVector(FR_WHEEL_HEADING_OFFSET,deltaWheelPositions[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR]);
+        wheelVectors[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR].calculateVector(BL_WHEEL_HEADING_OFFSET,deltaWheelPositions[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR]);
+        wheelVectors[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR].calculateVector(BR_WHEEL_HEADING_OFFSET,deltaWheelPositions[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR]);
+        return wheelVectors;
     }
 }

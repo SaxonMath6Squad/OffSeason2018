@@ -39,8 +39,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import DriveEngine.JennyNavigation;
-import SensorHandlers.JennySensorTelemetry;
-import UserControlled.JoystickHandler;
 
 @TeleOp(name="Jenny Drive Wiring Test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
 //@Disabled
@@ -100,6 +98,6 @@ public class JennyDriveMotorWiringTest extends LinearOpMode {
             telemetry.addData("Back right INCH", navigation.driveMotors[navigation.BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR].convertTicksToInches(navigation.driveMotors[navigation.BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR].getCurrentTick()));
             telemetry.update();
         }
-        navigation.stop();
+        navigation.stopNavigation();
     }
 }
