@@ -22,7 +22,7 @@ public class HeadingVector {
         double degree = headingInDegrees;
         degree += 90;
         degree = 180 - degree;
-        Log.d("Degree", Double.toString(degree));
+        //Log.d("Degree", Double.toString(degree));
         x = magnitude*Math.cos(Math.toRadians(degree));
         y = magnitude*Math.sin(Math.toRadians(degree));
     }
@@ -37,7 +37,6 @@ public class HeadingVector {
 
     public double getHeading(){
         double degree = Math.toDegrees(Math.atan2(y, x)) - 90;
-        Log.d("Degree of atan2 - 90", Double.toString(degree));
         degree = 360 - degree;
         if(degree > 360) degree -= 360;
         if(degree < 0) degree += 360;

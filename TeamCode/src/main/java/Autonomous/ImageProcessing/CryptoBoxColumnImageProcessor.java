@@ -15,6 +15,8 @@ public class CryptoBoxColumnImageProcessor {
     public int imageHeight;
     private double percentRequiredInColumnToCheck;
     private int minimumColumnWidth;
+    public static final int WANTED_WIDTH = 171;
+    public static final int WANTED_HEIGHT = 244;
 
     public CryptoBoxColumnImageProcessor(int desiredHeight, int desiredWidth, double percentColumnCheck, int minColumnWidth){
         imageHeight = desiredHeight;

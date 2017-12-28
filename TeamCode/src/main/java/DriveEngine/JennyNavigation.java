@@ -35,11 +35,15 @@ public class JennyNavigation extends Thread{
     public volatile double robotHeading = 0;
     private volatile double [] lastMotorPositionsInInches = {0,0,0,0};
     private PIDController headingController, turnController;
-    private Location myLocation;
+
+
+    private volatile Location myLocation;
+    private volatile HeadingVector [] wheelVectors = new HeadingVector[4];
+    private volatile HeadingVector robotMovementVector = new HeadingVector();
 
     public ImuHandler orientation;
     private long timeAtAccelerationStart;
-    public volatile boolean shouldRun = true;
+    private volatile boolean shouldRun = true;
 
     private final double HEADING_THRESHOLD = 3;
     private final double WHEEL_BASE_RADIUS = 20;
@@ -55,17 +59,29 @@ public class JennyNavigation extends Thread{
         hardwareMap = hw;
         initializeUsingConfigFile(configFile);
         orientation = new ImuHandler("imu", hardwareMap);
-//        myLocation.setX(0);
-//        myLocation.setY(0);
+        myLocation = new Location(0,0);
+        for(int i = 0; i < wheelVectors.length; i++){
+            wheelVectors[i] = new HeadingVector();
+        }
+        robotMovementVector = new HeadingVector();
         new Thread(new Runnable() {
             @Override
             public void run() {
+                for (int i = 0; i < driveMotors.length; i++) {
+                    Log.d("Inch from start", Integer.toString(i) + ": " + driveMotors[i].getInchesFromStart());
+                }
                 while (shouldRun) {
-                    updateData();
+                    try {
+                        updateData();
+                    }
+                    catch (Exception e){
+                        shouldRun = false;
+                        throw e;
+                    }
                     safetySleep(threadDelayMillis);
                 }
             }
-        });
+        }).start();
 
     }
 
@@ -79,18 +95,32 @@ public class JennyNavigation extends Thread{
         robotHeading = orientation.getOrientation();
     }
 
+    public Location getRobotLocation(){
+        return new Location(myLocation.getX(),myLocation.getY());
+    }
+
+    private void updateLocation(){
+        HeadingVector travelVector = wheelVectors[0].addVectors(wheelVectors);
+        travelVector = new HeadingVector(travelVector.x()/2, travelVector.y()/2);
+        Log.d("Wheel", "Dx: " + travelVector.x() + " Dy:" + travelVector.y());
+        double headingOfRobot = travelVector.getHeading();
+        Log.d("WHeel Heading", "" + headingOfRobot);
+        Log.d("Orientation heading", "" + robotHeading);
+        double magnitudeOfRobot = travelVector.getMagnitude();
+        double actualHeading = (headingOfRobot + robotHeading)%360;
+
+        Log.d("Robot Heading", "" + actualHeading);
+        robotMovementVector.calculateVector(actualHeading, magnitudeOfRobot);
+        double deltaX = robotMovementVector.x();
+        double deltaY = robotMovementVector.y();
+        myLocation.addXY(deltaX, deltaY);
+
+    }
+
     private void updateData(){
         updateHeading();
-        HeadingVector [] wheelVectors = getWheelVectors();
-        HeadingVector travelVector = wheelVectors[0].addVectors(wheelVectors);
-        double headingOfRobot = travelVector.getHeading();
-        double magnitudeOfRobot = travelVector.getMagnitude();
-        double actualHeading = headingOfRobot + robotHeading;
-        HeadingVector actualVector = new HeadingVector();
-        actualVector.calculateVector(actualHeading, magnitudeOfRobot);
-        double deltaX = actualVector.x();
-        double deltaY = actualVector.y();
-        myLocation.addXY(deltaX, deltaY);
+        wheelVectors = getWheelVectors();
+        updateLocation();
         updateLastMotorPositionsInInches();
     }
 
@@ -311,6 +341,9 @@ public class JennyNavigation extends Thread{
             mode.sleep(50);
         }
         brake();
+        for (int i = 0; i < driveMotors.length; i++) {
+            Log.d("Inch from start", Integer.toString(i) + ": " + driveMotors[i].getInchesFromStart());
+        }
     }
 
     long [] getMotorPositionsTicks(){
@@ -322,7 +355,7 @@ public class JennyNavigation extends Thread{
         return  positions;
     }
 
-    double [] getMotorPositionsInches(){
+    public double [] getMotorPositionsInches(){
         double [] inches = new double [4];
         long [] ticks = getMotorPositionsTicks();
         inches[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR] = Math.abs(driveMotors[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR].convertTicksToInches(ticks[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR]));
@@ -460,18 +493,42 @@ public class JennyNavigation extends Thread{
 
     }
 
-
-
     public HeadingVector[] getWheelVectors(){
         double [] deltaWheelPositions = {0,0,0,0};
         for(int i = 0; i < driveMotors.length; i ++){
             deltaWheelPositions[i] = driveMotors[i].getInchesFromStart() - lastMotorPositionsInInches[i];
         }
-        HeadingVector [] wheelVectors = new HeadingVector[4];
-        wheelVectors[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR].calculateVector(FL_WHEEL_HEADING_OFFSET,deltaWheelPositions[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR]);
-        wheelVectors[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR].calculateVector(FR_WHEEL_HEADING_OFFSET,deltaWheelPositions[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR]);
-        wheelVectors[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR].calculateVector(BL_WHEEL_HEADING_OFFSET,deltaWheelPositions[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR]);
-        wheelVectors[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR].calculateVector(BR_WHEEL_HEADING_OFFSET,deltaWheelPositions[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR]);
-        return wheelVectors;
+        HeadingVector [] vectors = new HeadingVector[4];
+        for(int i = 0; i < vectors.length; i++){
+            vectors[i] = new HeadingVector();
+        }
+        vectors[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR].calculateVector(FL_WHEEL_HEADING_OFFSET,deltaWheelPositions[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR]);
+        vectors[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR].calculateVector(FR_WHEEL_HEADING_OFFSET,deltaWheelPositions[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR]);
+        vectors[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR].calculateVector(BL_WHEEL_HEADING_OFFSET,deltaWheelPositions[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR]);
+        vectors[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR].calculateVector(BR_WHEEL_HEADING_OFFSET,deltaWheelPositions[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR]);
+        return vectors;
     }
+
+    public void setLastMotorPositionsInInchesToOneInch(){
+        for(int i = 0; i < lastMotorPositionsInInches.length; i ++){
+            lastMotorPositionsInInches[i] = 1;
+        }
+    }
+
+    public HeadingVector[] getWheelVectorsTest(){
+        double [] deltaWheelPositions = {1,1,1,1};
+        HeadingVector [] vectors = new HeadingVector[4];
+        for(int i = 0; i < vectors.length; i++){
+            vectors[i] = new HeadingVector();
+        }
+        vectors[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR].calculateVector(FL_WHEEL_HEADING_OFFSET,deltaWheelPositions[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR]);
+        vectors[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR].calculateVector(FR_WHEEL_HEADING_OFFSET,deltaWheelPositions[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR]);
+        vectors[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR].calculateVector(BL_WHEEL_HEADING_OFFSET,deltaWheelPositions[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR]);
+        vectors[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR].calculateVector(BR_WHEEL_HEADING_OFFSET,deltaWheelPositions[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR]);
+        for (int i = 0; i < vectors.length; i++){
+            Log.d("Vector " + Integer.toString(i), "x: " + vectors[i].x() + ", y: " + vectors[i].y() + ", magnitude: " + vectors[i].getMagnitude());
+        }
+        return vectors;
+    }
+
 }

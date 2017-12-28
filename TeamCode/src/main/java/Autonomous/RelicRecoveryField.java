@@ -9,13 +9,6 @@ public class RelicRecoveryField {
     final static int BLUE_ALLIANCE_2 = 1;
     final static int RED_ALLIANCE_1 = 2;
     final static int RED_ALLIANCE_2 = 3;
-    public final int TICKS_PER_REV = 1120;
-    public final static int FL_MOTOR = 0;
-    public final static int FR_MOTOR = 1;
-    public final static int BR_MOTOR = 2;
-    public final static int BL_MOTOR = 3;
-    public final static int LIFT_MOTOR = 4;
-    public final static int GLYPH_MOTOR = 5;
 
     //cryptobox designations
     final static double CRYPTOBOX_WIDTH = 2;
@@ -31,6 +24,10 @@ public class RelicRecoveryField {
     public final static double ROW2 = 11.5;
     public final static double ROW3 = 17.75;
     public final static double ROW4 = 19.25;
+    public final static double RIGHT_COLUMN_DISTANCE_TO_STONE_INCHES = 2.2*12;
+    public final static double MIDDLE_COLUMN_DISTANCE_TO_STONE_INCHES = 2.9*12;
+    public final static double LEFT_COLUMN_DISTANCE_TO_STONE_INCHES = 3.4*12;
+    public final static long CRYPTOBOX_APPROACH_TIME_LIMIT = 1500;
 
     //balance stones
     final static double BALANCE_STONE_WIDTH = 2.0;

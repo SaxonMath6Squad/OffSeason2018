@@ -48,11 +48,31 @@ public class VectorTester extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
     HeadingVector v1;
     HeadingVector v2;
+    HeadingVector v3;
+    HeadingVector v4;
+    HeadingVector v5;
+    HeadingVector v6;
+    HeadingVector v7;
+    HeadingVector v8;
 
     @Override
     public void runOpMode() {
-        v1 = new HeadingVector(1, -5);
-        v2 = new HeadingVector(4, 0);
+        v1 = new HeadingVector(0, 5);
+        v2 = new HeadingVector(3.5355339059327378, 3.5355339059327378);
+        v3 = new HeadingVector(5, 0);
+        v4 = new HeadingVector(3.5355339059327378, -3.5355339059327378);
+        v5 = new HeadingVector(0, -5);
+        v6 = new HeadingVector(-3.5355339059327378, -3.5355339059327378);
+        v7 = new HeadingVector(-5, 0);
+        v8 = new HeadingVector(-3.5355339059327378, 3.5355339059327378);
+//        v1.calculateVector(0, 5);
+//        v2.calculateVector(45, 5);
+//        v3.calculateVector(90, 5);
+//        v4.calculateVector(135, 5);
+//        v5.calculateVector(180, 5);
+//        v6.calculateVector(225, 5);
+//        v7.calculateVector(270, 5);
+//        v8.calculateVector(315, 5);
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
@@ -67,12 +87,30 @@ public class VectorTester extends LinearOpMode {
         Log.d("V2 Heading", Double.toString(v2.getHeading()));
         Log.d("V2 x", Double.toString(v2.x()));
         Log.d("V2 y", Double.toString(v2.y()));
-        Log.d("V1 + V2", Double.toString(v1.addVector(v2).x()) + ", " + Double.toString(v1.addVector(v2).y()));
-        Log.d("V1 + V2 Heading", Double.toString(v1.addVector(v2).getHeading()));
-        Log.d("V1 + V2 Magnitude", Double.toString(v1.addVector(v2).getMagnitude()));
-        Log.d("V1 - V2", Double.toString(v1.subtractVector(v2).x()) + ", " + Double.toString(v1.subtractVector(v2).y()));
-        Log.d("V1 - V2 Heading", Double.toString(v1.subtractVector(v2).getHeading()));
-        Log.d("V1 - V2 Magnitude", Double.toString(v1.subtractVector(v2).getMagnitude()));
+        Log.d("V3 Magnitude", Double.toString(v3.getMagnitude()));
+        Log.d("V3 Heading", Double.toString(v3.getHeading()));
+        Log.d("V3 x", Double.toString(v3.x()));
+        Log.d("V3 y", Double.toString(v3.y()));
+        Log.d("V4 Magnitude", Double.toString(v4.getMagnitude()));
+        Log.d("V4 Heading", Double.toString(v4.getHeading()));
+        Log.d("V4 x", Double.toString(v4.x()));
+        Log.d("V4 y", Double.toString(v4.y()));
+        Log.d("V5 Magnitude", Double.toString(v5.getMagnitude()));
+        Log.d("V5 Heading", Double.toString(v5.getHeading()));
+        Log.d("V5 x", Double.toString(v5.x()));
+        Log.d("V5 y", Double.toString(v5.y()));
+        Log.d("V6 Magnitude", Double.toString(v6.getMagnitude()));
+        Log.d("V6 Heading", Double.toString(v6.getHeading()));
+        Log.d("V6 x", Double.toString(v6.x()));
+        Log.d("V6 y", Double.toString(v6.y()));
+        Log.d("V7 Magnitude", Double.toString(v7.getMagnitude()));
+        Log.d("V7 Heading", Double.toString(v7.getHeading()));
+        Log.d("V7 x", Double.toString(v7.x()));
+        Log.d("V7 y", Double.toString(v7.y()));
+        Log.d("V8 Magnitude", Double.toString(v8.getMagnitude()));
+        Log.d("V8 Heading", Double.toString(v8.getHeading()));
+        Log.d("V8 x", Double.toString(v8.x()));
+        Log.d("V8 y", Double.toString(v8.y()));
         // run until the end of the match (driver presses STOP)
     }
 }

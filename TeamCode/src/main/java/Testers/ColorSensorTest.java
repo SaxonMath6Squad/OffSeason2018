@@ -54,7 +54,7 @@ import Autonomous.ColorModeController;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list.
  */
 @TeleOp(name = "ColorModeController Sensor Test", group = "Sensor")
-@Disabled
+//@Disabled
 public class ColorSensorTest extends LinearOpMode {
 
     /**
@@ -137,8 +137,8 @@ public class ColorSensorTest extends LinearOpMode {
 //            telemetry.addData("Distance To ColorModeController: ", distanceToColor);
             detectedColor = colorSensor.getColor();
             telemetry.addData("Color: ", detectedColor.toString());
-            Log.d("Distance in mm", Double.toString(sensorDistance.getDistance(DistanceUnit.MM)));
-            telemetry.addData("Distance in mm", Double.toString(sensorDistance.getDistance(DistanceUnit.MM)));
+            Log.d("Distance in cm", Double.toString(sensorDistance.getDistance(DistanceUnit.CM)));
+            telemetry.addData("Distance in cm", Double.toString(sensorDistance.getDistance(DistanceUnit.CM)));
 
 
             // change the background color to match the color detected by the RGB sensor.

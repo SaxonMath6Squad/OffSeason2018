@@ -40,7 +40,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import DriveEngine.JennyNavigation;
 import SensorHandlers.JennySensorTelemetry;
-import Systems.JennyO1APickAndExtend;
+import Systems.JennyO1BPickAndExtend;
 
 import static Autonomous.RelicRecoveryField.GROUND;
 import static Autonomous.RelicRecoveryField.ROW1;
@@ -56,7 +56,7 @@ public class JennyO1B extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
     JennyNavigation navigation;
     JoystickHandler leftJoystick, rightJoystick;
-    JennyO1APickAndExtend glyphSystem;
+    JennyO1BPickAndExtend glyphSystem;
     JennySensorTelemetry sensorTelemetry;
     boolean autoLiftPositionMode = false;
     double[] liftPosition = {GROUND, ROW1, ROW2, ROW3, ROW4};
@@ -73,7 +73,7 @@ public class JennyO1B extends LinearOpMode {
 
         }
         try{
-            glyphSystem = new JennyO1APickAndExtend(hardwareMap);
+            glyphSystem = new JennyO1BPickAndExtend(hardwareMap);
 
         }
         catch(Exception e){

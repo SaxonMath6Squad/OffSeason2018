@@ -40,7 +40,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import DriveEngine.JennyNavigation;
-import Systems.JennyV2PickAndExtend;
+
 import Autonomous.LocationController;
 import Autonomous.Location;
 
