@@ -10,6 +10,9 @@ import MotorControllers.NewMotorController;
  * Created by robotics on 11/15/17.
  */
 
+/*
+    A class to control our glyph picker with two motors (one for each wheel)
+ */
 public class WheelPickerDoubleMotor implements ActionHandler {
     NewMotorController wheelMotors[] = new NewMotorController[2];
     private final int LEFT_MOTOR = 0,RIGHT_MOTOR = 1;

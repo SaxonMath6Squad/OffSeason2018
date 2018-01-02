@@ -31,10 +31,10 @@ public class JennyNavigation extends Thread{
     public static final int FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR = 1;
     public static final int BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR = 2;
     public static final int BACK_LEFT_HOLONOMIC_DRIVE_MOTOR = 3;
-    private volatile long threadDelayMillis = 50;
+    private volatile long threadDelayMillis = 10;
     public volatile double robotHeading = 0;
     private volatile double [] lastMotorPositionsInInches = {0,0,0,0};
-    private PIDController headingController, turnController;
+    private PIDController headingController, turnController, cameraPIDController;
 
 
     private volatile Location myLocation;
@@ -62,6 +62,9 @@ public class JennyNavigation extends Thread{
         myLocation = new Location(0,0);
         for(int i = 0; i < wheelVectors.length; i++){
             wheelVectors[i] = new HeadingVector();
+        }
+        for(int i = 0; i < lastMotorPositionsInInches.length; i ++){
+            lastMotorPositionsInInches[i] = driveMotors[i].getInchesFromStart();
         }
         robotMovementVector = new HeadingVector();
         new Thread(new Runnable() {
@@ -107,6 +110,7 @@ public class JennyNavigation extends Thread{
         Log.d("WHeel Heading", "" + headingOfRobot);
         Log.d("Orientation heading", "" + robotHeading);
         double magnitudeOfRobot = travelVector.getMagnitude();
+        Log.d("Magnitude","" + magnitudeOfRobot);
         double actualHeading = (headingOfRobot + robotHeading)%360;
 
         Log.d("Robot Heading", "" + actualHeading);
@@ -114,6 +118,7 @@ public class JennyNavigation extends Thread{
         double deltaX = robotMovementVector.x();
         double deltaY = robotMovementVector.y();
         myLocation.addXY(deltaX, deltaY);
+        Log.d("Location","X:" + myLocation.getX() + " Y:" + myLocation.getY());
 
     }
 
@@ -121,7 +126,7 @@ public class JennyNavigation extends Thread{
         updateHeading();
         wheelVectors = getWheelVectors();
         updateLocation();
-        updateLastMotorPositionsInInches();
+        //updateLastMotorPositionsInInches();
     }
 
     private void safetySleep(long time){
@@ -193,6 +198,8 @@ public class JennyNavigation extends Thread{
             headingController.setIMax(reader.getDouble("HEADING_Ki_MAX"));
             turnController = new PIDController(reader.getDouble("TURN_Kp"), reader.getDouble("TURN_Ki"), reader.getDouble("TURN_Kd"));
             turnController.setIMax(reader.getDouble("TURN_Ki_MAX"));
+            cameraPIDController = new PIDController(reader.getDouble("CAMERA_Kp"), reader.getDouble("CAMERA_Ki"), reader.getDouble("CAMERA_Kd"));
+            cameraPIDController.setI(reader.getDouble("CAMERA_Ki_MAX"));
             acceleration = reader.getDouble("ACCELERATION");
 
         } catch(Exception e){
@@ -338,7 +345,7 @@ public class JennyNavigation extends Thread{
             //mode.telemetry.addData("Avg Position", averagePosition);
             //mode.telemetry.update();
 
-            mode.sleep(50);
+            mode.sleep(10);
         }
         brake();
         for (int i = 0; i < driveMotors.length; i++) {
@@ -496,8 +503,11 @@ public class JennyNavigation extends Thread{
     public HeadingVector[] getWheelVectors(){
         double [] deltaWheelPositions = {0,0,0,0};
         for(int i = 0; i < driveMotors.length; i ++){
-            deltaWheelPositions[i] = driveMotors[i].getInchesFromStart() - lastMotorPositionsInInches[i];
+            double a = driveMotors[i].getInchesFromStart();
+            deltaWheelPositions[i] = a - lastMotorPositionsInInches[i];
+            lastMotorPositionsInInches[i] = a;
         }
+        //updateLastMotorPositionsInInches();
         HeadingVector [] vectors = new HeadingVector[4];
         for(int i = 0; i < vectors.length; i++){
             vectors[i] = new HeadingVector();
@@ -531,4 +541,32 @@ public class JennyNavigation extends Thread{
         return vectors;
     }
 
+    public void driveToCryptobox(double cryptoBoxCenterX, double imageCenterX, double desiredSpeed, long delayTimeMillis, LinearOpMode mode){
+        double velocities[] = new double[4];
+        double deltaSpeed;
+        double distanceFromCenter = imageCenterX - cryptoBoxCenterX;
+        for(int i = 0; i < velocities.length; i++){
+            velocities[i] = desiredSpeed;
+        }
+        cameraPIDController.setSp(0);
+        deltaSpeed = Math.abs(distanceFromCenter);
+        if(cryptoBoxCenterX > imageCenterX){
+            velocities[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR] += deltaSpeed;
+            velocities[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR] -= deltaSpeed;
+            velocities[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR] += deltaSpeed;
+            velocities[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR] -= deltaSpeed;
+        }
+        else {
+            velocities[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR] -= deltaSpeed;
+            velocities[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR] += deltaSpeed;
+            velocities[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR] -= deltaSpeed;
+            velocities[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR] += deltaSpeed;
+        }
+        applyMotorVelocities(velocities);
+        mode.sleep(delayTimeMillis);
+    }
+
+    public void driveToCryptobox(double cryptoBoxCenterX, double imageCenterX, double desiredSpeed, LinearOpMode mode){
+        driveToCryptobox(cryptoBoxCenterX, imageCenterX, desiredSpeed, 10, mode);
+    }
 }

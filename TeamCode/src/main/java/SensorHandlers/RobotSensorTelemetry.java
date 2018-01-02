@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
+import Autonomous.ColorModeController;
 import Autonomous.Location;
 
 /**
@@ -23,4 +24,5 @@ public interface RobotSensorTelemetry {
     public void resetTelemetryLogging();
     public double getDistance(DistanceUnit unit);
     public boolean isPressed(int sensor);
+    public ColorModeController.color getColor(int sensor);
 }

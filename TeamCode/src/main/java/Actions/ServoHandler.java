@@ -12,7 +12,9 @@ import com.vuforia.Marker;
  *
  */
 
-
+/*
+    A class to handle setting up servos and simple functions of servos for us
+ */
 
 public class ServoHandler {
     private Servo servo;

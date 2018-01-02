@@ -15,6 +15,9 @@ import static Autonomous.RelicRecoveryField.*;
  * Created by robotics on 12/2/17.
  */
 
+/*
+    A class to set up two motors to use our extendotron and belt for our glyph system
+ */
 public class ArialDepositor implements ActionHandler {
     SpoolMotor leftLiftMotor;
     SpoolMotor belt;
@@ -60,6 +63,10 @@ public class ArialDepositor implements ActionHandler {
         leftLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         leftLiftMotor.setPosition(positionInInches);
         leftLiftMotor.setPower(0.3);
+    }
+
+    public void setLiftPower(double power){
+        leftLiftMotor.setPower(power);
     }
 
     public void setLiftDirection(DcMotor.Direction dir){

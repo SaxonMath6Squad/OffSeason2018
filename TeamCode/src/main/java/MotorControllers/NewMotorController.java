@@ -166,7 +166,7 @@ public class NewMotorController extends Thread {
     public void setTicksPerSecondVelocity(long ticksPerSec){
         //check for flip in sign, if so, reset our pid controller
         //power is a function of ticksPerSec/maxAcheivable ticks per second
-        Log.d("MotorVel", "" + ticksPerSec + " T/s");
+        //Log.d("MotorVel", "" + ticksPerSec + " T/s");
         try {
             motor.setPower((double) ticksPerSec / motor.getMotorType().getAchieveableMaxTicksPerSecondRounded());
         } catch (Exception e){
@@ -174,7 +174,7 @@ public class NewMotorController extends Thread {
             shouldRun = false;
             throw e;
         }
-        Log.d("MotorPow", "" + getMotorPower() + " %");
+        //Log.d("MotorPow", "" + getMotorPower() + " %");
 
     }
 

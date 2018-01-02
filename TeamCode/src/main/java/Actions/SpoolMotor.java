@@ -11,12 +11,16 @@ import MotorControllers.NewMotorController;
  * Created by robotics on 11/7/17.
  */
 
+/*
+    A class to set up a motor that has a spool of string attached to it
+    ex: our extendotron lift motor
+ */
 public class SpoolMotor implements ActionHandler{
     NewMotorController motor;
     HardwareMap hardwareMap;
     private double extendSpeedInPerSecond = 0;
     private double retractSpeedInPerSecond = 0;
-    private double extendPower = 1;
+    private double extendPower = 0.5;
     private long startTickLocation = 0;
     private double maxExtendLoc;
 

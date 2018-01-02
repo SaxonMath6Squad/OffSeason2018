@@ -6,6 +6,9 @@ import com.qualcomm.robotcore.hardware.Servo;
  * Created by robotics on 11/7/17.
  */
 
+/*
+    A general class for anything that uses a combination of two servos to grab something
+ */
 public class ServoGrippers {
     Servo myServos[] = new Servo[2];
     public final int LEFT_SERVO = 0;

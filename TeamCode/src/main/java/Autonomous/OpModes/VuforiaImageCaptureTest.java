@@ -15,6 +15,9 @@ import Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor;
  * Created by root on 11/20/17.
  */
 
+/*
+    An opmode to test saving images using vuforia
+ */
 @Autonomous(name="Save Image Test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
 @Disabled
 public class VuforiaImageCaptureTest extends LinearOpMode{

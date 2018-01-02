@@ -10,6 +10,9 @@ import java.util.ArrayList;
  * Created by robotics on 12/12/17.
  */
 
+/*
+    A class to process images and mainly find the columns of the cryptobox
+ */
 public class CryptoBoxColumnImageProcessor {
     public int imageWidth;
     public int imageHeight;
@@ -137,6 +140,7 @@ public class CryptoBoxColumnImageProcessor {
         if(shouldModifyImage){
             showBluePixels(pixels,height,width, Color.GREEN);
             showColumnCenters(pixels,height,width,columnCenters,Color.RED);
+            bmp.setPixels(pixels,0,width,0,0,width,height);
         }
         return columnCenters;
     }

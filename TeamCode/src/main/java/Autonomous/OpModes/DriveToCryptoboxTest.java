@@ -32,36 +32,39 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package Autonomous.OpModes;
 
+import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import java.util.ArrayList;
+
+import Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor;
 import DriveEngine.JennyNavigation;
+import Autonomous.VuforiaHelper;
 
-import Autonomous.LocationController;
-import Autonomous.Location;
-
-@Autonomous(name="Drive to location test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
+/*
+    An opmode to test driving from the glyph pit to the cryptobox maintaining the center of the cryptobox to the center of the robot as much as possible
+ */
+@Autonomous(name="Drive to cryptobox test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
 //@Disabled
-public class DriveToLocationTest extends LinearOpMode {
+public class DriveToCryptoboxTest extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
-//    JennyNavigation navigation;
-//    JennyV2PickAndExtend glyphSystem;
-    LocationController location;
-    Location startLocation = new Location(0, 0);
-    Location targetLocation = new Location(4, 3);
+    JennyNavigation navigation;
+    VuforiaHelper vuforia;
+    CryptoBoxColumnImageProcessor cryptoboxFinder;
     //ImuHandler imuHandler;
     @Override
     public void runOpMode() {
         //imuHandler = new ImuHandler("imu", hardwareMap);
         try {
-//            navigation = new JennyNavigation(hardwareMap,"RobotConfig/JennyV2.json");
-//            glyphSystem = new JennyV2PickAndExtend(hardwareMap);
+            navigation = new JennyNavigation(hardwareMap,"RobotConfig/JennyV2.json");
+            vuforia = new VuforiaHelper();
+            cryptoboxFinder = new CryptoBoxColumnImageProcessor(80, 100, .1, 1);
         }
         catch (Exception e){
             Log.e("Error!" , "Jenny Navigation: " + e.toString());
@@ -74,9 +77,13 @@ public class DriveToLocationTest extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
-        JennyNavigation.driveToLocation(startLocation, targetLocation, 10, this);
+        Bitmap image = null;
+        image = vuforia.getImage(171, 244);
+        ArrayList<Integer> centers;
+        centers = cryptoboxFinder.findColumnCenters(image, false);
+        navigation.driveToCryptobox(centers.get(1), cryptoboxFinder.imageWidth/2, 20, this);
 
-//        navigation.stopNavigation();
+        navigation.stopNavigation();
 //        glyphSystem.stopNavigation();
     }
 }
