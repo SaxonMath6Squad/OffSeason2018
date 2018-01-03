@@ -43,11 +43,13 @@ import SensorHandlers.JennySensorTelemetry;
 import Systems.JennyO1BPickAndExtend;
 import Systems.JennyO1BRAD;
 
+import static Autonomous.RelicRecoveryField.BLUE_ALLIANCE_2;
 import static Autonomous.RelicRecoveryField.GROUND;
 import static Autonomous.RelicRecoveryField.ROW1;
 import static Autonomous.RelicRecoveryField.ROW2;
 import static Autonomous.RelicRecoveryField.ROW3;
 import static Autonomous.RelicRecoveryField.ROW4;
+import static Autonomous.RelicRecoveryField.startLocations;
 
 /*
     An opmode for the User Controlled portion of the game
@@ -70,7 +72,7 @@ public class JennyO1B extends LinearOpMode {
     @Override
     public void runOpMode() {
         try {
-            navigation = new JennyNavigation(hardwareMap,"RobotConfig/JennyV2.json");
+            navigation = new JennyNavigation(hardwareMap, startLocations[BLUE_ALLIANCE_2], 0, "RobotConfig/JennyV2.json");
         }
         catch (Exception e){
             Log.e("Error!" , "Jenny Navigation: " + e.toString());

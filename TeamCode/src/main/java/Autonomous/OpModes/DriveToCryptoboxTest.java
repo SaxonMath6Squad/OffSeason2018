@@ -36,6 +36,7 @@ import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -45,11 +46,14 @@ import Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor;
 import DriveEngine.JennyNavigation;
 import Autonomous.VuforiaHelper;
 
+import static Autonomous.RelicRecoveryField.BLUE_ALLIANCE_2;
+import static Autonomous.RelicRecoveryField.startLocations;
+
 /*
     An opmode to test driving from the glyph pit to the cryptobox maintaining the center of the cryptobox to the center of the robot as much as possible
  */
 @Autonomous(name="Drive to cryptobox test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
-//@Disabled
+@Disabled
 public class DriveToCryptoboxTest extends LinearOpMode {
 
     /* Declare OpMode members. */
@@ -62,7 +66,7 @@ public class DriveToCryptoboxTest extends LinearOpMode {
     public void runOpMode() {
         //imuHandler = new ImuHandler("imu", hardwareMap);
         try {
-            navigation = new JennyNavigation(hardwareMap,"RobotConfig/JennyV2.json");
+            navigation = new JennyNavigation(hardwareMap, startLocations[BLUE_ALLIANCE_2], 0, "RobotConfig/JennyV2.json");
             vuforia = new VuforiaHelper();
             cryptoboxFinder = new CryptoBoxColumnImageProcessor(80, 100, .1, 1);
         }

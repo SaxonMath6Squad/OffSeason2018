@@ -41,6 +41,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import Autonomous.HeadingVector;
 import DriveEngine.JennyNavigation;
 
+import static Autonomous.RelicRecoveryField.BLUE_ALLIANCE_2;
+import static Autonomous.RelicRecoveryField.startLocations;
 import static DriveEngine.JennyNavigation.BACK_LEFT_HOLONOMIC_DRIVE_MOTOR;
 import static DriveEngine.JennyNavigation.BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR;
 import static DriveEngine.JennyNavigation.FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR;
@@ -62,7 +64,7 @@ public class WheelVectorTest extends LinearOpMode {
     public void runOpMode() {
         //imuHandler = new ImuHandler("imu", hardwareMap);
         try {
-            navigation = new JennyNavigation(hardwareMap,"RobotConfig/JennyV2.json");
+            navigation = new JennyNavigation(hardwareMap, startLocations[BLUE_ALLIANCE_2], 0, "RobotConfig/JennyV2.json");
         }
         catch (Exception e){
             Log.e("Error!" , "Jenny Navigation: " + e.toString());

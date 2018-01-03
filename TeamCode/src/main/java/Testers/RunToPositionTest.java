@@ -43,6 +43,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import DriveEngine.JennyNavigation;
 import SensorHandlers.JennySensorTelemetry;
 
+import static Autonomous.RelicRecoveryField.BLUE_ALLIANCE_2;
+import static Autonomous.RelicRecoveryField.startLocations;
+
 /*
     An opmode to test controlling the distance a motor moves
  */
@@ -58,7 +61,7 @@ public class RunToPositionTest extends LinearOpMode {
     public void runOpMode() {
         double [] drivePowers = {0,0,0,0};
         try {
-            navigation = new JennyNavigation(hardwareMap,"RobotConfig/JennyV2.json");
+            navigation = new JennyNavigation(hardwareMap, startLocations[BLUE_ALLIANCE_2], 0, "RobotConfig/JennyV2.json");
             sensorTelemetry = new JennySensorTelemetry(hardwareMap, 0,0);
         }
         catch (Exception e){

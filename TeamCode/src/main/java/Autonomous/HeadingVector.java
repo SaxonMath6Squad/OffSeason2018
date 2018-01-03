@@ -22,7 +22,7 @@ public class HeadingVector {
     }
 
     public void calculateVector(double headingInDegrees, double magnitude){
-        magnitude = Math.abs(magnitude);
+//        magnitude = Math.abs(magnitude);
         double degree = headingInDegrees;
         degree += 90;
         degree = 180 - degree;

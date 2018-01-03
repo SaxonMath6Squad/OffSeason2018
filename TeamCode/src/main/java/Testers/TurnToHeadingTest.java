@@ -41,6 +41,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import DriveEngine.JennyNavigation;
 
+import static Autonomous.RelicRecoveryField.BLUE_ALLIANCE_2;
+import static Autonomous.RelicRecoveryField.startLocations;
+
 /*
     An opmode to test our turnToHeading function
  */
@@ -56,7 +59,7 @@ public class TurnToHeadingTest extends LinearOpMode {
     public void runOpMode() {
         //imuHandler = new ImuHandler("imu", hardwareMap);
         try {
-            navigation = new JennyNavigation(hardwareMap,"RobotConfig/JennyV2.json");
+            navigation = new JennyNavigation(hardwareMap, startLocations[BLUE_ALLIANCE_2], 0, "RobotConfig/JennyV2.json");
         }
         catch (Exception e){
             Log.e("Error!" , "Jenny Navigation: " + e.toString());

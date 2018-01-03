@@ -30,55 +30,77 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
 TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package Autonomous.OpModes;
+package UserControlled;
 
 import android.util.Log;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import Autonomous.Location;
-import Autonomous.LocationController;
 import DriveEngine.JennyNavigation;
+import SensorHandlers.JennySensorTelemetry;
+import Systems.JennyO1BPickAndExtend;
+import Systems.JennyO1BRAD;
 
 import static Autonomous.RelicRecoveryField.BLUE_ALLIANCE_2;
+import static Autonomous.RelicRecoveryField.GROUND;
+import static Autonomous.RelicRecoveryField.ROW1;
+import static Autonomous.RelicRecoveryField.ROW2;
+import static Autonomous.RelicRecoveryField.ROW3;
+import static Autonomous.RelicRecoveryField.ROW4;
 import static Autonomous.RelicRecoveryField.startLocations;
-import static DriveEngine.JennyNavigation.NORTH;
 
 /*
-    An opmode to test the location the robot has traveled to
+    An opmode for the User Controlled portion of the game
  */
-@Autonomous(name="Location test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
-@Disabled
-public class JennyLocationCalculationTest extends LinearOpMode {
+@TeleOp(name="Test bot drive", group="Linear Opmode")  // @Autonomous(...) is the other common choice
+//@Disabled
+public class TestBotDrive extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
     JennyNavigation navigation;
+    JoystickHandler leftJoystick, rightJoystick;
 
     @Override
     public void runOpMode() {
-        //imuHandler = new ImuHandler("imu", hardwareMap);
         try {
             navigation = new JennyNavigation(hardwareMap, startLocations[BLUE_ALLIANCE_2], 0, "RobotConfig/JennyV2.json");
         }
-        catch (Exception e){
-            Log.e("Error!" , "Jenny Navigation: " + e.toString());
+        catch (Exception e) {
+            Log.e("Error!", "Jenny Navigation: " + e.toString());
             throw new RuntimeException("Navigation Creation Error! " + e.toString());
         }
+        leftJoystick = new JoystickHandler(gamepad1,JoystickHandler.LEFT_JOYSTICK);
+        rightJoystick = new JoystickHandler(gamepad1,JoystickHandler.RIGHT_JOYSTICK);
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
+        boolean isSlowMode = false;
 
-        navigation.driveDistance(12, NORTH, 5, this);
-
+        // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            telemetry.addData("Location", "x: " + navigation.getRobotLocation().getX() + ", y: " + navigation.getRobotLocation().getY());
+            //DRIVE
+
+            if(rightJoystick.magnitude() < .1){
+                if(!isSlowMode)
+                navigation.driveOnHeading(leftJoystick.angle(), leftJoystick.magnitude() * 50);
+                else navigation.driveOnHeading(leftJoystick.angle(), leftJoystick.magnitude() * 10);
+            }
+            else {
+                if(!isSlowMode) navigation.turn(rightJoystick.magnitude() * rightJoystick.x()/Math.abs(rightJoystick.x()));
+                else navigation.turn(.1 * rightJoystick.magnitude() * rightJoystick.x()/Math.abs(rightJoystick.x()));
+            }
+            if(gamepad1.start){
+                isSlowMode = !isSlowMode;
+                while(gamepad1.start);
+            }
+
+            telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.update();
         }
         navigation.stopNavigation();

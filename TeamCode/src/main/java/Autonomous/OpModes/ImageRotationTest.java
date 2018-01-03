@@ -3,6 +3,7 @@ package Autonomous.OpModes;
 import android.graphics.Bitmap;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import java.util.ArrayList;
@@ -25,7 +26,7 @@ import static DriveEngine.JennyNavigation.WEST;
     An opmode to test how the camera takes images based on the rotation of the phone
  */
 @Autonomous(name = "Image rotation test", group = "visual autonomous")
-//@Disabled
+@Disabled
 public class ImageRotationTest extends LinearOpMode{
 
     CryptoBoxColumnImageProcessor cryptoBoxFinder;

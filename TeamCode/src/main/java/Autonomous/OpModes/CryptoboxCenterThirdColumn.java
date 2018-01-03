@@ -39,7 +39,7 @@ public class CryptoboxCenterThirdColumn extends LinearOpMode{
     @Override
     public void runOpMode() throws InterruptedException {
         try{
-            nav = new JennyNavigation(hardwareMap, "RobotConfig/JennyV2.json");
+            nav = new JennyNavigation(hardwareMap, startLocations[BLUE_ALLIANCE_2], 0, "RobotConfig/JennyV2.json");
             vuforia = new VuforiaHelper();
             cryptoBoxFinder = new CryptoBoxColumnImageProcessor(80,100,.1,1);
             sensorTelemetry = new JennySensorTelemetry(hardwareMap, 0, 0);

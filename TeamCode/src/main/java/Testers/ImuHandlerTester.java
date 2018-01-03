@@ -50,7 +50,7 @@ public class ImuHandlerTester extends LinearOpMode {
     ImuHandler imu;
     @Override
     public void runOpMode() {
-        imu = new ImuHandler("imu", hardwareMap);
+        imu = new ImuHandler("imu", 0, hardwareMap);
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         // Wait for the game to start (driver presses PLAY)

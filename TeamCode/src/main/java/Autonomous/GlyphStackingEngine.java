@@ -13,23 +13,22 @@ package Autonomous;
     A class to decide how to put the cryptobox together based off of patterns and glyphs currently in the robot
  */
 public class GlyphStackingEngine {
-//    public enum spotStatus {NONE, BROWN, GREY};
+    public enum Glyph {NONE, BROWN, GREY};
 //    public spotStatus cryptoBox[3][4];
 //
-//
-//    public GlyphStackingEngine(){
-//        for(int i = 0; i < cryptoBox.size(); i ++){
-//            for(int j = 0; j < cryptoBox[0].size(); j ++){
-//                cryptoBox[i][j] = spotStatus.NONE;
-//            }
-//        }
-//    }
 //
 //    //return the location (index to the 3 x 4 cryptobox) of where to stack. return a negative value if we should not stack this
 //    public Location getLocToStore(GlyphColor color){
 //
 //    }
-    
-    
-    
+
+    public final Glyph[][] SNAKE_ONE = {{Glyph.BROWN, Glyph.GREY, Glyph.GREY},
+            {Glyph.BROWN, Glyph.BROWN, Glyph.GREY},
+            {Glyph.GREY, Glyph.BROWN, Glyph.BROWN},
+            {Glyph.GREY, Glyph.GREY, Glyph.BROWN}};
+
+    public final Glyph[][] SNAKE_TWO = {{Glyph.GREY, Glyph.BROWN, Glyph.BROWN},
+            {Glyph.GREY, Glyph.GREY, Glyph.BROWN},
+            {Glyph.BROWN, Glyph.GREY, Glyph.BROWN},
+            {Glyph.BROWN, Glyph.BROWN, Glyph.GREY}};
 }

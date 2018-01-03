@@ -38,8 +38,8 @@ public class JennySensorTelemetry implements RobotSensorTelemetry {
     private HardwareMap hardwareMap;
     private int tickLocationX = 0;
     private int tickLocationY = 0;
-    private int startPositionX = 0;
-    private int startPositionY = 0;
+    private double startPositionX = 0;
+    private double startPositionY = 0;
     private double wheelDiameter;
     private double ticksPerRev;
     private double ftToTicksFactor = 12;
@@ -48,7 +48,10 @@ public class JennySensorTelemetry implements RobotSensorTelemetry {
     public static final int JEWEL_SENSOR = 1;
     public static final double JEWEL_JOUST_ACTIVE_POSITION = 0/180;
     public static final double JEWEL_JOUST_STORE_POSITION = 70/180;
-    public JennySensorTelemetry(HardwareMap h, int positionX, int positionY){
+    public static final double START_LOCATION_X = 0;
+    public static final double START_LOCATION_Y = 0;
+    public static final int NO_DETECTABLE_WALL_DISTANCE = -1;
+    public JennySensorTelemetry(HardwareMap h, double positionX, double positionY){
         hardwareMap = h;
 //        robot = new JennyWithExtendotronHardware(hardwareMap);
         startPositionX = positionX;
@@ -126,7 +129,7 @@ public class JennySensorTelemetry implements RobotSensorTelemetry {
 
     @Override
     public double getDistance(DistanceUnit unit){
-        double distance = -1;
+        double distance = NO_DETECTABLE_WALL_DISTANCE;
         double curDist = distanceSensor.getDistance(unit);
         if(curDist > 0 && curDist < 40 && !Double.isNaN(curDist)){
             distance = curDist;

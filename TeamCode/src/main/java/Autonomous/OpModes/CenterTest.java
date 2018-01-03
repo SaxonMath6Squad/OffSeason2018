@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -16,8 +17,10 @@ import DriveEngine.JennyNavigation;
 import SensorHandlers.JennySensorTelemetry;
 import Systems.JennyO1BPickAndExtend;
 
+import static Autonomous.RelicRecoveryField.BLUE_ALLIANCE_2;
 import static Autonomous.RelicRecoveryField.CRYPTOBOX_APPROACH_TIME_LIMIT;
 import static Autonomous.RelicRecoveryField.RIGHT_COLUMN_DISTANCE_TO_STONE_INCHES;
+import static Autonomous.RelicRecoveryField.startLocations;
 import static DriveEngine.JennyNavigation.EAST;
 import static DriveEngine.JennyNavigation.NORTH;
 import static DriveEngine.JennyNavigation.SOUTH;
@@ -31,7 +34,7 @@ import static DriveEngine.JennyNavigation.WEST;
     An opmode to test centering the robot on a cryptobox with the camera
  */
 @Autonomous(name = "Center Test", group = "visual autonomous")
-//@Disabled
+@Disabled
 public class CenterTest extends LinearOpMode{
 
     JennyNavigation nav;
@@ -43,7 +46,7 @@ public class CenterTest extends LinearOpMode{
     @Override
     public void runOpMode() throws InterruptedException {
         try{
-            nav = new JennyNavigation(hardwareMap, "RobotConfig/JennyV2.json");
+            nav = new JennyNavigation(hardwareMap, startLocations[BLUE_ALLIANCE_2], 0, "RobotConfig/JennyV2.json");
             vuforia = new VuforiaHelper();
             cryptoBoxFinder = new CryptoBoxColumnImageProcessor(80,100,.1,1);
             sensorTelemetry = new JennySensorTelemetry(hardwareMap, 0, 0);

@@ -41,6 +41,21 @@ public class RelicRecoveryField {
         return new Location(x, y);
     }
 
+    public Location determinePitLocation(int team){
+        switch (team){
+            case RED_ALLIANCE_1:
+                return new Location(60, 60);
+            case RED_ALLIANCE_2:
+                return new Location(60, 108);
+            case BLUE_ALLIANCE_1:
+                return new Location(84, 60);
+            case BLUE_ALLIANCE_2:
+                return new Location(84, 108);
+            default:
+                return PIT_CENTER;
+        }
+    }
+
     /*
         start at balancing beam
         figure out which column we want to go by determining its position
@@ -49,14 +64,16 @@ public class RelicRecoveryField {
 
      */
 
-    final static Location[] cryptoBoxCenters = {new Location(0,3), new Location(7, 0), new Location(0, 9), new Location(7, 12)}; //reference the centers of the cryptoboxes
+    final static Location[] cryptoBoxCenters = {new Location(108,20), new Location(120, 84), new Location(36, 20), new Location(24, 84)}; //reference the centers of the cryptoboxes
     public final static double GROUND = 0;
     public final static double ROW1 = 6;
     public final static double ROW2 = 11.5;
     public final static double ROW3 = 17.75;
     public final static double ROW4 = 19.25;
-
-
+    public final static double DIST_FROM_CRYPTOBOX_2_TO_PIT_INCHES = 48;
+    public final static double BLUE_CRYPTOBOX_2_TO_PIT_ANGLE = 20;
+    public final static double PIT_TO_BLUE_CRYPTOBOX_2_ANGLE = 200;
+    public static final Location PIT_CENTER = new Location(72, 84);
 
 
     public final static double RIGHT_COLUMN_DISTANCE_TO_STONE_INCHES = 2.2*12;
@@ -66,7 +83,7 @@ public class RelicRecoveryField {
 
     //balance stones
     final static double BALANCE_STONE_WIDTH = 2.0;
-    final static Location[] startLocations = {new Location(4,2), new Location(10, 2), new Location(4, 10), new Location(10, 10)};
+    public final static Location[] startLocations = {new Location(120,48), new Location(120, 120), new Location(24, 48), new Location(24, 120)};
 
 
     //relics

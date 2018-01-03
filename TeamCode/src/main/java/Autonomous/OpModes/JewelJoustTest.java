@@ -47,6 +47,8 @@ import SensorHandlers.JennySensorTelemetry;
 import Systems.JennyO1BPickAndExtend;
 
 import static Autonomous.ColorModeController.color.BLUE;
+import static Autonomous.RelicRecoveryField.BLUE_ALLIANCE_2;
+import static Autonomous.RelicRecoveryField.startLocations;
 import static DriveEngine.JennyNavigation.EAST;
 import static SensorHandlers.JennySensorTelemetry.JEWEL_JOUST_ACTIVE_POSITION;
 import static SensorHandlers.JennySensorTelemetry.JEWEL_SENSOR;
@@ -55,7 +57,7 @@ import static SensorHandlers.JennySensorTelemetry.JEWEL_SENSOR;
     An opmode to test knocking off the correct jewel
  */
 @Autonomous(name="Jewel Joust Test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
-//@Disabled
+@Disabled
 public class JewelJoustTest extends LinearOpMode {
 
     /* Declare OpMode members. */
@@ -68,7 +70,7 @@ public class JewelJoustTest extends LinearOpMode {
     public void runOpMode() {
         //imuHandler = new ImuHandler("imu", hardwareMap);
         try {
-            navigation = new JennyNavigation(hardwareMap,"RobotConfig/JennyV2.json");
+            navigation = new JennyNavigation(hardwareMap, startLocations[BLUE_ALLIANCE_2], 0, "RobotConfig/JennyV2.json");
             glyphSystem = new JennyO1BPickAndExtend(hardwareMap);
             sensorTelemetry = new JennySensorTelemetry(hardwareMap, 0, 0);
         }

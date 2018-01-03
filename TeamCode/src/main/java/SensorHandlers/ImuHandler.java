@@ -33,12 +33,14 @@ public class ImuHandler extends Thread{
     private Velocity velocities;
     private Orientation angles;
     private volatile boolean shouldRun;
+    private double orientationOffset;
     private HardwareMap map;
 
-    public ImuHandler(String name, HardwareMap h){
+    public ImuHandler(String name, double robotOrientationOffset, HardwareMap h){
 
         initIMU(name, h);
         shouldRun = true;
+        orientationOffset = robotOrientationOffset;
         new Thread(new Runnable(){
             public void run(){
                 while(shouldRun) {
@@ -111,6 +113,8 @@ public class ImuHandler extends Thread{
         double angle = 360 - angles.firstAngle;
         if(angle < 0) angle += 360;
         else if(angle >= 360) angle -= 360;
+        angle += orientationOffset;
+        angle %= 360;
         return angle;
     }
 
