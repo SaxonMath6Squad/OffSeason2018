@@ -46,6 +46,9 @@ import static DriveEngine.JennyNavigation.BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR;
 import static DriveEngine.JennyNavigation.FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR;
 import static DriveEngine.JennyNavigation.FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR;
 
+/*
+    An opmode to test our getWheelVectors function
+ */
 @TeleOp(name="Wheel vector test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
 //@Disabled
 public class WheelVectorTest extends LinearOpMode {

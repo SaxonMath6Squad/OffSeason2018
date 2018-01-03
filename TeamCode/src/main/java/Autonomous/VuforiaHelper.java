@@ -21,6 +21,9 @@ import java.io.IOException;
  * Created by robotics on 12/12/17.
  */
 
+/*
+    A class to help us use vuforia more easily
+ */
 public class VuforiaHelper {
 
     VuforiaLocalizer vuLoc;

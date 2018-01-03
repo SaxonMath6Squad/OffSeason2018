@@ -53,8 +53,12 @@ import Autonomous.ColorModeController;
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list.
  */
+
+/*
+    An opmode to test the REV color distance sensor with our ColorModeSensor class colors
+ */
 @TeleOp(name = "ColorModeController Sensor Test", group = "Sensor")
-//@Disabled
+@Disabled
 public class ColorSensorTest extends LinearOpMode {
 
     /**

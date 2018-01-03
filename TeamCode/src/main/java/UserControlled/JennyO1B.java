@@ -49,6 +49,9 @@ import static Autonomous.RelicRecoveryField.ROW2;
 import static Autonomous.RelicRecoveryField.ROW3;
 import static Autonomous.RelicRecoveryField.ROW4;
 
+/*
+    An opmode for the User Controlled portion of the game
+ */
 @TeleOp(name="Jenny O1B User Controlled", group="Linear Opmode")  // @Autonomous(...) is the other common choice
 //@Disabled
 public class JennyO1B extends LinearOpMode {

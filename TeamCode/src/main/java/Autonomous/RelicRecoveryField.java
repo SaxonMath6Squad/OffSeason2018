@@ -4,6 +4,9 @@ package Autonomous;
  * Created by Jeremy on 12/18/2017.
  */
 
+/*
+    A class to store field constants and general autonomous functions
+ */
 public class RelicRecoveryField {
     public final static int BLUE_ALLIANCE_1 = 0;
     public final static int BLUE_ALLIANCE_2 = 1;

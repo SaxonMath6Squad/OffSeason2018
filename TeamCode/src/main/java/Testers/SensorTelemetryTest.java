@@ -45,6 +45,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import Autonomous.ColorModeController;
 import SensorHandlers.JennySensorTelemetry;
 
+/*
+    An opmode to test our SensorTelemetry class
+ */
 @TeleOp(name = "Sensor Telemetry Test", group = "Sensor")
 @Disabled
 public class SensorTelemetryTest extends LinearOpMode {

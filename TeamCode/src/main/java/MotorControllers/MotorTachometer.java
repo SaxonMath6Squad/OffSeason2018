@@ -10,6 +10,9 @@ import MotorControllers.FiFoBuffer;
  * Created by robotics on 8/4/17.
  */
 
+/*
+    A class that helps us keep up with the speed of the robot/wheels
+ */
 public class MotorTachometer {
     //private HWMapBetty robot = new HWMapBetty();
     private double averageRPS = 0;

@@ -14,6 +14,9 @@ import java.io.InputStream;
  * Created by root on 11/11/17.
  */
 
+/*
+    A class to more easily and reliably control our DC motors
+ */
 public class NewMotorController extends Thread {
     //config file values
     private long maxTicksPerSecond = 0;

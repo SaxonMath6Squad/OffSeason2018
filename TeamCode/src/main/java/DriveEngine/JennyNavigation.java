@@ -21,6 +21,9 @@ import SensorHandlers.ImuHandler;
  * Created by Jeremy on 8/23/2017.
  */
 
+/*
+    The base class for every opmode --- it sets up our drive system and contains all it's funcitons
+ */
 public class JennyNavigation extends Thread{
     public static final int NORTH = 0;
     public static final int SOUTH = 180;

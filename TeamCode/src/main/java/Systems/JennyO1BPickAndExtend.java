@@ -14,6 +14,9 @@ import Actions.WheelPickerSingleMotor;
  * Created by Jeremy on 8/23/2017.
  */
 
+/*
+    A class to handle our extendotron and glyph picker wheels
+ */
 public class JennyO1BPickAndExtend {
     ArialDepositor glyphPlacement;
     WheelPickerSingleMotor glyphGrabber;

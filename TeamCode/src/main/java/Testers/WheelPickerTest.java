@@ -41,6 +41,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import Actions.WheelPickerDoubleMotor;
 
+/*
+    An opmode to test our two motor glyph picker system
+ */
 @TeleOp(name="Wheel Picker Test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
 @Disabled
 public class WheelPickerTest extends LinearOpMode {

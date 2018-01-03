@@ -41,6 +41,9 @@ import MotorControllers.*;
 
 import MotorControllers.MotorTachometer;
 
+/*
+    An opmode to test our MotorTachometer class
+ */
 @TeleOp(name="TachometerTester", group="Linear Opmode")  // @Autonomous(...) is the other common choice
 @Disabled
 public class MotorTachometerTester extends LinearOpMode {

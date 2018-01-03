@@ -7,6 +7,9 @@ import com.qualcomm.robotcore.hardware.Gamepad;
  * For more intuitive joystick variable access
  */
 
+/*
+    A class to help us set up the controllers for easy usage
+ */
 public class JoystickHandler {
     public static final int LEFT_JOYSTICK = 0;
     public static final int RIGHT_JOYSTICK = 1;

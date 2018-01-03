@@ -41,6 +41,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import DriveEngine.JennyNavigation;
 
+/*
+    An opmode to test our turnToHeading function
+ */
 @TeleOp(name="Turn test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
 @Disabled
 public class TurnToHeadingTest extends LinearOpMode {

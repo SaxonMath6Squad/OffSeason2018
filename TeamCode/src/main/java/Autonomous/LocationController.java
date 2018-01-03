@@ -11,6 +11,9 @@ import static Autonomous.RelicRecoveryField.*;
  * Created by robotics on 12/21/17.
  */
 
+/*
+    A class to control robot location more easily
+ */
 public class LocationController implements GeoLocator{
     Location currentLocation;
     Location baseLocation;

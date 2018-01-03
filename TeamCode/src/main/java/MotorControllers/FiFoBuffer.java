@@ -7,12 +7,11 @@ import java.util.ArrayList;
 /**
  * Created by robotics on 8/17/17.
  */
-        //Jeremy is fourByFour
-            //fourByFour is Jeremy
-    //Jeremy is the enlightened dumpster
-    //int = fourByFour
-    // if
 
+/*
+    ~~~
+ */
+//TODO: ask what this does
 public class FiFoBuffer {
     private ArrayList buffer;
     private int length = 0;

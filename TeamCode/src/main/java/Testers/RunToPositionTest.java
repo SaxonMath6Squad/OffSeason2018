@@ -43,6 +43,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import DriveEngine.JennyNavigation;
 import SensorHandlers.JennySensorTelemetry;
 
+/*
+    An opmode to test controlling the distance a motor moves
+ */
 @TeleOp(name="Run To Position Test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
 @Disabled
 public class RunToPositionTest extends LinearOpMode {

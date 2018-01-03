@@ -38,6 +38,9 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+/*
+    An opmode to test how we can control two servos to make grippers
+ */
 @TeleOp(name="Grabber Test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
 @Disabled
 public class ServoGrabberTest extends LinearOpMode {

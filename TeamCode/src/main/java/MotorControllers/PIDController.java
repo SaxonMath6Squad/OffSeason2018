@@ -4,6 +4,9 @@ package MotorControllers;
  * Created by Jordan on 8/5/2017.
  */
 
+/*
+    A general PID controller class for anything that will use PID
+ */
 public class PIDController {
     private volatile double Kp = 0;
     private volatile double Ki = 0;

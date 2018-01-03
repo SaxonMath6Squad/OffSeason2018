@@ -4,6 +4,9 @@ package Autonomous;
  * Created by root on 8/22/17.
  */
 
+/*
+    A class for a location object
+ */
 public class Location {
     double x;
     double y;

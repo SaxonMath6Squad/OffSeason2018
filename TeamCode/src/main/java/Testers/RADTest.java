@@ -42,6 +42,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import Actions.WheelPickerDoubleMotor;
 import Systems.JennyO1BRAD;
 
+/*
+    An opmode to test our RAD
+ */
 @TeleOp(name="RAD test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
 //@Disabled
 public class RADTest extends LinearOpMode {

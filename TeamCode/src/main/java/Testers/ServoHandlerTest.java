@@ -40,6 +40,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import Actions.ServoHandler;
 
+/*
+    An opmode to test our ServoHandler class
+ */
 @TeleOp(name="Servo Handler Test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
 @Disabled
 public class ServoHandlerTest extends LinearOpMode {

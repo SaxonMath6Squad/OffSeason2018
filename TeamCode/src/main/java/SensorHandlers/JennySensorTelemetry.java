@@ -20,6 +20,9 @@ import Autonomous.Location;
  * Created by Jeremy on 8/26/2017.
  */
 
+/*
+    A class to handle all of our sensors
+ */
 public class JennySensorTelemetry implements RobotSensorTelemetry {
 //    private JennyWithExtendotronHardware robot;
     private JsonConfigReader reader;

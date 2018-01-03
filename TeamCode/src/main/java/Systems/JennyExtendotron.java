@@ -14,6 +14,9 @@ import MotorControllers.NewMotorController;
  * Created by Jeremy on 8/23/2017.
  */
 
+/*
+    A class to handle our extendotron and grippers for glyphs
+ */
 public class JennyExtendotron {
     double minAngles[];
     double maxAngles[];

@@ -40,6 +40,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import DriveEngine.JennyNavigation;
 
+/*
+    An opmode to test if all our drive wheels are working correctly
+ */
 @TeleOp(name="Jenny Drive Wiring Test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
 //@Disabled
 public class JennyDriveMotorWiringTest extends LinearOpMode {

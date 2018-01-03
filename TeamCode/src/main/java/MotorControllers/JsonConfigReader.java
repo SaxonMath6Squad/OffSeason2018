@@ -12,6 +12,9 @@ import java.io.InputStream;
  * Created by Jeremy on 8/7/2017.
  */
 
+/*
+    A class to help us more easily use .json files with java
+ */
 public class JsonConfigReader {
     private JsonParser parser;
     private JSONObject jsonObject;

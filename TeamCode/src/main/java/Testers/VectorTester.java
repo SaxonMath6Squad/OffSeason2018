@@ -40,6 +40,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import Autonomous.HeadingVector;
 
+/*
+    An opmode to test our HeadingVector class
+ */
 @TeleOp(name="HeadingVector test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
 //@Disabled
 public class VectorTester extends LinearOpMode {

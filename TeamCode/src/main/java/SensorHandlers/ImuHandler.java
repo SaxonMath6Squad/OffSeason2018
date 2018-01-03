@@ -23,6 +23,9 @@ import java.io.IOException;
  * Created by root on 8/18/17.
  */
 
+/*
+    A class to handle the IMU for us - it sets up the gyroscope in the REV modules for us
+ */
 public class ImuHandler extends Thread{
     private long updateDelay = 200;
     private long lastUpdateStart;

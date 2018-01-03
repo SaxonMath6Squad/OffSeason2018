@@ -12,6 +12,9 @@ import Autonomous.Location;
  * Created by Jeremy on 8/26/2017.
  */
 
+/*
+    An interface for our sensor class as this can be used for any sensor class
+ */
 public interface RobotSensorTelemetry {
     public Location getLocation();
     public void setBaseLocation(Location location);

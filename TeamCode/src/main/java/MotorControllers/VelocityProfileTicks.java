@@ -6,6 +6,10 @@ import android.util.Log;
  * Created by robotics on 11/7/17.
  */
 
+/*
+    ~~~
+ */
+//TODO: ask what this is for
 public class VelocityProfileTicks {
     public enum VelocityProfileType{
         ACCEL_AND_DECCEL, DECCEL_ONLY, ACCEL_ONLY, NO_ACCEL_AND_DECCEL

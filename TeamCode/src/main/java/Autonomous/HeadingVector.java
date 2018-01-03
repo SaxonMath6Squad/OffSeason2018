@@ -6,6 +6,9 @@ import android.util.Log;
  * Created by robotics on 12/27/17.
  */
 
+/*
+    A class to create and use vectors for location based classes and functions
+ */
 public class HeadingVector {
     private double x = 0;
     private double y = 0;

@@ -9,6 +9,9 @@ package Autonomous;
 3  4  5
 0  1  2
  */
+/*
+    A class to decide how to put the cryptobox together based off of patterns and glyphs currently in the robot
+ */
 public class GlyphStackingEngine {
 //    public enum spotStatus {NONE, BROWN, GREY};
 //    public spotStatus cryptoBox[3][4];

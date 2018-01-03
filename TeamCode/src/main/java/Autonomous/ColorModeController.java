@@ -6,6 +6,9 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
  * Created by robotics on 9/22/17.
  */
 
+/*
+    A class to help us tell what color the color sensor sees
+ */
 public class ColorModeController {
     public enum type{
         JEWEL_SNATCH_O_MATIC, GLYPH_STACK_O_TRON

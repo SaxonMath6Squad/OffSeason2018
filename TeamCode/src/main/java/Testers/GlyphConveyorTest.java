@@ -40,6 +40,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import Actions.ServoHandler;
 
+/*
+    An opmode to test the belt for our glyph system
+ */
 @TeleOp(name="Glyph conveyor test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
 @Disabled
 public class GlyphConveyorTest extends LinearOpMode {
