@@ -35,13 +35,17 @@ public class JennyNavigation extends Thread{
     public static final int FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR = 1;
     public static final int BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR = 2;
     public static final int BACK_LEFT_HOLONOMIC_DRIVE_MOTOR = 3;
+    public static final double ROBOT_WIDTH_INCHES = 18;
     public static final double ADJUSTING_SPEED_IN_PER_SEC = 5;
     public static final double SLOW_SPEED_IN_PER_SEC = 10;
     public static final double MED_SPEED_IN_PER_SEC = 20;
     public static final double DEFAULT_SPEED_IN_PER_SEC = 30;
     public static final double HIGH_SPEED_IN_PER_SEC = 50;
+    public static final double LOCATION_DISTANCE_TOLERANCE = 0.5;
     public static final long DEFAULT_DELAY_MILLIS = 10;
     public static final long DEFAULT_SLEEP_DELAY_MILLIS = 50;
+    public static final long MED_SLEEP_DELAY_MILLIS = 500;
+    public static final long LONG_SLEEP_DELAY_MILLIS = 1000;
     private volatile long threadDelayMillis = 10;
     public volatile double robotHeading = 0;
     private volatile double [] lastMotorPositionsInInches = {0,0,0,0};
@@ -444,7 +448,7 @@ public class JennyNavigation extends Thread{
             //long loopTime = System.currentTimeMillis() - startTime;
             //Log.d("Loop time", Long.toString(loopTime) );
             //deltaTime = loopTime - deltaTime;
-            Log.d("Delta loop time", Long.toString(System.currentTimeMillis() - startTime));
+            //Log.d("Delta loop time", Long.toString(System.currentTimeMillis() - startTime));
 //            mode.sleep(10);
         }
         brake();
@@ -585,20 +589,26 @@ public class JennyNavigation extends Thread{
 
     private void driveToLocation(Location startLocation, Location targetLocation, double desiredSpeed, LinearOpMode mode){
         double distanceToTravel = startLocation.distanceToLocation(targetLocation);
-        double deltaX = targetLocation.getX() - startLocation.getX();
-        double deltaY = targetLocation.getY() - startLocation.getY();
-        double heading = (int)Math.toDegrees(Math.atan2(deltaY, deltaX)) - 90;
-        heading = 360 - heading;
-        if(heading >= 360) heading -= 360;
-        if(heading < 0) heading += 360;
-        heading = (heading + orientation.getOrientation())%360;
-        Log.d("start x", Double.toString(startLocation.getX()));
-        Log.d("start y", Double.toString(startLocation.getY()));
-        Log.d("target x", Double.toString(targetLocation.getX()));
-        Log.d("target y", Double.toString(targetLocation.getY()));
-        Log.d("dist to travel", Double.toString(distanceToTravel));
-        Log.d("heading", Double.toString(heading));
-        driveDistance(distanceToTravel, heading, desiredSpeed, mode);
+        double deltaX;
+        double deltaY;
+        double heading;
+        while(distanceToTravel > LOCATION_DISTANCE_TOLERANCE) {
+            distanceToTravel = startLocation.distanceToLocation(targetLocation);
+            deltaX = targetLocation.getX() - startLocation.getX();
+            deltaY = targetLocation.getY() - startLocation.getY();
+            heading = Math.toDegrees(Math.atan2(deltaY, deltaX)) - 90;
+            heading = 360 - heading;
+            heading = (heading - orientation.getOrientation()) % 360;
+            if (heading >= 360) heading -= 360;
+            if (heading < 0) heading += 360;
+            newDriveOnHeadingIMU(heading, desiredSpeed, 0, mode);
+//            Log.d("start x", Double.toString(startLocation.getX()));
+//            Log.d("start y", Double.toString(startLocation.getY()));
+//            Log.d("target x", Double.toString(targetLocation.getX()));
+//            Log.d("target y", Double.toString(targetLocation.getY()));
+//            Log.d("dist to travel", Double.toString(distanceToTravel));
+//            Log.d("heading", Double.toString(heading));
+        }
     }
 
     public void driveToLocation(Location targetLocation, double desiredSpeed, LinearOpMode mode){

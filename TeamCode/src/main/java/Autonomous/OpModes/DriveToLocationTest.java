@@ -40,11 +40,10 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import java.util.ArrayList;
-
 import Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor;
 import DriveEngine.JennyNavigation;
 import Autonomous.VuforiaHelper;
+import Autonomous.Location;
 
 import static Autonomous.RelicRecoveryField.BLUE_ALLIANCE_2;
 import static Autonomous.RelicRecoveryField.startLocations;
@@ -52,9 +51,9 @@ import static Autonomous.RelicRecoveryField.startLocations;
 /*
     An opmode to test driving from the glyph pit to the cryptobox maintaining the center of the cryptobox to the center of the robot as much as possible
  */
-@Autonomous(name="Drive to cryptobox test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
-@Disabled
-public class DriveToCryptoboxTest extends LinearOpMode {
+@Autonomous(name="Drive to location test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
+//@Disabled
+public class DriveToLocationTest extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
@@ -66,7 +65,7 @@ public class DriveToCryptoboxTest extends LinearOpMode {
     public void runOpMode() {
         //imuHandler = new ImuHandler("imu", hardwareMap);
         try {
-            navigation = new JennyNavigation(hardwareMap, startLocations[BLUE_ALLIANCE_2], 0, "RobotConfig/JennyV2.json");
+            navigation = new JennyNavigation(hardwareMap, startLocations[BLUE_ALLIANCE_2], 270, "RobotConfig/JennyV2.json");
             vuforia = new VuforiaHelper();
             cryptoboxFinder = new CryptoBoxColumnImageProcessor(80, 100, .1, 1);
         }
@@ -81,11 +80,7 @@ public class DriveToCryptoboxTest extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
-        Bitmap image = null;
-        image = vuforia.getImage(171, 244);
-        ArrayList<Integer> centers;
-        centers = cryptoboxFinder.findColumnCenters(image, false);
-        navigation.driveToCryptobox(centers.get(1), cryptoboxFinder.imageWidth/2, 20, this);
+        navigation.driveToLocation(new Location(72, navigation.getRobotLocation().getY()), 10, this);
 
         navigation.stopNavigation();
 //        glyphSystem.stopNavigation();

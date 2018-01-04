@@ -14,6 +14,8 @@ import DriveEngine.JennyNavigation;
 import SensorHandlers.JennySensorTelemetry;
 import Systems.JennyO1BPickAndExtend;
 
+import static Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor.DESIRED_HEIGHT;
+import static Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor.DESIRED_WIDTH;
 import static DriveEngine.JennyNavigation.EAST;
 import static DriveEngine.JennyNavigation.NORTH;
 import static DriveEngine.JennyNavigation.WEST;
@@ -26,7 +28,7 @@ import static DriveEngine.JennyNavigation.WEST;
     An opmode to test how the camera takes images based on the rotation of the phone
  */
 @Autonomous(name = "Image rotation test", group = "visual autonomous")
-@Disabled
+//@Disabled
 public class ImageRotationTest extends LinearOpMode{
 
     CryptoBoxColumnImageProcessor cryptoBoxFinder;
@@ -36,7 +38,7 @@ public class ImageRotationTest extends LinearOpMode{
     public void runOpMode() throws InterruptedException {
         try{
             vuforia = new VuforiaHelper();
-            cryptoBoxFinder = new CryptoBoxColumnImageProcessor(80,100,.1,1);
+            cryptoBoxFinder = new CryptoBoxColumnImageProcessor(DESIRED_HEIGHT,DESIRED_WIDTH,.1,1);
         } catch (Exception e){
             throw new RuntimeException(e);
         }
@@ -45,7 +47,7 @@ public class ImageRotationTest extends LinearOpMode{
         waitForStart();
 
         Bitmap image = null;
-        image = vuforia.getImage(171, 244);
+        image = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
         cryptoBoxFinder.findColumnCenters(image, true);
         vuforia.saveBMP(image);
     }

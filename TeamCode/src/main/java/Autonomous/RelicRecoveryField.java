@@ -18,39 +18,61 @@ public class RelicRecoveryField {
     public final static int SCORING_COLUMN_3 = 2;
 
     //cryptobox designations
-    final static double CRYPTOBOX_WIDTH_INCHES = 24; //feet
-    final static double CRYPTOBOX_COLORED_COLUMN_WIDTHS = .3;
-    final static double CRYPTOBOX_SCORING_COLUMN_WIDTHS = 0;
+    final static double CRYPTOBOX_WIDTH_INCHES = 24;
+    final static double CRYPTOBOX_COLORED_COLUMN_WIDTHS_INCHES = 1.375;
+    final static double CRYPTOBOX_SCORING_COLUMN_WIDTHS_INCHES = 6.125;
+    public final static double CRYPTOBOX_THICKNESS_INCHES = 4;
 
     public Location determineLocationOfCryptoboxScoringCenter(int team, int col){
         double x = cryptoBoxCenters[team].getX();
         double y = cryptoBoxCenters[team].getY();
         if(team == BLUE_ALLIANCE_1 || team == RED_ALLIANCE_1){
-            if(col != SCORING_COLUMN_2){
-                x += (col == SCORING_COLUMN_1)? -6:6;
+            switch (col){
+                case SCORING_COLUMN_1:
+                    x += CRYPTOBOX_SCORING_COLUMN_WIDTHS_INCHES + CRYPTOBOX_COLORED_COLUMN_WIDTHS_INCHES;
+                    break;
+                case SCORING_COLUMN_2:
+                    break;
+                case SCORING_COLUMN_3:
+                    x -= CRYPTOBOX_SCORING_COLUMN_WIDTHS_INCHES + CRYPTOBOX_COLORED_COLUMN_WIDTHS_INCHES;
+                    break;
             }
         } else if(team == BLUE_ALLIANCE_2){
-            if(col != SCORING_COLUMN_2){
-                y += (col == SCORING_COLUMN_1)? 6:-6;
+            switch (col){
+                case SCORING_COLUMN_1:
+                    y += CRYPTOBOX_SCORING_COLUMN_WIDTHS_INCHES + CRYPTOBOX_COLORED_COLUMN_WIDTHS_INCHES;
+                    break;
+                case SCORING_COLUMN_2:
+                    break;
+                case SCORING_COLUMN_3:
+                    y -= CRYPTOBOX_SCORING_COLUMN_WIDTHS_INCHES - CRYPTOBOX_COLORED_COLUMN_WIDTHS_INCHES;
+                    break;
             }
         } else {
-            if(col != SCORING_COLUMN_2){
-                y += (col == SCORING_COLUMN_1)? -6:6;
+            switch (col){
+                case SCORING_COLUMN_1:
+                    y -= CRYPTOBOX_SCORING_COLUMN_WIDTHS_INCHES + CRYPTOBOX_COLORED_COLUMN_WIDTHS_INCHES;
+                    break;
+                case SCORING_COLUMN_2:
+                    break;
+                case SCORING_COLUMN_3:
+                    y += CRYPTOBOX_SCORING_COLUMN_WIDTHS_INCHES + CRYPTOBOX_COLORED_COLUMN_WIDTHS_INCHES;
+                    break;
             }
         }
         return new Location(x, y);
     }
 
-    public Location determinePitLocation(int team){
+    public Location determinePitLocation(int team, Location robotLocation){
         switch (team){
             case RED_ALLIANCE_1:
-                return new Location(60, 60);
+                return new Location(72, 84);
             case RED_ALLIANCE_2:
-                return new Location(60, 108);
+                return new Location(84, robotLocation.getY());
             case BLUE_ALLIANCE_1:
-                return new Location(84, 60);
+                return new Location(72, 84);
             case BLUE_ALLIANCE_2:
-                return new Location(84, 108);
+                return new Location(60, robotLocation.getY());
             default:
                 return PIT_CENTER;
         }
@@ -64,7 +86,7 @@ public class RelicRecoveryField {
 
      */
 
-    final static Location[] cryptoBoxCenters = {new Location(108,20), new Location(120, 84), new Location(36, 20), new Location(24, 84)}; //reference the centers of the cryptoboxes
+    public final static Location[] cryptoBoxCenters = {new Location(108,20), new Location(120, 84), new Location(36, 20), new Location(24, 84)}; //reference the centers of the cryptoboxes
     public final static double GROUND = 0;
     public final static double ROW1 = 6;
     public final static double ROW2 = 11.5;

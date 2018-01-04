@@ -40,9 +40,9 @@ public class VuforiaImageCaptureTest extends LinearOpMode{
             long timeStart = System.currentTimeMillis();
             bmp = vuforia.getImage(120,100);
             if(bmp != null){
-                //vuforia.saveBMP(bmp);
+//                vuforia.saveBMP(bmp);
                 long algorithmStart = System.currentTimeMillis();
-                columnLocations = cryptoFinder.findColumns(bmp,false);
+                columnLocations = cryptoFinder.findColumns(bmp,true);
                 telemetry.addData("Algorithm Time", "" + (System.currentTimeMillis() - algorithmStart));
                 if(columnLocations != null){
                     for(int i = 0; i < columnLocations.size(); i ++){

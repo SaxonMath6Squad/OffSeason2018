@@ -28,4 +28,5 @@ public interface RobotSensorTelemetry {
     public double getDistance(DistanceUnit unit);
     public boolean isPressed(int sensor);
     public ColorModeController.color getColor(int sensor);
+    public void stopSensorTelemetry();
 }

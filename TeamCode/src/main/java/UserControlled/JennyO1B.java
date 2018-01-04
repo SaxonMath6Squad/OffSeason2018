@@ -50,6 +50,7 @@ import static Autonomous.RelicRecoveryField.ROW2;
 import static Autonomous.RelicRecoveryField.ROW3;
 import static Autonomous.RelicRecoveryField.ROW4;
 import static Autonomous.RelicRecoveryField.startLocations;
+import static SensorHandlers.JennySensorTelemetry.JEWEL_JOUST_STORE_POSITION;
 
 /*
     An opmode for the User Controlled portion of the game
@@ -96,9 +97,9 @@ public class JennyO1B extends LinearOpMode {
         sensorTelemetry = new JennySensorTelemetry(hardwareMap, 0, 0);
         leftJoystick = new JoystickHandler(gamepad1,JoystickHandler.LEFT_JOYSTICK);
         rightJoystick = new JoystickHandler(gamepad1,JoystickHandler.RIGHT_JOYSTICK);
+        sensorTelemetry.setJewelJoustPosition(JEWEL_JOUST_STORE_POSITION);
         telemetry.addData("Status", "Initialized");
         telemetry.update();
-
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
@@ -213,7 +214,7 @@ public class JennyO1B extends LinearOpMode {
 //                RAD.releaseRelic();
 //            }
 
-            sensorTelemetry.jewelJoust.setPosition(0);
+            sensorTelemetry.jewelJoust.setPosition(JEWEL_JOUST_STORE_POSITION);
             telemetry.addData("lift tick", glyphSystem.getLiftPosition());
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.update();

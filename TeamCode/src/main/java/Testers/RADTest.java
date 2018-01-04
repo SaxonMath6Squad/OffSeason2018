@@ -40,7 +40,10 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import Actions.WheelPickerDoubleMotor;
+import SensorHandlers.JennySensorTelemetry;
 import Systems.JennyO1BRAD;
+
+import static SensorHandlers.JennySensorTelemetry.RAD_LIMIT;
 
 /*
     An opmode to test our RAD
@@ -52,11 +55,13 @@ public class RADTest extends LinearOpMode {
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
     JennyO1BRAD RAD;
+    JennySensorTelemetry sensorTelemetry;
 
     @Override
     public void runOpMode() {
         try{
             RAD = new JennyO1BRAD(hardwareMap);
+            sensorTelemetry = new JennySensorTelemetry(hardwareMap, 0, 0);
         }
         catch(Exception e){
             Log.e("Error!","Jenny Wheel Picker: " + e.toString());
@@ -75,16 +80,16 @@ public class RADTest extends LinearOpMode {
             if(gamepad1.right_trigger > 0.1){
                 RAD.extendRAD();
             }
-            if(gamepad1.left_trigger > 0.1){
+            else if(gamepad1.left_trigger > 0.1 && !sensorTelemetry.isPressed(RAD_LIMIT)){
                 RAD.retractRAD();
             }
-            if(gamepad1.right_trigger < 0.1 && gamepad1.left_trigger < 0.1){
+            else {
                 RAD.pauseRADExtender();
             }
             if(gamepad1.a){
                 RAD.grabRelic();
             }
-            if(gamepad1.b){
+            else if(gamepad1.b){
                 RAD.releaseRelic();
             }
 
