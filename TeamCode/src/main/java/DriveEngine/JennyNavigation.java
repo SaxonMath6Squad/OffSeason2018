@@ -17,6 +17,9 @@ import MotorControllers.NewMotorController;
 import MotorControllers.PIDController;
 import SensorHandlers.ImuHandler;
 
+import static Autonomous.RelicRecoveryField.BLUE_ALLIANCE_2;
+import static Autonomous.RelicRecoveryField.RED_ALLIANCE_2;
+
 
 /**
  * Created by Jeremy on 8/23/2017.
@@ -656,15 +659,26 @@ public class JennyNavigation extends Thread{
         return vectors;
     }
 
-    public void driveToCryptobox(double cryptoBoxCenterX, double imageCenterX, double desiredSpeed, long delayTimeMillis, LinearOpMode mode){
+    public void driveToCryptobox(int team, double cryptoBoxCenterX, double imageCenterX, double desiredSpeed, long delayTimeMillis, LinearOpMode mode){
         double velocities[] = new double[4];
         double deltaSpeed;
-        double distanceFromCenter = imageCenterX - cryptoBoxCenterX;
+        double distanceFromCenter = cryptoBoxCenterX - imageCenterX;
+        double orientation = getOrientation();
         for(int i = 0; i < velocities.length; i++){
             velocities[i] = desiredSpeed;
         }
+        switch (team) {
+            case BLUE_ALLIANCE_2:
+                turnToHeading(WEST, mode);
+                break;
+            case RED_ALLIANCE_2:
+                turnToHeading(EAST, mode);
+                break;
+            default:
+                turnToHeading(NORTH, mode);
+        }
         cameraPIDController.setSp(0);
-        deltaSpeed = Math.abs(distanceFromCenter);
+        deltaSpeed = Math.abs(cameraPIDController.calculatePID(distanceFromCenter));
         if(cryptoBoxCenterX > imageCenterX){
             velocities[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR] += deltaSpeed;
             velocities[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR] -= deltaSpeed;
@@ -681,7 +695,7 @@ public class JennyNavigation extends Thread{
         mode.sleep(delayTimeMillis);
     }
 
-    public void driveToCryptobox(double cryptoBoxCenterX, double imageCenterX, double desiredSpeed, LinearOpMode mode){
-        driveToCryptobox(cryptoBoxCenterX, imageCenterX, desiredSpeed, 10, mode);
+    public void driveToCryptobox(int team, double cryptoBoxCenterX, double imageCenterX, double desiredSpeed, LinearOpMode mode){
+        driveToCryptobox(team, cryptoBoxCenterX, imageCenterX, desiredSpeed, DEFAULT_DELAY_MILLIS, mode);
     }
 }
