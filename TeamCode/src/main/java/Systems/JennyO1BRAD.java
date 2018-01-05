@@ -22,6 +22,8 @@ public class JennyO1BRAD {
     ServoHandler RADGrabber;
     SpoolMotor RADExtender;
     HardwareMap hardwareMap;
+    final double RELEASE_POSITION = 140;
+    final double GRAB_POSITION = 35;
 
     public JennyO1BRAD(HardwareMap hw) throws InterruptedException{
         hardwareMap = hw;
@@ -34,7 +36,9 @@ public class JennyO1BRAD {
             throw new RuntimeException(e.toString());
         }
         RADGrabber.setDirection(Servo.Direction.FORWARD);
-        RADExtender.setDirection(DcMotorSimple.Direction.FORWARD);
+        RADGrabber.setServoRanges(GRAB_POSITION, RELEASE_POSITION);
+        RADGrabber.setDegree(GRAB_POSITION);
+        RADExtender.setDirection(DcMotorSimple.Direction.REVERSE);
         RADExtender.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
@@ -54,12 +58,17 @@ public class JennyO1BRAD {
     }
 
     public int grabRelic(){
-        RADGrabber.incrementDegree(5);
+        RADGrabber.setDegree(GRAB_POSITION);
         return 0;
     }
 
     public int releaseRelic(){
-        RADGrabber.incrementDegree(-5);
+        RADGrabber.setDegree(RELEASE_POSITION);
+        return 0;
+    }
+
+    public int setGrabberPosition(double positionInDeg){
+        RADGrabber.setDegree(positionInDeg);
         return 0;
     }
 

@@ -1,6 +1,5 @@
 package DriveEngine;
 
-import android.provider.CalendarContract;
 import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -64,7 +63,7 @@ public class JennyNavigation extends Thread{
     private long timeAtAccelerationStart;
     private volatile boolean shouldRun = true;
 
-    private final double HEADING_THRESHOLD = 3;
+    private final double HEADING_THRESHOLD = 2;
     private final double WHEEL_BASE_RADIUS = 20;
     private final double FL_WHEEL_HEADING_OFFSET = 45;
     private final double FR_WHEEL_HEADING_OFFSET = 315;
@@ -516,23 +515,23 @@ public class JennyNavigation extends Thread{
         double curHeading = orientation.getOrientation();
         double rps;
         double distanceFromHeading = 0;
-        distanceFromHeading = orientation.getHeading() - desiredHeading;
-        if(distanceFromHeading > 180) distanceFromHeading -= 360;
-        else if(distanceFromHeading < -180) distanceFromHeading += 360;
+        distanceFromHeading = desiredHeading - orientation.getOrientation();
+        if(distanceFromHeading > 180) distanceFromHeading = 360 - distanceFromHeading;
+        else if(distanceFromHeading < -180) distanceFromHeading = 360 + distanceFromHeading;
         if(distanceFromHeading > 0){
             while(Math.abs(distanceFromHeading) > HEADING_THRESHOLD && mode.opModeIsActive()){
-
                 //heading always positive
                 Log.d("Distance From Heading","" + distanceFromHeading);
                 //Log.d("Heading", Double.toString(curHeading));
                 rps = turnController.calculatePID(distanceFromHeading);
                 Log.d("RPS", Double.toString(rps));
                 turn(-rps);
-                //mode.sleep(10);
+                mode.sleep(5);
                 curHeading = orientation.getOrientation();
-                distanceFromHeading = curHeading - desiredHeading;
-                if(distanceFromHeading > 180) distanceFromHeading -= 360;
-                else if(distanceFromHeading < -180) distanceFromHeading += 360;
+                Log.d("Cur Heading", "" + curHeading);
+                distanceFromHeading = desiredHeading - curHeading;
+                if(distanceFromHeading > 180) distanceFromHeading = 360 - distanceFromHeading;
+                else if(distanceFromHeading < -180) distanceFromHeading = 360 + distanceFromHeading;
             }
             brake();
         }
@@ -545,11 +544,12 @@ public class JennyNavigation extends Thread{
                 rps = turnController.calculatePID(distanceFromHeading);
                 Log.d("RPS", Double.toString(rps));
                 turn(-rps);
-                mode.sleep(10);
+                mode.sleep(5);
                 curHeading = orientation.getOrientation();
-                distanceFromHeading = curHeading - desiredHeading;
-                if(distanceFromHeading > 180) distanceFromHeading -= 360;
-                else if(distanceFromHeading < -180) distanceFromHeading += 360;
+                Log.d("Cur Heading", "" + curHeading);
+                distanceFromHeading = desiredHeading - curHeading;
+                if(distanceFromHeading > 180) distanceFromHeading = 360 - distanceFromHeading;
+                else if(distanceFromHeading < -180) distanceFromHeading = 360 + distanceFromHeading;
             }
             brake();
         }
@@ -659,23 +659,23 @@ public class JennyNavigation extends Thread{
         return vectors;
     }
 
-    public void driveToCryptobox(int team, double cryptoBoxCenterX, double imageCenterX, double desiredSpeed, long delayTimeMillis, LinearOpMode mode){
+    public void driveTowardsCryptobox(int team, double cryptoBoxCenterX, double imageCenterX, double desiredSpeed, long delayTimeMillis, LinearOpMode mode){
         double velocities[] = new double[4];
         double deltaSpeed;
         double distanceFromCenter = cryptoBoxCenterX - imageCenterX;
         double orientation = getOrientation();
         for(int i = 0; i < velocities.length; i++){
-            velocities[i] = desiredSpeed;
+            velocities[i] = -desiredSpeed; // we are going to be reversed so the speed needs to be reversed
         }
         switch (team) {
             case BLUE_ALLIANCE_2:
-                turnToHeading(WEST, mode);
+                if(Math.abs(WEST - orientation) > 5) turnToHeading(WEST, mode);
                 break;
             case RED_ALLIANCE_2:
-                turnToHeading(EAST, mode);
+                if(Math.abs(EAST - orientation) > 5) turnToHeading(EAST, mode);
                 break;
             default:
-                turnToHeading(NORTH, mode);
+                if(Math.abs(NORTH - orientation) > 5) turnToHeading(NORTH, mode);
         }
         cameraPIDController.setSp(0);
         deltaSpeed = Math.abs(cameraPIDController.calculatePID(distanceFromCenter));
@@ -695,7 +695,7 @@ public class JennyNavigation extends Thread{
         mode.sleep(delayTimeMillis);
     }
 
-    public void driveToCryptobox(int team, double cryptoBoxCenterX, double imageCenterX, double desiredSpeed, LinearOpMode mode){
-        driveToCryptobox(team, cryptoBoxCenterX, imageCenterX, desiredSpeed, DEFAULT_DELAY_MILLIS, mode);
+    public void driveTowardsCryptobox(int team, double cryptoBoxCenterX, double imageCenterX, double desiredSpeed, LinearOpMode mode){
+        driveTowardsCryptobox(team, cryptoBoxCenterX, imageCenterX, desiredSpeed, DEFAULT_DELAY_MILLIS, mode);
     }
 }

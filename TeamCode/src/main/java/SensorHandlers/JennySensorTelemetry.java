@@ -24,7 +24,7 @@ import Autonomous.Location;
 /*
     A class to handle all of our sensors
  */
-public class JennySensorTelemetry extends Thread implements RobotSensorTelemetry {
+public class JennySensorTelemetry implements RobotSensorTelemetry {
 //    private JennyWithExtendotronHardware robot;
     private JsonConfigReader reader;
     private ColorSensor[] colorSensors = new ColorSensor[2];
@@ -32,7 +32,6 @@ public class JennySensorTelemetry extends Thread implements RobotSensorTelemetry
     private DistanceSensor distanceSensor;
     private TouchSensor[] limitSwitches = new TouchSensor[4];
     public ServoHandler jewelJoust;
-    private ServoHandler[] flagHolder;
 //    private ImuHandler imu;
     private volatile boolean shouldRun = true;
     private long loopTime = 100;
@@ -49,8 +48,8 @@ public class JennySensorTelemetry extends Thread implements RobotSensorTelemetry
     public static final int RAD_LIMIT = 1;
     public static final int COLOR_DISTANCE_SENSOR = 0;
     public static final int JEWEL_SENSOR = 1;
-    public static final double JEWEL_JOUST_ACTIVE_POSITION = 0;
-    public static final double JEWEL_JOUST_STORE_POSITION = 0;
+    public static final double JEWEL_JOUST_ACTIVE_POSITION = 35;
+    public static final double JEWEL_JOUST_STORE_POSITION = 100;
     public static final double START_LOCATION_X = 0;
     public static final double START_LOCATION_Y = 0;
     public static final int NO_DETECTABLE_WALL_DISTANCE = -1;
@@ -66,12 +65,10 @@ public class JennySensorTelemetry extends Thread implements RobotSensorTelemetry
         limitSwitches[EXTEND_LIMIT] = hardwareMap.touchSensor.get("extendLimit");
         limitSwitches[RAD_LIMIT] = hardwareMap.touchSensor.get("radLimit");
         jewelJoust = new ServoHandler("jewelJoust", hardwareMap);
+        jewelJoust.setServoRanges(JEWEL_JOUST_ACTIVE_POSITION, JEWEL_JOUST_STORE_POSITION);
+        jewelJoust.setDegree(JEWEL_JOUST_STORE_POSITION);
         colorSensors[JEWEL_SENSOR] = hardwareMap.colorSensor.get("jewelSensor");
         jewelColorController = new ColorModeController(ColorModeController.type.JEWEL_SNATCH_O_MATIC, colorSensors[JEWEL_SENSOR]);
-//        flagHolder[FLAG_SPINNER] = new ServoHandler("flagSpinner", hardwareMap);
-//        flagHolder[FLAG_SPINNER].setDirection(Servo.Direction.FORWARD);
-//        flagHolder[FLAG_WAVER] = new ServoHandler("flagWaver", hardwareMap);
-//        flagHolder[FLAG_WAVER].setDirection(Servo.Direction.FORWARD);
         try {
             reader = new JsonConfigReader(h.appContext.getAssets().open("MotorConfig/DriveMotors/HolonomicDriveMotorConfig.json"));
         } catch (Exception e){
@@ -87,24 +84,6 @@ public class JennySensorTelemetry extends Thread implements RobotSensorTelemetry
         } catch (Exception e){
             Log.d("Error: ", e.toString());
         }
-
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                while (shouldRun){
-//                    moveFlagSpinner();
-//                }
-//            }
-//        }).start();
-//
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                while (shouldRun){
-//                    moveFlagWaver();
-//                }
-//            }
-//        }).start();
     }
     @Override
     public Location getLocation() {
@@ -176,45 +155,7 @@ public class JennySensorTelemetry extends Thread implements RobotSensorTelemetry
     }
 
     public void setJewelJoustPosition(double positionInDeg){
-        jewelJoust.setPosition(positionInDeg/180);
-    }
-
-    private void moveFlagSpinner(){
-        for(double i = 0; i < 1; i+=0.1){
-            flagHolder[FLAG_SPINNER].setPosition(i);
-            try {
-                sleep(50);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        for(double i = 1; i > 0; i-=0.1){
-            flagHolder[FLAG_SPINNER].setPosition(i);
-            try {
-                sleep(50);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private void moveFlagWaver(){
-        for(double i = 0; i < 0.4; i+=0.1){
-            flagHolder[FLAG_WAVER].setPosition(i);
-            try {
-                sleep(50);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        for(double i = 0.4; i > 0; i-=0.1){
-            flagHolder[FLAG_WAVER].setPosition(i);
-            try {
-                sleep(50);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+        jewelJoust.setDegree(positionInDeg);
     }
 
     @Override

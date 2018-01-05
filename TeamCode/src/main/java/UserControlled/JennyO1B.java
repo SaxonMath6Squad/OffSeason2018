@@ -50,7 +50,9 @@ import static Autonomous.RelicRecoveryField.ROW2;
 import static Autonomous.RelicRecoveryField.ROW3;
 import static Autonomous.RelicRecoveryField.ROW4;
 import static Autonomous.RelicRecoveryField.startLocations;
+import static DriveEngine.JennyNavigation.NORTH;
 import static SensorHandlers.JennySensorTelemetry.JEWEL_JOUST_STORE_POSITION;
+import static SensorHandlers.JennySensorTelemetry.RAD_LIMIT;
 
 /*
     An opmode for the User Controlled portion of the game
@@ -97,7 +99,6 @@ public class JennyO1B extends LinearOpMode {
         sensorTelemetry = new JennySensorTelemetry(hardwareMap, 0, 0);
         leftJoystick = new JoystickHandler(gamepad1,JoystickHandler.LEFT_JOYSTICK);
         rightJoystick = new JoystickHandler(gamepad1,JoystickHandler.RIGHT_JOYSTICK);
-        sensorTelemetry.setJewelJoustPosition(JEWEL_JOUST_STORE_POSITION);
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         // Wait for the game to start (driver presses PLAY)
@@ -194,27 +195,31 @@ public class JennyO1B extends LinearOpMode {
                 else
                     glyphSystem.pauseBelt();
             }
-            //TODO: test RAD
-//            //RAD Extender
-//            if(gamepad1.dpad_up){
-//                RAD.extendRAD();
-//            }
-//            else if(gamepad1.dpad_down){
-//                RAD.retractRAD();
-//            }
-//            else {
-//                RAD.pauseRADExtender();
-//            }
-//
-//            //RAD Grabber
-//            if(gamepad1.x){
-//                RAD.grabRelic();
-//            }
-//            else if(gamepad1.y){
-//                RAD.releaseRelic();
-//            }
 
-            sensorTelemetry.jewelJoust.setPosition(JEWEL_JOUST_STORE_POSITION);
+            //RAD Extender
+            if(gamepad1.dpad_up){
+                RAD.extendRAD();
+            }
+            else if(gamepad1.dpad_down && !sensorTelemetry.isPressed(RAD_LIMIT)){
+                RAD.retractRAD();
+            }
+            else {
+                RAD.pauseRADExtender();
+            }
+
+            //RAD Grabber
+            if(gamepad1.x){
+                RAD.grabRelic();
+            }
+            else if(gamepad1.y){
+                RAD.releaseRelic();
+            }
+
+            if(gamepad1.right_stick_button){
+                navigation.turnToHeading(NORTH, this);
+            }
+
+            sensorTelemetry.setJewelJoustPosition(JEWEL_JOUST_STORE_POSITION);
             telemetry.addData("lift tick", glyphSystem.getLiftPosition());
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.update();

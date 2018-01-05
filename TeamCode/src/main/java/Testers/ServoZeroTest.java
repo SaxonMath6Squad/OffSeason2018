@@ -40,30 +40,41 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import DriveEngine.JennyNavigation;
+import SensorHandlers.JennySensorTelemetry;
+import Systems.JennyFlagController;
+import Systems.JennyO1BPickAndExtend;
+import Systems.JennyO1BRAD;
 
 import static Autonomous.RelicRecoveryField.BLUE_ALLIANCE_2;
 import static Autonomous.RelicRecoveryField.startLocations;
 
 /*
-    An opmode to test our turnToHeading function
+    An opmode to test if all our drive wheels are working correctly
  */
-@TeleOp(name="Turn test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
+@TeleOp(name="Servo Zero Test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
 //@Disabled
-public class TurnToHeadingTest extends LinearOpMode {
+public class ServoZeroTest extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
     JennyNavigation navigation;
-    //ImuHandler imuHandler;
+    JennyO1BRAD rad;
+    JennySensorTelemetry sensorTelemetry;
+    JennyFlagController flagController;
+
     @Override
     public void runOpMode() {
-        //imuHandler = new ImuHandler("imu", hardwareMap);
+        int servo = 0;
+        double position = 0;
         try {
             navigation = new JennyNavigation(hardwareMap, startLocations[BLUE_ALLIANCE_2], 0, "RobotConfig/JennyV2.json");
+            rad = new JennyO1BRAD(hardwareMap);
+            sensorTelemetry = new JennySensorTelemetry(hardwareMap, 0, 0);
+            flagController = new JennyFlagController(hardwareMap);
         }
         catch (Exception e){
-            Log.e("Error!" , "Jenny Navigation: " + e.toString());
-            throw new RuntimeException("Navigation Creation Error! " + e.toString());
+            Log.e("Error!" , e.toString());
+            throw new RuntimeException("System Creation Error! " + e.toString());
 
         }
         telemetry.addData("Status", "Initialized");
@@ -72,15 +83,44 @@ public class TurnToHeadingTest extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
-        navigation.turnToHeading(-90,this);
-        // run until the end of the match (driver presses STOP)
-        while (opModeIsActive()) {
 
-
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-            //telemetry.addData("Current Heading", imuHandler.getOrientation());
+        while (opModeIsActive()){
+            if(gamepad1.dpad_up){
+                position++;
+                while(gamepad1.dpad_up);
+            } else if(gamepad1.dpad_down){
+                position--;
+                while(gamepad1.dpad_down);
+            }
+            if(gamepad1.start){
+                servo++;
+                if(servo > 3) servo = 0;
+                while (gamepad1.start);
+            }
+            if(position >= 180) position = 180;
+            if(position <= 0) position = 0;
+            switch (servo){
+                case 0:
+                    telemetry.addData("Servo", "Jewel Joust");
+                    sensorTelemetry.setJewelJoustPosition(position);
+                    break;
+                case 1:
+                    telemetry.addData("Servo", "RAD Grabber");
+                    rad.setGrabberPosition(position);
+                    break;
+                case 2:
+                    telemetry.addData("Servo", "Flag Spinner");
+                    flagController.setFlagSpinnerPosition(position);
+                    break;
+                case 3:
+                    telemetry.addData("Servo", "Flag Waver");
+                    flagController.setFlagWaverPosition(position);
+                    break;
+            }
+            telemetry.addData("Position", Double.toString(position));
             telemetry.update();
         }
+
         navigation.stopNavigation();
     }
 }

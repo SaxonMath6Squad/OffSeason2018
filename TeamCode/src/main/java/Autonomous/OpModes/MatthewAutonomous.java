@@ -28,7 +28,7 @@ import static DriveEngine.JennyNavigation.WEST;
     An opmode to test centering the robot on a cryptobox with the camera
  */
 @Autonomous(name = "Matthew Autonomous", group = "visual autonomous")
-//@Disabled
+@Disabled
 public class MatthewAutonomous extends LinearOpMode{
 
     JennyNavigation nav;

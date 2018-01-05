@@ -30,7 +30,7 @@ public class ArialDepositor implements ActionHandler {
 
     public ArialDepositor(HardwareMap hw) throws Exception{
         hardwareMap = hw;
-        leftLiftMotor = new SpoolMotor(new NewMotorController("liftMotor","MotorConfig/FunctionMotors/SpoolMotor.json", hardwareMap),10,30,100, hardwareMap);
+        leftLiftMotor = new SpoolMotor(new NewMotorController("liftMotor","MotorConfig/FunctionMotors/SpoolMotor.json", hardwareMap),10,15,100, hardwareMap);
 
         belt = new SpoolMotor(new NewMotorController("belt", "MotorConfig/FunctionMotors/BeltMotor.json", hardwareMap), 10, 10, 100, hardwareMap);
         belt.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);

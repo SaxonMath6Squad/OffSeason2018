@@ -1,13 +1,17 @@
 package Systems;
 
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import Actions.ArialDepositor;
-import Actions.WheelPickerDoubleMotor;
 import Actions.WheelPickerSingleMotor;
+import Autonomous.ColorModeController;
+import Autonomous.ColorModeController.color;
+
+import static Autonomous.ColorModeController.type.GLYPH_STACK_O_TRON;
 
 
 /**
@@ -20,6 +24,8 @@ import Actions.WheelPickerSingleMotor;
 public class JennyO1BPickAndExtend {
     ArialDepositor glyphPlacement;
     WheelPickerSingleMotor glyphGrabber;
+    ColorSensor glyphSensor;
+    ColorModeController glyphColorController;
     HardwareMap hardwareMap;
 
     public JennyO1BPickAndExtend(HardwareMap hw) throws Exception{
@@ -27,7 +33,9 @@ public class JennyO1BPickAndExtend {
         glyphGrabber = new WheelPickerSingleMotor(hardwareMap);
         glyphPlacement = new ArialDepositor(hardwareMap);
         glyphPlacement.setBeltDirection(DcMotor.Direction.FORWARD);
-        glyphPlacement.setLiftDirection(DcMotorSimple.Direction.REVERSE);
+        glyphPlacement.setLiftDirection(DcMotorSimple.Direction.FORWARD);
+        glyphSensor = hardwareMap.colorSensor.get("glyphSensor");
+        glyphColorController = new ColorModeController(GLYPH_STACK_O_TRON, glyphSensor);
     }
 
     public int liftToPosition(double inInches){
@@ -92,6 +100,10 @@ public class JennyO1BPickAndExtend {
     public int pauseGrabber(){
         glyphGrabber.pause();
         return 0;
+    }
+
+    public color getColor(){
+        return glyphColorController.getColor();
     }
 
     public int stop(){

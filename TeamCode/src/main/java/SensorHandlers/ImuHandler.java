@@ -96,7 +96,8 @@ public class ImuHandler extends Thread{
             velocities = imu.getVelocity();
         } catch (Exception e){
             stopIMU();
-            throw e;
+            throw new RuntimeException(e);
+
         }
     }
 
