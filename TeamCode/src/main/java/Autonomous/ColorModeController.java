@@ -1,6 +1,7 @@
 package Autonomous;
 
 import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
 /**
  * Created by robotics on 9/22/17.
@@ -26,6 +27,10 @@ public class ColorModeController {
     public ColorModeController(type m, ColorSensor sensor){
         setColorMode(m);
         colorSensor = sensor;
+    }
+
+    public ColorModeController(type m, String sensor, HardwareMap h){
+        this(m, h.colorSensor.get(sensor));
     }
 
     public color getColor(){

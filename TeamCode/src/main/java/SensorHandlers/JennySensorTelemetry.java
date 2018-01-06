@@ -31,7 +31,7 @@ public class JennySensorTelemetry implements RobotSensorTelemetry {
     private ColorModeController jewelColorController;
     private DistanceSensor distanceSensor;
     private TouchSensor[] limitSwitches = new TouchSensor[4];
-    public ServoHandler jewelJoust;
+    //public ServoHandler jewelJoust;
 //    private ImuHandler imu;
     private volatile boolean shouldRun = true;
     private long loopTime = 100;
@@ -48,8 +48,8 @@ public class JennySensorTelemetry implements RobotSensorTelemetry {
     public static final int RAD_LIMIT = 1;
     public static final int COLOR_DISTANCE_SENSOR = 0;
     public static final int JEWEL_SENSOR = 1;
-    public static final double JEWEL_JOUST_ACTIVE_POSITION = 35;
-    public static final double JEWEL_JOUST_STORE_POSITION = 100;
+    //public static final double JEWEL_JOUST_ACTIVE_POSITION = 35;
+   // public static final double JEWEL_JOUST_STORE_POSITION = 100;
     public static final double START_LOCATION_X = 0;
     public static final double START_LOCATION_Y = 0;
     public static final int NO_DETECTABLE_WALL_DISTANCE = -1;
@@ -64,11 +64,11 @@ public class JennySensorTelemetry implements RobotSensorTelemetry {
         distanceSensor = hardwareMap.get(DistanceSensor.class, "colorSensor");
         limitSwitches[EXTEND_LIMIT] = hardwareMap.touchSensor.get("extendLimit");
         limitSwitches[RAD_LIMIT] = hardwareMap.touchSensor.get("radLimit");
-        jewelJoust = new ServoHandler("jewelJoust", hardwareMap);
-        jewelJoust.setServoRanges(JEWEL_JOUST_ACTIVE_POSITION, JEWEL_JOUST_STORE_POSITION);
-        jewelJoust.setDegree(JEWEL_JOUST_STORE_POSITION);
+        //jewelJoust = new ServoHandler("jewelJoust", hardwareMap);
+        //jewelJoust.setServoRanges(JEWEL_JOUST_ACTIVE_POSITION, JEWEL_JOUST_STORE_POSITION);
+        //jewelJoust.setDegree(JEWEL_JOUST_STORE_POSITION);
         colorSensors[JEWEL_SENSOR] = hardwareMap.colorSensor.get("jewelSensor");
-        jewelColorController = new ColorModeController(ColorModeController.type.JEWEL_SNATCH_O_MATIC, colorSensors[JEWEL_SENSOR]);
+        //jewelColorController = new ColorModeController(ColorModeController.type.JEWEL_SNATCH_O_MATIC, colorSensors[JEWEL_SENSOR]);
         try {
             reader = new JsonConfigReader(h.appContext.getAssets().open("MotorConfig/DriveMotors/HolonomicDriveMotorConfig.json"));
         } catch (Exception e){
@@ -154,9 +154,6 @@ public class JennySensorTelemetry implements RobotSensorTelemetry {
         return jewelColorController.getColor();
     }
 
-    public void setJewelJoustPosition(double positionInDeg){
-        jewelJoust.setDegree(positionInDeg);
-    }
 
     @Override
     public void stopSensorTelemetry(){

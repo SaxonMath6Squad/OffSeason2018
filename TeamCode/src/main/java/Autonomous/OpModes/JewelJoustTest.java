@@ -50,7 +50,7 @@ import static Autonomous.ColorModeController.color.BLUE;
 import static Autonomous.RelicRecoveryField.BLUE_ALLIANCE_2;
 import static Autonomous.RelicRecoveryField.startLocations;
 import static DriveEngine.JennyNavigation.EAST;
-import static SensorHandlers.JennySensorTelemetry.JEWEL_JOUST_ACTIVE_POSITION;
+//import static SensorHandlers.JennySensorTelemetry.JEWEL_JOUST_ACTIVE_POSITION;
 import static SensorHandlers.JennySensorTelemetry.JEWEL_SENSOR;
 
 /*
@@ -85,7 +85,7 @@ public class JewelJoustTest extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
-        sensorTelemetry.jewelJoust.setPosition(JEWEL_JOUST_ACTIVE_POSITION);
+        //sensorTelemetry.jewelJoust.setPosition(JEWEL_JOUST_ACTIVE_POSITION);
         sleep(250);
         if(sensorTelemetry.getColor(JEWEL_SENSOR) == BLUE){
 

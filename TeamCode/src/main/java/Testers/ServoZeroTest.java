@@ -39,6 +39,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import Actions.JewelJouster;
 import DriveEngine.JennyNavigation;
 import SensorHandlers.JennySensorTelemetry;
 import Systems.JennyFlagController;
@@ -59,7 +60,8 @@ public class ServoZeroTest extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
     JennyNavigation navigation;
     JennyO1BRAD rad;
-    JennySensorTelemetry sensorTelemetry;
+    //JennySensorTelemetry sensorTelemetry;
+    JewelJouster jouster;
     JennyFlagController flagController;
 
     @Override
@@ -69,7 +71,7 @@ public class ServoZeroTest extends LinearOpMode {
         try {
             navigation = new JennyNavigation(hardwareMap, startLocations[BLUE_ALLIANCE_2], 0, "RobotConfig/JennyV2.json");
             rad = new JennyO1BRAD(hardwareMap);
-            sensorTelemetry = new JennySensorTelemetry(hardwareMap, 0, 0);
+            jouster = new JewelJouster("jewelJouster",hardwareMap);
             flagController = new JennyFlagController(hardwareMap);
         }
         catch (Exception e){
@@ -102,7 +104,7 @@ public class ServoZeroTest extends LinearOpMode {
             switch (servo){
                 case 0:
                     telemetry.addData("Servo", "Jewel Joust");
-                    sensorTelemetry.setJewelJoustPosition(position);
+                    jouster.setDegree(position);
                     break;
                 case 1:
                     telemetry.addData("Servo", "RAD Grabber");

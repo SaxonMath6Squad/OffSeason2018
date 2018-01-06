@@ -47,6 +47,15 @@ public class JennyO1BPickAndExtend {
         glyphPlacement.extend();
         return 0;
     }
+    public int liftSlow(){
+        glyphPlacement.slowExtend();
+        return 0;
+    }
+    public int dropSlow(){
+        glyphPlacement.slowExtend();
+        return 0;
+    }
+
 
     public int drop(){
         glyphPlacement.retract();

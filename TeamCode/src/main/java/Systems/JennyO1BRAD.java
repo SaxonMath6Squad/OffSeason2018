@@ -23,7 +23,7 @@ public class JennyO1BRAD {
     SpoolMotor RADExtender;
     HardwareMap hardwareMap;
     final double RELEASE_POSITION = 140;
-    final double GRAB_POSITION = 35;
+    final double GRAB_POSITION = 25;
 
     public JennyO1BRAD(HardwareMap hw) throws InterruptedException{
         hardwareMap = hw;

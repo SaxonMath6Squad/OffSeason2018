@@ -38,6 +38,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import Actions.JewelJouster;
 import DriveEngine.JennyNavigation;
 import SensorHandlers.JennySensorTelemetry;
 import Systems.JennyO1BPickAndExtend;
@@ -51,7 +52,7 @@ import static Autonomous.RelicRecoveryField.ROW3;
 import static Autonomous.RelicRecoveryField.ROW4;
 import static Autonomous.RelicRecoveryField.startLocations;
 import static DriveEngine.JennyNavigation.NORTH;
-import static SensorHandlers.JennySensorTelemetry.JEWEL_JOUST_STORE_POSITION;
+//import static SensorHandlers.JennySensorTelemetry.JEWEL_JOUST_STORE_POSITION;
 import static SensorHandlers.JennySensorTelemetry.RAD_LIMIT;
 
 /*
@@ -67,6 +68,7 @@ public class JennyO1B extends LinearOpMode {
     JoystickHandler leftJoystick, rightJoystick;
     JennyO1BPickAndExtend glyphSystem;
     JennyO1BRAD RAD;
+    JewelJouster jouster;
     JennySensorTelemetry sensorTelemetry;
     boolean autoLiftPositionMode = false;
     double[] liftPosition = {GROUND, ROW1, ROW2, ROW3, ROW4};
@@ -95,6 +97,12 @@ public class JennyO1B extends LinearOpMode {
         } catch (Exception e){
             Log.e("Error!", "Jenny RAD: " + e.toString());
             throw new RuntimeException("RAD Creation Error! " + e.toString());
+        }
+        try{
+            jouster = new JewelJouster("jewelJouster",hardwareMap);
+        } catch (Exception e){
+            Log.e("Error!", "Jenny JewelJouster: " + e.toString());
+            throw new RuntimeException("Jenny JewelJouster! " + e.toString());
         }
         sensorTelemetry = new JennySensorTelemetry(hardwareMap, 0, 0);
         leftJoystick = new JoystickHandler(gamepad1,JoystickHandler.LEFT_JOYSTICK);
@@ -133,13 +141,39 @@ public class JennyO1B extends LinearOpMode {
 
             //GLYPH LIFT
             if (!autoLiftPositionMode) {
-                if (gamepad1.right_trigger > 0.1) glyphSystem.lift();
-                else if (gamepad1.right_bumper && !sensorTelemetry.isPressed(sensorTelemetry.EXTEND_LIMIT)) glyphSystem.drop();
-                else if (gamepad2.right_trigger > 0.1 && gamepad1.right_trigger < 0.1 && gamepad1.left_trigger < 0.1 && !gamepad1.right_bumper && !gamepad1.left_bumper)
-                    glyphSystem.lift();
-                else if (gamepad2.right_bumper && gamepad1.right_trigger < 0.1 && gamepad1.left_trigger < 0.1 && !gamepad1.right_bumper && !gamepad1.left_bumper && !sensorTelemetry.isPressed(sensorTelemetry.EXTEND_LIMIT))
-                    glyphSystem.drop();
+                if (gamepad1.right_trigger > 0.1) {
+                    if(!isSlowMode){
+                        glyphSystem.lift();
+                    }
+                    else{
+                        glyphSystem.liftSlow();
+                    }
+                }
+                else if (gamepad1.right_bumper && !sensorTelemetry.isPressed(sensorTelemetry.EXTEND_LIMIT)){
+                    if(!isSlowMode){
+                        glyphSystem.drop();
+                    }
+                    else{
+                        glyphSystem.dropSlow();
+                    }
+                }
+                else if (gamepad2.right_trigger > 0.1 && gamepad1.right_trigger < 0.1 && gamepad1.left_trigger < 0.1 && !gamepad1.right_bumper && !gamepad1.left_bumper){
+                    if(!isSlowMode){
+                        glyphSystem.lift();
+                    }
+                    else {
+                        glyphSystem.liftSlow();
+                    }
+                }
 
+                else if (gamepad2.right_bumper && gamepad1.right_trigger < 0.1 && gamepad1.left_trigger < 0.1 && !gamepad1.right_bumper && !gamepad1.left_bumper && !sensorTelemetry.isPressed(sensorTelemetry.EXTEND_LIMIT)){
+                    if(!isSlowMode){
+                        glyphSystem.drop();
+                    }
+                    else{
+                        glyphSystem.dropSlow();
+                    }
+                }
                 else if(!sensorTelemetry.isPressed(sensorTelemetry.EXTEND_LIMIT)) {
                     glyphSystem.pauseLift();
                 }
@@ -219,7 +253,7 @@ public class JennyO1B extends LinearOpMode {
                 navigation.turnToHeading(NORTH, this);
             }
 
-            sensorTelemetry.setJewelJoustPosition(JEWEL_JOUST_STORE_POSITION);
+            //sensorTelemetry.setJewelJoustPosition(JEWEL_JOUST_STORE_POSITION);
             telemetry.addData("lift tick", glyphSystem.getLiftPosition());
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.update();

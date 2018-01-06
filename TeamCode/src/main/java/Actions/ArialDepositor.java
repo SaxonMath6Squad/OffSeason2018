@@ -23,6 +23,11 @@ public class ArialDepositor implements ActionHandler {
     SpoolMotor belt;
     HardwareMap hardwareMap;
     double currentPosition = 0;
+    private final static double FAST_RETRACT_SPEED = 10.0;
+    private final static double FAST_EXTEND_SPEED = 15.0;
+    private final static double SLOW_RETRACT_SPEED = 3.0;
+    private final static double SLOW_EXTEND_SPEED = 5.0;
+
     public final static int LIFT_MOTOR = 4;
     public final static int GLYPH_MOTOR = 5;
     public final static int TICKS_PER_REV = 1120;
@@ -30,7 +35,7 @@ public class ArialDepositor implements ActionHandler {
 
     public ArialDepositor(HardwareMap hw) throws Exception{
         hardwareMap = hw;
-        leftLiftMotor = new SpoolMotor(new NewMotorController("liftMotor","MotorConfig/FunctionMotors/SpoolMotor.json", hardwareMap),10,15,100, hardwareMap);
+        leftLiftMotor = new SpoolMotor(new NewMotorController("liftMotor","MotorConfig/FunctionMotors/SpoolMotor.json", hardwareMap),FAST_EXTEND_SPEED,FAST_RETRACT_SPEED,100, hardwareMap);
 
         belt = new SpoolMotor(new NewMotorController("belt", "MotorConfig/FunctionMotors/BeltMotor.json", hardwareMap), 10, 10, 100, hardwareMap);
         belt.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -39,11 +44,24 @@ public class ArialDepositor implements ActionHandler {
 
     public void extend(){
         leftLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftLiftMotor.setExtendSpeed(FAST_EXTEND_SPEED);
         leftLiftMotor.extend();
     }
 
     public void retract(){
         leftLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftLiftMotor.setExtendSpeed(FAST_RETRACT_SPEED);
+        leftLiftMotor.retract();
+    }
+
+    public void slowRetract(){
+        leftLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftLiftMotor.setExtendSpeed(SLOW_RETRACT_SPEED);
+        leftLiftMotor.retract();
+    }
+    public void slowExtend(){
+        leftLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftLiftMotor.setExtendSpeed(SLOW_EXTEND_SPEED);
         leftLiftMotor.retract();
     }
 
