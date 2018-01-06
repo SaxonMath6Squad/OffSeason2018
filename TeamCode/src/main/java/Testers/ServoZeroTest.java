@@ -34,16 +34,13 @@ package Testers;
 
 import android.util.Log;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import Actions.JewelJouster;
 import DriveEngine.JennyNavigation;
-import SensorHandlers.JennySensorTelemetry;
-import Systems.JennyFlagController;
-import Systems.JennyO1BPickAndExtend;
+import Actions.JennyFlagController;
 import Systems.JennyO1BRAD;
 
 import static Autonomous.RelicRecoveryField.BLUE_ALLIANCE_2;

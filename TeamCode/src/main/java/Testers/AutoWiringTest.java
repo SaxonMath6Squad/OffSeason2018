@@ -42,14 +42,13 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import Autonomous.ColorModeController.*;
 import DriveEngine.JennyNavigation;
 import SensorHandlers.JennySensorTelemetry;
-import Systems.JennyFlagController;
+import Actions.JennyFlagController;
 import Systems.JennyO1BPickAndExtend;
 import Systems.JennyO1BRAD;
 
 import static Autonomous.RelicRecoveryField.BLUE_ALLIANCE_2;
 import static Autonomous.RelicRecoveryField.startLocations;
 import static DriveEngine.JennyNavigation.DEFAULT_SLEEP_DELAY_MILLIS;
-import static DriveEngine.JennyNavigation.LONG_SLEEP_DELAY_MILLIS;
 import static DriveEngine.JennyNavigation.MED_SLEEP_DELAY_MILLIS;
 import static SensorHandlers.JennySensorTelemetry.COLOR_DISTANCE_SENSOR;
 import static SensorHandlers.JennySensorTelemetry.JEWEL_SENSOR;

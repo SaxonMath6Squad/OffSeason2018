@@ -52,7 +52,7 @@ public class JennyO1BPickAndExtend {
         return 0;
     }
     public int dropSlow(){
-        glyphPlacement.slowExtend();
+        glyphPlacement.slowRetract();
         return 0;
     }
 

@@ -1,4 +1,6 @@
-package Systems;
+package Actions;
+
+import android.util.Log;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -12,6 +14,8 @@ public class JennyFlagController extends Thread{
     ServoHandler[] flagHolder = new ServoHandler[2];
     public static final int FLAG_SPINNER = 0;
     public static final int FLAG_WAVER = 1;
+    public static final int[] FLAG_WAVER_MIN_MAX_DEG = {0,120};
+    public static final int[] FLAG_SPINNER_MIN_MAX_DEG = {0,120};
     volatile boolean shouldRun = true;
     volatile boolean flagShouldMove = false;
     HardwareMap hardwareMap;
@@ -32,10 +36,12 @@ public class JennyFlagController extends Thread{
     }
 
     private void moveFlag(){
-        double spinner = Math.sin(System.currentTimeMillis());
-        double waver = Math.cos(System.currentTimeMillis());
-        flagHolder[FLAG_SPINNER].setPosition(spinner);
-        flagHolder[FLAG_WAVER].setPosition(waver);
+        double spinner = FLAG_SPINNER_MIN_MAX_DEG[0] + (FLAG_SPINNER_MIN_MAX_DEG[1] - FLAG_SPINNER_MIN_MAX_DEG[0])*(.5 + Math.sin(3*(double)System.currentTimeMillis()/1000)/2.0);
+        double waver = FLAG_WAVER_MIN_MAX_DEG[0] + (FLAG_WAVER_MIN_MAX_DEG[1] - FLAG_WAVER_MIN_MAX_DEG[0])*(.5+Math.cos(4*(double)System.currentTimeMillis()/1000)/2.0);
+        Log.d("Spinner deg","" + spinner);
+        Log.d("Waver deg","" + waver);
+        flagHolder[FLAG_SPINNER].setDegree(spinner);
+        flagHolder[FLAG_WAVER].setDegree(waver);
     }
 
     public void setFlagSpinnerPosition(double positionInDeg){
@@ -46,11 +52,11 @@ public class JennyFlagController extends Thread{
         flagHolder[FLAG_WAVER].setDegree(positionInDeg);
     }
 
-    public void setFlagShouldMove(boolean shouldMove){
-        flagShouldMove = shouldMove;
+    public void startFlag(){
+        flagShouldMove = true;
     }
 
-    public void stopFlagController(){
+    public void stopFlag(){
         flagShouldMove = false;
         shouldRun = false;
     }

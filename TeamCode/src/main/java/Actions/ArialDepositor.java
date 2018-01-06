@@ -25,18 +25,17 @@ public class ArialDepositor implements ActionHandler {
     double currentPosition = 0;
     private final static double FAST_RETRACT_SPEED = 10.0;
     private final static double FAST_EXTEND_SPEED = 15.0;
-    private final static double SLOW_RETRACT_SPEED = 3.0;
+    private final static double SLOW_RETRACT_SPEED = 1.0;
     private final static double SLOW_EXTEND_SPEED = 5.0;
 
     public final static int LIFT_MOTOR = 4;
     public final static int GLYPH_MOTOR = 5;
     public final static int TICKS_PER_REV = 1120;
-    public final static double EXTENDOTRON_DIAMETER_INCHES = 2.25;
+    public final static double EXTENDOTRON_DIAMETER_INCHES = 1.18;
 
     public ArialDepositor(HardwareMap hw) throws Exception{
         hardwareMap = hw;
-        leftLiftMotor = new SpoolMotor(new NewMotorController("liftMotor","MotorConfig/FunctionMotors/SpoolMotor.json", hardwareMap),FAST_EXTEND_SPEED,FAST_RETRACT_SPEED,100, hardwareMap);
-
+        leftLiftMotor = new SpoolMotor(new NewMotorController("liftMotor","MotorConfig/FunctionMotors/AerialLiftSpool.json", hardwareMap),FAST_EXTEND_SPEED,FAST_RETRACT_SPEED,100, hardwareMap);
         belt = new SpoolMotor(new NewMotorController("belt", "MotorConfig/FunctionMotors/BeltMotor.json", hardwareMap), 10, 10, 100, hardwareMap);
         belt.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         belt.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -62,7 +61,7 @@ public class ArialDepositor implements ActionHandler {
     public void slowExtend(){
         leftLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftLiftMotor.setExtendSpeed(SLOW_EXTEND_SPEED);
-        leftLiftMotor.retract();
+        leftLiftMotor.extend();
     }
 
     public void stopLift(){
