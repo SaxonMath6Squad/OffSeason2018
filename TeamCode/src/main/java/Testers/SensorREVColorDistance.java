@@ -45,7 +45,7 @@ import java.util.Locale;
 
 /*
  * This is an example LinearOpMode that shows how to use
- * the REV Robotics ColorModeController-Distance Sensor.
+ * the REV Robotics REVColorDistanceSensorController-Distance Sensor.
  *
  * It assumes the sensor is configured with the name "sensor_color_distance".
  *
@@ -61,12 +61,12 @@ import java.util.Locale;
 public class SensorREVColorDistance extends LinearOpMode {
 
     /**
-     * Note that the REV Robotics ColorModeController-Distance incorporates two sensors into one device.
+     * Note that the REV Robotics REVColorDistanceSensorController-Distance incorporates two sensors into one device.
      * It has a light/distance (range) sensor.  It also has an RGB color sensor.
      * The light/distance sensor saturates at around 2" (5cm).  This means that targets that are 2"
      * or closer will display the same value for distance/light detected.
      *
-     * Although you configure a single REV Robotics ColorModeController-Distance sensor in your configuration file,
+     * Although you configure a single REV Robotics REVColorDistanceSensorController-Distance sensor in your configuration file,
      * you can treat the sensor as two separate sensors that share the same name in your op mode.
      *
      * In this example, we represent the detected color by a hue, saturation, and value color

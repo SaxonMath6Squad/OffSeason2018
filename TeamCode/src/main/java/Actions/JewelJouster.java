@@ -2,7 +2,9 @@ package Actions;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import Autonomous.ColorModeController;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
+import Autonomous.REVColorDistanceSensorController;
 
 /**
  * Created by robotics on 1/6/18.
@@ -10,7 +12,7 @@ import Autonomous.ColorModeController;
 
 public class JewelJouster implements ActionHandler {
     private ServoHandler servo;
-    private ColorModeController colorSensor;
+    private REVColorDistanceSensorController colorSensor;
     private HardwareMap hardwareMap;
     public enum EXTENDION_MODE {STORE, READ, HIT};
     private EXTENDION_MODE curMode = EXTENDION_MODE.STORE;
@@ -21,7 +23,7 @@ public class JewelJouster implements ActionHandler {
     public JewelJouster(String servoName, HardwareMap h){
         servo = new ServoHandler(servoName,h);
         hardwareMap = h;
-        colorSensor = new ColorModeController(ColorModeController.type.JEWEL_SNATCH_O_MATIC,"jewelSensor", hardwareMap);
+        colorSensor = new REVColorDistanceSensorController(REVColorDistanceSensorController.type.JEWEL_SNATCH_O_MATIC,"jewelSensor", hardwareMap);
         servo.setServoRanges(HIT_POSITION, STORE_POSITION);
         setPosition(EXTENDION_MODE.STORE);
     }
@@ -48,8 +50,12 @@ public class JewelJouster implements ActionHandler {
         servo.setDegree(degree);
     }
 
-    public ColorModeController.color getJewelColor(){
+    public REVColorDistanceSensorController.color getJewelColor(){
         return colorSensor.getColor();
+    }
+
+    public double getDistance() {
+        return colorSensor.getDistance(DistanceUnit.CM);
     }
 
     @Override

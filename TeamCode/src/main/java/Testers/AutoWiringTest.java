@@ -39,12 +39,12 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import Autonomous.ColorModeController.*;
+import Autonomous.REVColorDistanceSensorController.*;
 import DriveEngine.JennyNavigation;
 import SensorHandlers.JennySensorTelemetry;
 import Actions.JennyFlagController;
-import Systems.JennyO1BPickAndExtend;
-import Systems.JennyO1BRAD;
+import Actions.JennyO1BGlyphExtender;
+import Actions.JennyO1BRAD;
 
 import static Autonomous.RelicRecoveryField.BLUE_ALLIANCE_2;
 import static Autonomous.RelicRecoveryField.startLocations;
@@ -64,7 +64,7 @@ public class AutoWiringTest extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
     JennyNavigation navigation;
     JennyO1BRAD rad;
-    JennyO1BPickAndExtend glyphSystem;
+    JennyO1BGlyphExtender glyphSystem;
     JennySensorTelemetry sensorTelemetry;
     JennyFlagController flagController;
 
@@ -79,7 +79,7 @@ public class AutoWiringTest extends LinearOpMode {
         try {
             navigation = new JennyNavigation(hardwareMap, startLocations[BLUE_ALLIANCE_2], 0, "RobotConfig/JennyV2.json");
             rad = new JennyO1BRAD(hardwareMap);
-            glyphSystem = new JennyO1BPickAndExtend(hardwareMap);
+            glyphSystem = new JennyO1BGlyphExtender(hardwareMap);
             sensorTelemetry = new JennySensorTelemetry(hardwareMap, 0, 0);
             flagController = new JennyFlagController(hardwareMap);
         }

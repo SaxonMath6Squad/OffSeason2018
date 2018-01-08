@@ -41,7 +41,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import Actions.JewelJouster;
 import DriveEngine.JennyNavigation;
 import Actions.JennyFlagController;
-import Systems.JennyO1BRAD;
+import Actions.JennyO1BRAD;
 
 import static Autonomous.RelicRecoveryField.BLUE_ALLIANCE_2;
 import static Autonomous.RelicRecoveryField.startLocations;

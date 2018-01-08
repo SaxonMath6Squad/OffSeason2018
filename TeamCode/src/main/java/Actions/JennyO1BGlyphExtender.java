@@ -1,17 +1,17 @@
-package Systems;
+package Actions;
 
-import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
+
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import Actions.ArialDepositor;
-import Actions.WheelPickerSingleMotor;
-import Autonomous.ColorModeController;
-import Autonomous.ColorModeController.color;
+import Actions.JennyO1BGlyphPicker;
+import Autonomous.REVColorDistanceSensorController;
+import Autonomous.REVColorDistanceSensorController.color;
 
-import static Autonomous.ColorModeController.type.GLYPH_STACK_O_TRON;
+import static Autonomous.REVColorDistanceSensorController.type.GLYPH_STACK_O_TRON;
 
 
 /**
@@ -21,21 +21,17 @@ import static Autonomous.ColorModeController.type.GLYPH_STACK_O_TRON;
 /*
     A class to handle our extendotron and glyph picker wheels
  */
-public class JennyO1BPickAndExtend {
+public class JennyO1BGlyphExtender {
     ArialDepositor glyphPlacement;
-    WheelPickerSingleMotor glyphGrabber;
-    ColorSensor glyphSensor;
-    ColorModeController glyphColorController;
+    REVColorDistanceSensorController glyphColorController;
     HardwareMap hardwareMap;
 
-    public JennyO1BPickAndExtend(HardwareMap hw) throws Exception{
+    public JennyO1BGlyphExtender(HardwareMap hw) throws Exception{
         hardwareMap = hw;
-        glyphGrabber = new WheelPickerSingleMotor(hardwareMap);
         glyphPlacement = new ArialDepositor(hardwareMap);
         glyphPlacement.setBeltDirection(DcMotor.Direction.FORWARD);
         glyphPlacement.setLiftDirection(DcMotorSimple.Direction.FORWARD);
-        glyphSensor = hardwareMap.colorSensor.get("glyphSensor");
-        glyphColorController = new ColorModeController(GLYPH_STACK_O_TRON, glyphSensor);
+        glyphColorController = new REVColorDistanceSensorController(GLYPH_STACK_O_TRON, "glyphSensor", hardwareMap);
     }
 
     public int liftToPosition(double inInches){
@@ -96,28 +92,15 @@ public class JennyO1BPickAndExtend {
         return 0;
     }
 
-    public int grab(){
-        glyphGrabber.pick();
-        return 0;
-    }
-
-    public int spit(){
-        glyphGrabber.spit();
-        return 0;
-    }
-
-    public int pauseGrabber(){
-        glyphGrabber.pause();
-        return 0;
-    }
-
     public color getColor(){
         return glyphColorController.getColor();
     }
 
+    public double getDistance() {
+        return glyphColorController.getDistance(DistanceUnit.CM);
+    }
+
     public int stop(){
-        glyphGrabber.pause();
-        glyphGrabber.stop();
         glyphPlacement.stop();
         return 0;
     }

@@ -12,7 +12,7 @@ import java.io.InputStream;
 import Autonomous.HeadingVector;
 import Autonomous.Location;
 import MotorControllers.JsonConfigReader;
-import MotorControllers.NewMotorController;
+import MotorControllers.MotorController;
 import MotorControllers.PIDController;
 import SensorHandlers.ImuHandler;
 
@@ -32,7 +32,7 @@ public class JennyNavigation extends Thread{
     public static final int SOUTH = 180;
     public static final int WEST = 270;
     public static final int EAST = 90;
-    public NewMotorController[] driveMotors = new NewMotorController[4];
+    public MotorController[] driveMotors = new MotorController[4];
     public static final int FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR = 0;
     public static final int FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR = 1;
     public static final int BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR = 2;
@@ -172,10 +172,10 @@ public class JennyNavigation extends Thread{
         }
         JsonConfigReader reader = new JsonConfigReader(stream);
         try{
-            driveMotors[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR] = new NewMotorController(reader.getString("FRONT_LEFT_MOTOR_NAME"), "MotorConfig/DriveMotors/NewHolonomicDriveMotorConfig.json", hardwareMap);
-            driveMotors[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR] = new NewMotorController(reader.getString("FRONT_RIGHT_MOTOR_NAME"), "MotorConfig/DriveMotors/NewHolonomicDriveMotorConfig.json", hardwareMap);
-            driveMotors[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR] = new NewMotorController(reader.getString("BACK_LEFT_MOTOR_NAME"), "MotorConfig/DriveMotors/NewHolonomicDriveMotorConfig.json", hardwareMap);
-            driveMotors[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR] = new NewMotorController(reader.getString("BACK_RIGHT_MOTOR_NAME"), "MotorConfig/DriveMotors/NewHolonomicDriveMotorConfig.json", hardwareMap);
+            driveMotors[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR] = new MotorController(reader.getString("FRONT_LEFT_MOTOR_NAME"), "MotorConfig/DriveMotors/NewHolonomicDriveMotorConfig.json", hardwareMap);
+            driveMotors[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR] = new MotorController(reader.getString("FRONT_RIGHT_MOTOR_NAME"), "MotorConfig/DriveMotors/NewHolonomicDriveMotorConfig.json", hardwareMap);
+            driveMotors[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR] = new MotorController(reader.getString("BACK_LEFT_MOTOR_NAME"), "MotorConfig/DriveMotors/NewHolonomicDriveMotorConfig.json", hardwareMap);
+            driveMotors[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR] = new MotorController(reader.getString("BACK_RIGHT_MOTOR_NAME"), "MotorConfig/DriveMotors/NewHolonomicDriveMotorConfig.json", hardwareMap);
             for (int i = 0; i < driveMotors.length; i++) {
                 driveMotors[i].setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
             }
@@ -308,12 +308,13 @@ public class JennyNavigation extends Thread{
     public void newDriveOnHeadingIMU(double heading, double desiredVelocity, long delayTimeMillis, LinearOpMode mode) {
         desiredVelocity = Math.abs(desiredVelocity);
         double curOrientation = orientation.getOrientation();
-        curOrientation += (heading - curOrientation);
+        //curOrientation += (heading - curOrientation);
         double distanceFromHeading = 0;
-        distanceFromHeading = curOrientation - heading;
+        distanceFromHeading = curOrientation + heading;
         if(distanceFromHeading > 180) distanceFromHeading -= 360;
         else if(distanceFromHeading < -180) distanceFromHeading += 360;
         headingController.setSp(0);
+        Log.d("Distance From Heading","" + distanceFromHeading);
         double deltaVelocity = Math.abs(headingController.calculatePID(distanceFromHeading));
 
         /*
@@ -322,7 +323,7 @@ public class JennyNavigation extends Thread{
         the idea behind this is to isolate the 'left' and 'right' side of the desired heading
         weight the wheels based upon their sin or cos as determined in the wheel vectoring
         add to the robot
-         */
+
         int [] leftSideIndexes = {0,0,0,0};
         int [] rightSideIndexes = {0,0,0,0};
         if(heading > 315 || heading <= 45){
@@ -349,9 +350,10 @@ public class JennyNavigation extends Thread{
             rightSideIndexes[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR] = 1;
             rightSideIndexes[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR] = 1;
         }
-
+*/
         //weight the wheels appropriately
-        double [] velocities = determineMotorVelocitiesToDriveOnHeading(heading,desiredVelocity);
+        double [] velocities = determineMotorVelocitiesToDriveOnHeading(distanceFromHeading,desiredVelocity);
+        /*
         for(int i = 0; i < driveMotors.length; i ++){
             if(leftSideIndexes[i] == 1) {
                 if(distanceFromHeading > 0){
@@ -398,6 +400,7 @@ public class JennyNavigation extends Thread{
 //        for(int i = 0; i < velocities.length; i ++){
 //            Log.d("Velocity: " + i, "" + velocities[i] + "in/s");
 //        }
+*/
 
         applyMotorVelocities(velocities);
         mode.sleep(delayTimeMillis);

@@ -10,6 +10,9 @@ import Actions.ServoHandler;
  * Created by robotics on 1/5/18.
  */
 
+/*
+    A class to control the robots
+ */
 public class JennyFlagController extends Thread{
     ServoHandler[] flagHolder = new ServoHandler[2];
     public static final int FLAG_SPINNER = 0;

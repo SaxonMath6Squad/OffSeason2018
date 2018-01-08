@@ -2,14 +2,11 @@ package Actions;
 
 import android.util.Log;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
 
-import MotorControllers.NewMotorController;
-import static Autonomous.RelicRecoveryField.*;
+import MotorControllers.MotorController;
 
 /**
  * Created by robotics on 12/2/17.
@@ -35,8 +32,8 @@ public class ArialDepositor implements ActionHandler {
 
     public ArialDepositor(HardwareMap hw) throws Exception{
         hardwareMap = hw;
-        leftLiftMotor = new SpoolMotor(new NewMotorController("liftMotor","MotorConfig/FunctionMotors/AerialLiftSpool.json", hardwareMap),FAST_EXTEND_SPEED,FAST_RETRACT_SPEED,100, hardwareMap);
-        belt = new SpoolMotor(new NewMotorController("belt", "MotorConfig/FunctionMotors/BeltMotor.json", hardwareMap), 10, 10, 100, hardwareMap);
+        leftLiftMotor = new SpoolMotor(new MotorController("liftMotor","MotorConfig/FunctionMotors/AerialLiftSpool.json", hardwareMap),FAST_EXTEND_SPEED,FAST_RETRACT_SPEED,100, hardwareMap);
+        belt = new SpoolMotor(new MotorController("belt", "MotorConfig/FunctionMotors/BeltMotor.json", hardwareMap), 10, 10, 100, hardwareMap);
         belt.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         belt.setDirection(DcMotorSimple.Direction.REVERSE);
     }

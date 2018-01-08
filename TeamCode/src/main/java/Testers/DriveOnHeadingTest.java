@@ -30,50 +30,38 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
 TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package Autonomous.OpModes;
+package Testers;
 
 import android.util.Log;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import DriveEngine.JennyNavigation;
 
-import SensorHandlers.JennySensorTelemetry;
-import Actions.JennyO1BGlyphExtender;
-
-import static Autonomous.REVColorDistanceSensorController.color.BLUE;
 import static Autonomous.RelicRecoveryField.BLUE_ALLIANCE_2;
 import static Autonomous.RelicRecoveryField.startLocations;
-//import static SensorHandlers.JennySensorTelemetry.JEWEL_JOUST_ACTIVE_POSITION;
-import static SensorHandlers.JennySensorTelemetry.JEWEL_SENSOR;
 
 /*
-    An opmode to test knocking off the correct jewel
+    An opmode to test if all our drive wheels are working correctly
  */
-@Autonomous(name="Jewel Joust Test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
-@Disabled
-public class JewelJoustTest extends LinearOpMode {
+@TeleOp(name="Drive On Heading Test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
+//@Disabled
+public class DriveOnHeadingTest extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
     JennyNavigation navigation;
-    JennyO1BGlyphExtender glyphSystem;
-    JennySensorTelemetry sensorTelemetry;
-    //ImuHandler imuHandler;
     @Override
     public void runOpMode() {
-        //imuHandler = new ImuHandler("imu", hardwareMap);
         try {
             navigation = new JennyNavigation(hardwareMap, startLocations[BLUE_ALLIANCE_2], 0, "RobotConfig/JennyV2.json");
-            glyphSystem = new JennyO1BGlyphExtender(hardwareMap);
-            sensorTelemetry = new JennySensorTelemetry(hardwareMap, 0, 0);
         }
         catch (Exception e){
             Log.e("Error!" , "Jenny Navigation: " + e.toString());
             throw new RuntimeException("Navigation Creation Error! " + e.toString());
+
         }
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -82,13 +70,14 @@ public class JewelJoustTest extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
-        //sensorTelemetry.jewelJoust.setPosition(JEWEL_JOUST_ACTIVE_POSITION);
-        sleep(250);
-        if(sensorTelemetry.getColor(JEWEL_SENSOR) == BLUE){
-
+        while (opModeIsActive()){
+            while (gamepad1.a) navigation.newDriveOnHeadingIMU(JennyNavigation.SOUTH, 10, 10, this);
+            while (gamepad1.b) navigation.newDriveOnHeadingIMU(JennyNavigation.EAST, 10, 10, this);
+            while (gamepad1.x) navigation.newDriveOnHeadingIMU(JennyNavigation.WEST, 10, 10, this);
+            while (gamepad1.y) navigation.newDriveOnHeadingIMU(JennyNavigation.NORTH, 10, 10, this);
+            navigation.brake();
         }
 
         navigation.stopNavigation();
-//        glyphSystem.stopNavigation();
     }
 }

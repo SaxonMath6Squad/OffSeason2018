@@ -3,22 +3,13 @@ package Autonomous.OpModes;
 import android.graphics.Bitmap;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-
-import java.util.ArrayList;
 
 import Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor;
 import Autonomous.VuforiaHelper;
-import DriveEngine.JennyNavigation;
-import SensorHandlers.JennySensorTelemetry;
-import Systems.JennyO1BPickAndExtend;
 
 import static Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor.DESIRED_HEIGHT;
 import static Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor.DESIRED_WIDTH;
-import static DriveEngine.JennyNavigation.EAST;
-import static DriveEngine.JennyNavigation.NORTH;
-import static DriveEngine.JennyNavigation.WEST;
 
 /**
  * Created by robotics on 12/15/17.

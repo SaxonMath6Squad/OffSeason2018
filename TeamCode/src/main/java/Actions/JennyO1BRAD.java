@@ -1,14 +1,11 @@
-package Systems;
+package Actions;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import Actions.ServoGrippers;
-import Actions.ServoHandler;
-import Actions.SpoolMotor;
-import MotorControllers.NewMotorController;
+import MotorControllers.MotorController;
 
 
 /**
@@ -29,7 +26,7 @@ public class JennyO1BRAD {
         hardwareMap = hw;
         try {
             RADExtender =
-                    new SpoolMotor(new NewMotorController("radExtender", "MotorConfig/FunctionMotors/RADExtender.json", hardwareMap),
+                    new SpoolMotor(new MotorController("radExtender", "MotorConfig/FunctionMotors/RADExtender.json", hardwareMap),
                     10, 10, 100, hardwareMap);
             RADGrabber = new ServoHandler("radGrabber", hardwareMap);
         } catch (Exception e){

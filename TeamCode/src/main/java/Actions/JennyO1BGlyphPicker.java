@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import MotorControllers.NewMotorController;
+import MotorControllers.MotorController;
 
 /**
  * Created by robotics on 11/15/17.
@@ -13,20 +13,20 @@ import MotorControllers.NewMotorController;
 /*
     A class to control our glyph picker with one motor
  */
-public class WheelPickerSingleMotor implements ActionHandler {
-    NewMotorController wheelMotor;
+public class JennyO1BGlyphPicker implements ActionHandler {
+    MotorController wheelMotor;
     HardwareMap hardwareMap;
     private double WHEEL_POWERS = 1;
 
 
-    public WheelPickerSingleMotor(HardwareMap hw) throws Exception{
+    public JennyO1BGlyphPicker(HardwareMap hw) throws Exception{
         hardwareMap = hw;
-        wheelMotor = new NewMotorController("glyphMotor", "MotorConfig/DriveMotors/NewHolonomicDriveMotorConfig.json", hardwareMap);
+        wheelMotor = new MotorController("glyphMotor", "MotorConfig/DriveMotors/NewHolonomicDriveMotorConfig.json", hardwareMap);
         wheelMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         wheelMotor.setMotorDirection(DcMotorSimple.Direction.FORWARD);
     }
 
-    public int pick(){
+    public int grab(){
         wheelMotor.setMotorPower(WHEEL_POWERS);
         return 0;
     }

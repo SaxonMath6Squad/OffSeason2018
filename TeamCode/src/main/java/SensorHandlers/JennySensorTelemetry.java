@@ -5,13 +5,11 @@ import android.util.Log;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-import Actions.ServoHandler;
-import Autonomous.ColorModeController;
+import Autonomous.REVColorDistanceSensorController;
 import MotorControllers.JsonConfigReader;
 import Autonomous.Location;
 
@@ -28,7 +26,7 @@ public class JennySensorTelemetry implements RobotSensorTelemetry {
 //    private JennyWithExtendotronHardware robot;
     private JsonConfigReader reader;
     private ColorSensor[] colorSensors = new ColorSensor[2];
-    private ColorModeController jewelColorController;
+    private REVColorDistanceSensorController jewelColorController;
     private DistanceSensor distanceSensor;
     private TouchSensor[] limitSwitches = new TouchSensor[4];
     //public ServoHandler jewelJoust;
@@ -68,7 +66,7 @@ public class JennySensorTelemetry implements RobotSensorTelemetry {
         //jewelJoust.setServoRanges(JEWEL_JOUST_ACTIVE_POSITION, JEWEL_JOUST_STORE_POSITION);
         //jewelJoust.setDegree(JEWEL_JOUST_STORE_POSITION);
         colorSensors[JEWEL_SENSOR] = hardwareMap.colorSensor.get("jewelSensor");
-        //jewelColorController = new ColorModeController(ColorModeController.type.JEWEL_SNATCH_O_MATIC, colorSensors[JEWEL_SENSOR]);
+        //jewelColorController = new REVColorDistanceSensorController(REVColorDistanceSensorController.type.JEWEL_SNATCH_O_MATIC, colorSensors[JEWEL_SENSOR]);
         try {
             reader = new JsonConfigReader(h.appContext.getAssets().open("MotorConfig/DriveMotors/HolonomicDriveMotorConfig.json"));
         } catch (Exception e){
@@ -150,7 +148,7 @@ public class JennySensorTelemetry implements RobotSensorTelemetry {
     }
 
     @Override
-    public ColorModeController.color getColor(int sensor){
+    public REVColorDistanceSensorController.color getColor(int sensor){
         return jewelColorController.getColor();
     }
 
