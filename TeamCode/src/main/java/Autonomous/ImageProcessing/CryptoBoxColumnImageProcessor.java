@@ -265,12 +265,29 @@ public class CryptoBoxColumnImageProcessor {
         }
         return false;
     }
+    public boolean checkIfRed(float [] hsl){
+        if (hsl[0] > 300 || hsl[0] < 60) {
+            //make sure it's not a white red
+            if (hsl[1] > .5) {
+                //make sure it's not a black red
+                if (hsl[2] > .2) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
     public boolean checkIfBlue(int color){
         float [] hsl = new float[3];
         Color.colorToHSV(color,hsl);
         return checkIfBlue(hsl);
     }
-
+    
+    public boolean checkIfRed(int color){
+        float [] hsl = new float[3];
+        Color.colorToHSV(color,hsl);
+        return checkIfRed(hsl);
+    }
 
 
 
