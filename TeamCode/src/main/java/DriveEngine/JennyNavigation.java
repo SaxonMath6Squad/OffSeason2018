@@ -310,7 +310,7 @@ public class JennyNavigation extends Thread{
         double curOrientation = orientation.getOrientation();
         //curOrientation += (heading - curOrientation);
         double distanceFromHeading = 0;
-        distanceFromHeading = curOrientation + heading;
+        distanceFromHeading = heading - curOrientation;
         if(distanceFromHeading > 180) distanceFromHeading -= 360;
         else if(distanceFromHeading < -180) distanceFromHeading += 360;
         headingController.setSp(0);
