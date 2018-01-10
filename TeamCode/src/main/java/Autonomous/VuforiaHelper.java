@@ -10,7 +10,10 @@ import com.vuforia.PIXEL_FORMAT;
 import com.vuforia.Vuforia;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.teamcode.R;
 
 import java.io.File;
@@ -27,6 +30,8 @@ import java.io.IOException;
 public class VuforiaHelper {
 
     VuforiaLocalizer vuLoc;
+    VuforiaTrackables relicTrackables;
+    VuforiaTrackable relicTemplate;
     private final float UPRIGHT_POST_ROTATE_IN_DEG = 270;
     private final float HORIZONTAL_WITH_CAMERA_TO_LEFT_POST_ROTATE_IN_DEG = 180;
 
@@ -42,6 +47,17 @@ public class VuforiaHelper {
         } catch (Exception e){
             throw new RuntimeException(e);
         }
+    }
+
+    public void loadCipherAssets(){
+        relicTrackables = vuLoc.loadTrackablesFromAsset("RelicVuMark");
+        relicTemplate = relicTrackables.get(0);
+        relicTrackables.activate();
+    }
+
+    public RelicRecoveryVuMark getMark(){
+        RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.from(relicTemplate);
+        return vuMark;
     }
 
     public Bitmap getImage(int wantedWidth, int wantedHeight) {

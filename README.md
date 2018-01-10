@@ -20,3 +20,9 @@ This code is for the 2017-2018 Relic Recovery code. A few key features of are co
         easier placement. 
         
         
+The main structure for our code is as follows:
+    Drive Engine -- This handles all driving kinematics found on the robot. This is initialized by OpModes requiring locomotion.
+    Actions -- All components of the robot are initialized here. This includes our Aerial Lift, Glyph Grabber, Jewel Jousts, etc.
+    Autonomous -- All components used by the robot in autonomous are found here. This includes the field layout, Cryptobox Detection Algorithm,
+        and all OpModes used in Autonomous.
+    UserControlled -- All userOpmodes are found here.
