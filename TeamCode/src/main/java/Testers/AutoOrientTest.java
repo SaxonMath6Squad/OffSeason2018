@@ -30,55 +30,39 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
 TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package Autonomous.OpModes;
+package Testers;
 
 import android.util.Log;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import Actions.JewelJouster;
 import DriveEngine.JennyNavigation;
+import MotorControllers.PIDController;
 
-import SensorHandlers.JennySensorTelemetry;
-import Actions.JennyO1BGlyphExtender;
-
-import static Autonomous.REVColorDistanceSensorController.color.BLUE;
 import static Autonomous.RelicRecoveryField.BLUE_ALLIANCE_2;
 import static Autonomous.RelicRecoveryField.startLocations;
-import static DriveEngine.JennyNavigation.ADJUSTING_SPEED_IN_PER_SEC;
-import static DriveEngine.JennyNavigation.DEFAULT_SLEEP_DELAY_MILLIS;
-import static DriveEngine.JennyNavigation.NORTH;
-import static DriveEngine.JennyNavigation.SOUTH;
 
 /*
-    An opmode to test knocking off the correct jewel
+    An opmode to test if all our drive wheels are working correctly
  */
-@Autonomous(name="Jewel Joust Test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
+@TeleOp(name="Auto Orient Test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
 //@Disabled
-public class JewelJoustTest extends LinearOpMode {
+public class AutoOrientTest extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
     JennyNavigation navigation;
-    JennyO1BGlyphExtender glyphSystem;
-    JennySensorTelemetry sensorTelemetry;
-    JewelJouster jewelJouster;
-    //ImuHandler imuHandler;
     @Override
     public void runOpMode() {
-        //imuHandler = new ImuHandler("imu", hardwareMap);
         try {
             navigation = new JennyNavigation(hardwareMap, startLocations[BLUE_ALLIANCE_2], 0, "RobotConfig/JennyV2.json");
-            glyphSystem = new JennyO1BGlyphExtender(hardwareMap);
-            sensorTelemetry = new JennySensorTelemetry(hardwareMap, 0, 0);
-            jewelJouster = new JewelJouster("jewelJouster", hardwareMap);
         }
         catch (Exception e){
             Log.e("Error!" , "Jenny Navigation: " + e.toString());
             throw new RuntimeException("Navigation Creation Error! " + e.toString());
+
         }
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -87,25 +71,28 @@ public class JewelJoustTest extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
-        //sensorTelemetry.jewelJoust.setPosition(JEWEL_JOUST_ACTIVE_POSITION);
-        jewelJouster.setPosition(JewelJouster.EXTENDION_MODE.READ);
-        sleep(250);
-        if(jewelJouster.getJewelColor() == BLUE){
-            navigation.turnToHeading(15, this);
-            jewelJouster.setPosition(JewelJouster.EXTENDION_MODE.HIT);
-            sleep(DEFAULT_SLEEP_DELAY_MILLIS);
-            navigation.driveDistance(3, SOUTH, ADJUSTING_SPEED_IN_PER_SEC, this);
-            sleep(DEFAULT_SLEEP_DELAY_MILLIS);
-        }
-        else {
-            navigation.driveDistance(1.5, SOUTH, ADJUSTING_SPEED_IN_PER_SEC, this);
-            sleep(DEFAULT_SLEEP_DELAY_MILLIS);
-            jewelJouster.setPosition(JewelJouster.EXTENDION_MODE.HIT);
-            navigation.driveDistance(2, NORTH, ADJUSTING_SPEED_IN_PER_SEC, this);
-            sleep(DEFAULT_SLEEP_DELAY_MILLIS);
+        while (opModeIsActive()){
+            if(gamepad1.left_stick_button){
+                navigation.setOrientationOffset(360 - navigation.getOrientation());
+            }
+
+            if(gamepad1.a){
+                navigation.turnToHeading(JennyNavigation.SOUTH, this);
+            }
+            else if(gamepad1.b){
+                navigation.turnToHeading(JennyNavigation.EAST, this);
+            }
+            else if(gamepad1.x){
+                navigation.turnToHeading(JennyNavigation.WEST, this);
+            }
+            else if(gamepad1.y){
+                navigation.turnToHeading(JennyNavigation.NORTH, this);
+            }
+            else {
+                navigation.brake();
+            }
         }
 
         navigation.stopNavigation();
-//        glyphSystem.stopNavigation();
     }
 }

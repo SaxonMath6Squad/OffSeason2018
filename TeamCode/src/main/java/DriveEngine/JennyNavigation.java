@@ -107,6 +107,11 @@ public class JennyNavigation extends Thread{
 
     }
 
+    public void setOrientationOffset(double offset){
+        orientationOffset = offset;
+        orientation.setOrientationOffset(orientationOffset);
+    }
+
     private void updateLastMotorPositionsInInches(){
         for (int i = 0; i < driveMotors.length; i++){
             lastMotorPositionsInInches[i] = driveMotors[i].getInchesFromStart();

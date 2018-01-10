@@ -45,12 +45,12 @@ import SensorHandlers.JennySensorTelemetry;
 import Actions.JennyO1BGlyphExtender;
 import Actions.JennyO1BRAD;
 
+import static Actions.JennyO1BGlyphExtender.GROUND;
+import static Actions.JennyO1BGlyphExtender.ROW1;
+import static Actions.JennyO1BGlyphExtender.ROW2;
+import static Actions.JennyO1BGlyphExtender.ROW3;
+import static Actions.JennyO1BGlyphExtender.ROW4;
 import static Autonomous.RelicRecoveryField.BLUE_ALLIANCE_2;
-import static Autonomous.RelicRecoveryField.GROUND;
-import static Autonomous.RelicRecoveryField.ROW1;
-import static Autonomous.RelicRecoveryField.ROW2;
-import static Autonomous.RelicRecoveryField.ROW3;
-import static Autonomous.RelicRecoveryField.ROW4;
 import static Autonomous.RelicRecoveryField.startLocations;
 import static DriveEngine.JennyNavigation.NORTH;
 import static SensorHandlers.JennySensorTelemetry.RAD_LIMIT;
@@ -72,7 +72,8 @@ public class JennyO1B extends LinearOpMode {
     JewelJouster jouster;
     JennySensorTelemetry sensorTelemetry;
     boolean autoLiftPositionMode = false;
-    double[] liftPosition = {GROUND, ROW1, ROW2, ROW3, ROW4};
+    double[] liftPosition = new double[]{GROUND, ROW1, ROW2, ROW3, ROW4};
+
     int position = 0;
 
     @Override
@@ -116,6 +117,7 @@ public class JennyO1B extends LinearOpMode {
         rightJoystick = new JoystickHandler(gamepad1,JoystickHandler.RIGHT_JOYSTICK);
         telemetry.addData("Status", "Initialized");
         telemetry.update();
+        jouster.setPosition(JewelJouster.EXTENDION_MODE.NEUTRAL);
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
@@ -259,8 +261,11 @@ public class JennyO1B extends LinearOpMode {
             if(gamepad1.right_stick_button){
                 navigation.turnToHeading(NORTH, this);
             }
+            if(gamepad1.left_stick_button){
+                navigation.setOrientationOffset(0);
+            }
 
-            //sensorTelemetry.setJewelJoustPosition(JEWEL_JOUST_STORE_POSITION);
+            jouster.setPosition(JewelJouster.EXTENDION_MODE.NEUTRAL);
             telemetry.addData("lift tick", glyphLift.getLiftPosition());
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.update();

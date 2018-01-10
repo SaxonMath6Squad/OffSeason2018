@@ -25,9 +25,7 @@ import Autonomous.Location;
 public class JennySensorTelemetry implements RobotSensorTelemetry {
 //    private JennyWithExtendotronHardware robot;
     private JsonConfigReader reader;
-    private ColorSensor[] colorSensors = new ColorSensor[2];
-    private REVColorDistanceSensorController jewelColorController;
-    private DistanceSensor distanceSensor;
+    private REVColorDistanceSensorController colorSensors[] = new REVColorDistanceSensorController[2];
     private TouchSensor[] limitSwitches = new TouchSensor[4];
     //public ServoHandler jewelJoust;
 //    private ImuHandler imu;
@@ -45,7 +43,6 @@ public class JennySensorTelemetry implements RobotSensorTelemetry {
     public static final int EXTEND_LIMIT = 0;
     public static final int RAD_LIMIT = 1;
     public static final int COLOR_DISTANCE_SENSOR = 0;
-    public static final int JEWEL_SENSOR = 1;
     //public static final double JEWEL_JOUST_ACTIVE_POSITION = 35;
    // public static final double JEWEL_JOUST_STORE_POSITION = 100;
     public static final double START_LOCATION_X = 0;
@@ -58,15 +55,9 @@ public class JennySensorTelemetry implements RobotSensorTelemetry {
 //        robot = new JennyWithExtendotronHardware(hardwareMap);
         startPositionX = positionX;
         startPositionY = positionY;
-        colorSensors[COLOR_DISTANCE_SENSOR] = hardwareMap.colorSensor.get("colorSensor");
-        distanceSensor = hardwareMap.get(DistanceSensor.class, "colorSensor");
+        colorSensors[COLOR_DISTANCE_SENSOR] = new REVColorDistanceSensorController(REVColorDistanceSensorController.type.JEWEL_SNATCH_O_MATIC, "jewelSensor", hardwareMap);
         limitSwitches[EXTEND_LIMIT] = hardwareMap.touchSensor.get("extendLimit");
         limitSwitches[RAD_LIMIT] = hardwareMap.touchSensor.get("radLimit");
-        //jewelJoust = new ServoHandler("jewelJoust", hardwareMap);
-        //jewelJoust.setServoRanges(JEWEL_JOUST_ACTIVE_POSITION, JEWEL_JOUST_STORE_POSITION);
-        //jewelJoust.setDegree(JEWEL_JOUST_STORE_POSITION);
-        colorSensors[JEWEL_SENSOR] = hardwareMap.colorSensor.get("jewelSensor");
-        //jewelColorController = new REVColorDistanceSensorController(REVColorDistanceSensorController.type.JEWEL_SNATCH_O_MATIC, colorSensors[JEWEL_SENSOR]);
         try {
             reader = new JsonConfigReader(h.appContext.getAssets().open("MotorConfig/DriveMotors/HolonomicDriveMotorConfig.json"));
         } catch (Exception e){
@@ -135,7 +126,7 @@ public class JennySensorTelemetry implements RobotSensorTelemetry {
     @Override
     public double getDistance(DistanceUnit unit){
         double distance = NO_DETECTABLE_WALL_DISTANCE;
-        double curDist = distanceSensor.getDistance(unit);
+        double curDist = colorSensors[COLOR_DISTANCE_SENSOR].getDistance(unit);
         if(curDist > 0 && curDist < 40 && !Double.isNaN(curDist)){
             distance = curDist;
         }
@@ -147,15 +138,14 @@ public class JennySensorTelemetry implements RobotSensorTelemetry {
         return limitSwitches[sensor].isPressed();
     }
 
-    @Override
-    public REVColorDistanceSensorController.color getColor(int sensor){
-        return jewelColorController.getColor();
-    }
-
 
     @Override
     public void stopSensorTelemetry(){
         shouldRun = false;
         stopTelemetryLogging();
+    }
+
+    public REVColorDistanceSensorController.color getColor(int sensor){
+        return colorSensors[COLOR_DISTANCE_SENSOR].getColor();
     }
 }

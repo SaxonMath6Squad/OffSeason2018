@@ -87,11 +87,6 @@ public class RelicRecoveryField {
      */
 
     public final static Location[] cryptoBoxCenters = {new Location(108,20), new Location(120, 84), new Location(36, 20), new Location(24, 84)}; //reference the centers of the cryptoboxes
-    public final static double GROUND = 0;
-    public final static double ROW1 = 6;
-    public final static double ROW2 = 11.5;
-    public final static double ROW3 = 17.75;
-    public final static double ROW4 = 19.25;
     public final static double DIST_FROM_CRYPTOBOX_2_TO_PIT_INCHES = 48;
     public final static double BLUE_CRYPTOBOX_2_TO_PIT_ANGLE = 20;
     public final static double PIT_TO_BLUE_CRYPTOBOX_2_ANGLE = 200;

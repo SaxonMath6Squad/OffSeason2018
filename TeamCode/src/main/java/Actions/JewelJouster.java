@@ -14,9 +14,10 @@ public class JewelJouster implements ActionHandler {
     private ServoHandler servo;
     private REVColorDistanceSensorController colorSensor;
     private HardwareMap hardwareMap;
-    public enum EXTENDION_MODE {STORE, READ, HIT};
+    public enum EXTENDION_MODE {STORE, READ, HIT, NEUTRAL};
     private EXTENDION_MODE curMode = EXTENDION_MODE.STORE;
     private static final double STORE_POSITION = 106.0;
+    private static final double NEUTRAL_POSITION = 85.0;
     private static final double READ_POSITION = 45.0;
     private static final double HIT_POSITION = 35.0;
 
@@ -38,6 +39,9 @@ public class JewelJouster implements ActionHandler {
                 break;
             case HIT:
                 servo.setDegree(HIT_POSITION);
+                break;
+            case NEUTRAL:
+                servo.setDegree(NEUTRAL_POSITION);
                 break;
         }
     }

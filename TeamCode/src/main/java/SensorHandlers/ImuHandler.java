@@ -58,6 +58,10 @@ public class ImuHandler extends Thread{
         }).start();
     }
 
+    public void setOrientationOffset(double offset){
+        orientationOffset = offset + orientationOffset;
+    }
+
     private void safetySleep(long time){
         long start = System.currentTimeMillis();
         while(System.currentTimeMillis() - start < time && shouldRun);

@@ -39,6 +39,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import Actions.JewelJouster;
 import Autonomous.REVColorDistanceSensorController.*;
 import DriveEngine.JennyNavigation;
 import SensorHandlers.JennySensorTelemetry;
@@ -51,7 +52,6 @@ import static Autonomous.RelicRecoveryField.startLocations;
 import static DriveEngine.JennyNavigation.DEFAULT_SLEEP_DELAY_MILLIS;
 import static DriveEngine.JennyNavigation.MED_SLEEP_DELAY_MILLIS;
 import static SensorHandlers.JennySensorTelemetry.COLOR_DISTANCE_SENSOR;
-import static SensorHandlers.JennySensorTelemetry.JEWEL_SENSOR;
 
 /*
     An opmode to test if all our drive wheels are working correctly
@@ -67,6 +67,7 @@ public class AutoWiringTest extends LinearOpMode {
     JennyO1BGlyphExtender glyphSystem;
     JennySensorTelemetry sensorTelemetry;
     JennyFlagController flagController;
+    JewelJouster jewelJouster;
 
     @Override
     public void runOpMode() {
@@ -82,6 +83,7 @@ public class AutoWiringTest extends LinearOpMode {
             glyphSystem = new JennyO1BGlyphExtender(hardwareMap);
             sensorTelemetry = new JennySensorTelemetry(hardwareMap, 0, 0);
             flagController = new JennyFlagController(hardwareMap);
+            jewelJouster = new JewelJouster("jewelJouster", hardwareMap);
         }
         catch (Exception e){
             Log.e("Error!" , e.toString());
@@ -139,7 +141,7 @@ public class AutoWiringTest extends LinearOpMode {
 
         color[] detectedColors = new color[3];
         detectedColors[0] = sensorTelemetry.getColor(COLOR_DISTANCE_SENSOR);
-        detectedColors[1] = sensorTelemetry.getColor(JEWEL_SENSOR);
+        detectedColors[1] = jewelJouster.getJewelColor();
         detectedColors[2] = glyphSystem.getColor();
         for(int i = 0; i < detectedColors.length; i++){
             if(detectedColors[i] == color.UNKNOWN) sensorOk[i] = true;

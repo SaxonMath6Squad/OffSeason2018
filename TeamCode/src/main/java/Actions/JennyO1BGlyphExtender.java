@@ -24,6 +24,11 @@ import static Autonomous.REVColorDistanceSensorController.type.GLYPH_STACK_O_TRO
 public class JennyO1BGlyphExtender {
     ArialDepositor glyphPlacement;
     REVColorDistanceSensorController glyphColorController;
+    public final static double GROUND = 0;
+    public final static double ROW1 = 6;
+    public final static double ROW2 = 11.5;
+    public final static double ROW3 = 17.75;
+    public final static double ROW4 = 19.25;
     HardwareMap hardwareMap;
 
     public JennyO1BGlyphExtender(HardwareMap hw) throws Exception{
