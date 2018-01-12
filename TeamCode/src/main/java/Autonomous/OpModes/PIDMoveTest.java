@@ -67,7 +67,7 @@ public class PIDMoveTest extends LinearOpMode {
     public void runOpMode() {
         //imuHandler = new ImuHandler("imu", hardwareMap);
         try {
-            navigation = new JennyNavigation(hardwareMap, startLocations[BLUE_ALLIANCE_2], 90, "RobotConfig/JennyV2.json");
+            navigation = new JennyNavigation(hardwareMap, startLocations[BLUE_ALLIANCE_2], 0, "RobotConfig/JennyV2.json");
             glyphSystem = new ArialDepositor(hardwareMap);
             sensorTelemetry = new JennySensorTelemetry(hardwareMap, 0, 0);
             jewelJouster = new JewelJouster("jewelJouster", hardwareMap);
@@ -83,7 +83,7 @@ public class PIDMoveTest extends LinearOpMode {
         waitForStart();
         runtime.reset();
         while(opModeIsActive())
-        navigation.driveOnHeadingIMU(JennyNavigation.WEST,JennyNavigation.ADJUSTING_SPEED_IN_PER_SEC,10,this);
+        navigation.correctedDriveOnHeadingIMU(JennyNavigation.WEST,JennyNavigation.ADJUSTING_SPEED_IN_PER_SEC,100,this);
         /*
         //sensorTelemetry.jewelJoust.setPosition(JEWEL_JOUST_ACTIVE_POSITION);
         jewelJouster.setPosition(JewelJouster.EXTENDION_MODE.HIT);

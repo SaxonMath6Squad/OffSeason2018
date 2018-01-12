@@ -254,7 +254,7 @@ public class JennyNavigation extends Thread{
         //mode.telemetry.addData("Wanted heading", heading);
         //mode.telemetry.addData("Current heading", curOrientation);
         //mode.telemetry.addData("Dist from heading", distanceFromHeading);
-    //if(heading - curHeading < 0) curHeading -= 360;
+        //if(heading - curHeading < 0) curHeading -= 360;
 //        else if(heading - curHeading > 180) curHeading +=360;
         double [] velocities = determineMotorVelocitiesToDriveOnHeading(distanceFromHeading,desiredVelocity);
         if(distanceFromHeading  < 0){
@@ -309,6 +309,69 @@ public class JennyNavigation extends Thread{
 //        }
 
         applyMotorVelocities(velocities);
+        mode.sleep(delayTimeMillis);
+    }
+
+    public void correctedDriveOnHeadingIMU(int heading, double desiredVelocity, long delayTimeMillis, LinearOpMode mode) {
+        desiredVelocity = Math.abs(desiredVelocity);
+        double curOrientation = orientation.getOrientation();
+        //curOrientation += (heading - curOrientation);
+        double distanceFromHeading = 0;
+        distanceFromHeading = heading - curOrientation; // as in -1 if heading is 0 and current orientation is 1
+        if(distanceFromHeading > 180) distanceFromHeading -= 360;
+        if(distanceFromHeading < -180) distanceFromHeading += 360;
+        headingController.setSp(0);
+
+        double deltaVelocity = headingController.calculatePID((distanceFromHeading - heading)%90); //isue with this line...
+        Log.d("heading", Double.toString(heading));
+        Log.d("Distance from heading", Double.toString(distanceFromHeading));
+        Log.d("Current heading", Double.toString(curOrientation));
+        Log.d("Distance From Zero","" + (distanceFromHeading%90));
+        Log.d("Delta velocity", Double.toString(deltaVelocity));
+        //Log.d("Desired Velocity", Double.toString(desiredVelocity));
+        //mode.telemetry.addData("Wanted heading", heading);
+        //mode.telemetry.addData("Current heading", curOrientation);
+        //mode.telemetry.addData("Dist from heading", distanceFromHeading);
+        //if(heading - curHeading < 0) curHeading -= 360;
+//        else if(heading - curHeading > 180) curHeading +=360;
+        double [] velocities = determineMotorVelocitiesToDriveOnHeading(0,desiredVelocity);
+        //real quick, make distance from heading always positive
+        if(distanceFromHeading < 0) distanceFromHeading = Math.abs(distanceFromHeading);
+        else if(distanceFromHeading > 0) distanceFromHeading = 360 - distanceFromHeading;
+        Log.d("distance from f heading", Double.toString(distanceFromHeading));
+        if(distanceFromHeading > 315 || distanceFromHeading <= 45){
+            velocities[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR] -= deltaVelocity;
+            velocities[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR] += deltaVelocity;
+            velocities[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR] -= deltaVelocity;
+            velocities[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR] += deltaVelocity;
+        }
+
+        else if(distanceFromHeading >45 && distanceFromHeading <= 135){
+            velocities[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR] -= deltaVelocity;
+            velocities[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR] -= deltaVelocity;
+            velocities[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR] += deltaVelocity;
+            velocities[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR] += deltaVelocity;
+        }
+
+        else if(distanceFromHeading >135 && distanceFromHeading <= 225){
+            velocities[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR] -= deltaVelocity;
+            velocities[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR] += deltaVelocity;
+            velocities[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR] -= deltaVelocity;
+            velocities[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR] += deltaVelocity;
+        }
+
+        else if(distanceFromHeading >225 && distanceFromHeading <= 315){
+            velocities[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR] += deltaVelocity;
+            velocities[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR] += deltaVelocity;
+            velocities[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR] -= deltaVelocity;
+            velocities[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR] -= deltaVelocity;
+        }
+
+        for(int i = 0; i < velocities.length; i ++){
+            Log.d("Velocity: " + i, "" + velocities[i] + "in/s");
+        }
+
+        //applyMotorVelocities(velocities);
         mode.sleep(delayTimeMillis);
     }
 

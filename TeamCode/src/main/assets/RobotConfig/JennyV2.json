@@ -16,8 +16,8 @@
   "TURN_Ki":"0.00",
   "TURN_Ki_MAX":".05",
   "TURN_Kd":"0.0",
-  "HEADING_Kp":"1", // .2
-  "HEADING_Ki":".1",
+  "HEADING_Kp":".2", // .2
+  "HEADING_Ki":"0",
   "HEADING_Ki_MAX":"10",
   "HEADING_Kd":"0",
   "CAMERA_Kp":"0",
