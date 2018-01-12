@@ -82,8 +82,9 @@ public class PIDMoveTest extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
-        while(opModeIsActive())
-        navigation.correctedDriveOnHeadingIMU(JennyNavigation.WEST,JennyNavigation.ADJUSTING_SPEED_IN_PER_SEC,100,this);
+        navigation.turnToHeading(JennyNavigation.WEST, this);
+        while (opModeIsActive())
+        navigation.correctedDriveOnHeadingIMU(JennyNavigation.SOUTH,JennyNavigation.ADJUSTING_SPEED_IN_PER_SEC,JennyNavigation.DEFAULT_SLEEP_DELAY_MILLIS,this);
         /*
         //sensorTelemetry.jewelJoust.setPosition(JEWEL_JOUST_ACTIVE_POSITION);
         jewelJouster.setPosition(JewelJouster.EXTENDION_MODE.HIT);

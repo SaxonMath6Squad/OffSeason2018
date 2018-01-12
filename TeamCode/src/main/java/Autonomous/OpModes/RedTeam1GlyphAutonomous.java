@@ -162,7 +162,6 @@ public class RedTeam1GlyphAutonomous extends LinearOpMode {
         telemetry.update();
         navigation.turnToHeading(NORTH, this);
         sleep(DEFAULT_SLEEP_DELAY_MILLIS);
-        navigation.driveDistance(3, SOUTH, SLOW_SPEED_IN_PER_SEC, this);
         telemetry.addData("Heading", navigation.getOrientation());
         telemetry.update();
         switch (mark) {
@@ -180,7 +179,7 @@ public class RedTeam1GlyphAutonomous extends LinearOpMode {
         curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
         centers = cryptoBoxFinder.findColumnCenters(curImage, false);
         while (centers.size() == 0 && opModeIsActive()) {
-            navigation.newDriveOnHeadingIMU(EAST, ADJUSTING_SPEED_IN_PER_SEC, 0, this);
+            navigation.correctedDriveOnHeadingIMU(EAST, ADJUSTING_SPEED_IN_PER_SEC, 0, this);
             curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
             centers = cryptoBoxFinder.findColumnCenters(curImage, false);
         }
@@ -209,14 +208,14 @@ public class RedTeam1GlyphAutonomous extends LinearOpMode {
     public boolean centerOnCryptoBox(int column, ArrayList<Integer> centers, int dirHint){
         if(cryptoBoxFinder.imageWidth/2 < centers.get(column).intValue()){
             if(cryptoBoxFinder.imageWidth/2  - centers.get(column).intValue() < centers.get(column).intValue()/10){
-                navigation.newDriveOnHeadingIMU(EAST, ADJUSTING_SPEED_IN_PER_SEC, 0, this);
+                navigation.correctedDriveOnHeadingIMU(EAST, ADJUSTING_SPEED_IN_PER_SEC, 0, this);
             } else {
                 navigation.brake();
                 return true;
             }
         } else if(cryptoBoxFinder.imageWidth/2  > centers.get(column).intValue()){
             if(centers.get(column).intValue() - cryptoBoxFinder.imageWidth/2  > centers.get(column).intValue()/10){
-                navigation.newDriveOnHeadingIMU(WEST, ADJUSTING_SPEED_IN_PER_SEC, 0, this);
+                navigation.correctedDriveOnHeadingIMU(WEST, ADJUSTING_SPEED_IN_PER_SEC, 0, this);
             } else {
                 navigation.brake();
                 return true;
