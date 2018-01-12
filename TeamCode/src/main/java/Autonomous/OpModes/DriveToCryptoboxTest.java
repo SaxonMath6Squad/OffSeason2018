@@ -67,7 +67,7 @@ public class DriveToCryptoboxTest extends LinearOpMode{
         }
         centers = cryptoBoxFinder.findColumnCenters(curImage, false);
 
-        nav.driveToCryptobox(centers.get(0),cryptoBoxFinder.imageWidth/2, MED_SPEED_IN_PER_SEC, this);
+        nav.driveToCryptobox(BLUE_ALLIANCE_2, centers.get(0),cryptoBoxFinder.imageWidth/2, MED_SPEED_IN_PER_SEC, this);
 
         nav.stopNavigation();
         sensorTelemetry.stopSensorTelemetry();

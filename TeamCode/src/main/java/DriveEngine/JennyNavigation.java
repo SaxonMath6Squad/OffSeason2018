@@ -417,7 +417,7 @@ public class JennyNavigation extends Thread{
         double averagePosition = 0;
         while(distanceTraveled < distanceInInches && mode.opModeIsActive()){
             startTime = System.currentTimeMillis();
-            //from our motor posisition, determine location
+            //from our motor position, determine location
             newDriveOnHeadingIMU(heading,desiredVelocity,0,mode);
             motorPositionsInches = getMotorPositionsInches();
             deltaInches = new double[4];
