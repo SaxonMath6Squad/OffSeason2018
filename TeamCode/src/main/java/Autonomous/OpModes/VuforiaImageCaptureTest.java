@@ -19,7 +19,7 @@ import Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor;
     An opmode to test saving images using vuforia
  */
 @Autonomous(name="Save Image Test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
-@Disabled
+//@Disabled
 public class VuforiaImageCaptureTest extends LinearOpMode{
 
     CryptoBoxColumnImageProcessor cryptoFinder;
@@ -30,7 +30,7 @@ public class VuforiaImageCaptureTest extends LinearOpMode{
 
         /*To access the image: you need to iterate through the images of the frame object:*/
         VuforiaHelper vuforia = new VuforiaHelper();
-        cryptoFinder = new CryptoBoxColumnImageProcessor(100,120,.1,1);
+        cryptoFinder = new CryptoBoxColumnImageProcessor(100,120,.1,1, CryptoBoxColumnImageProcessor.CRYPTOBOX_COLOR.RED);
         telemetry.addData("Status","Initialized");
         telemetry.update();
         waitForStart();

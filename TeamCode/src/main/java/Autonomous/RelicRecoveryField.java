@@ -12,15 +12,15 @@ public class RelicRecoveryField {
     public final static int BLUE_ALLIANCE_2 = 1;
     public final static int RED_ALLIANCE_1 = 2;
     public final static int RED_ALLIANCE_2 = 3;
-
     public final static int SCORING_COLUMN_1 = 0;
     public final static int SCORING_COLUMN_2 = 1;
     public final static int SCORING_COLUMN_3 = 2;
 
+
     //cryptobox designations
     final static double CRYPTOBOX_WIDTH_INCHES = 24;
-    final static double CRYPTOBOX_COLORED_COLUMN_WIDTHS_INCHES = 1.375;
-    final static double CRYPTOBOX_SCORING_COLUMN_WIDTHS_INCHES = 6.125;
+    public final static double CRYPTOBOX_COLORED_COLUMN_WIDTHS_INCHES = 1.375;
+    public final static double CRYPTOBOX_SCORING_COLUMN_WIDTHS_INCHES = 6.125;
     public final static double CRYPTOBOX_THICKNESS_INCHES = 4;
 
     public Location determineLocationOfCryptoboxScoringCenter(int team, int col){

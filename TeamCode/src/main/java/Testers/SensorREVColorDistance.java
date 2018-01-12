@@ -56,7 +56,7 @@ import java.util.Locale;
 /*
     An opmode to test the REV color distance sensor
  */
-@Autonomous(name = "Sensor: REVColorDistance", group = "Sensor")
+@Autonomous(name = "JewelJouster Color Sensor Test", group = "Sensor")
 @Disabled                            // Comment this out to add to the opmode list
 public class SensorREVColorDistance extends LinearOpMode {
 

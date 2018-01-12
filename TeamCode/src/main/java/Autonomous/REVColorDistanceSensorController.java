@@ -19,7 +19,7 @@ public class REVColorDistanceSensorController {
     }
 
     public enum color{
-        BLUE, RED, GREY, BROWN, UNKNOWN
+        BLUE, RED, GREY, BROWN, UNKNOWN, NOT_IN_RANGE
     }
 
     type colorMode;
@@ -51,14 +51,17 @@ public class REVColorDistanceSensorController {
                     if (red() && !blue()) color = REVColorDistanceSensorController.color.RED;
                     else if (blue() && !red()) color = REVColorDistanceSensorController.color.BLUE;
                 }
-                else color = REVColorDistanceSensorController.color.UNKNOWN;
+                else {
+                    color = REVColorDistanceSensorController.color.NOT_IN_RANGE;
+
+                }
                 break;
             case GLYPH_STACK_O_TRON:
                 if(!Double.isNaN(distanceSensor.getDistance(DistanceUnit.CM))) {
                     if (brown() && !grey()) color = REVColorDistanceSensorController.color.BROWN;
                     else if (grey() && !brown()) color = REVColorDistanceSensorController.color.GREY;
                 }
-                else color = REVColorDistanceSensorController.color.UNKNOWN;
+                else color = REVColorDistanceSensorController.color.NOT_IN_RANGE;
                 break;
         }
         return color;

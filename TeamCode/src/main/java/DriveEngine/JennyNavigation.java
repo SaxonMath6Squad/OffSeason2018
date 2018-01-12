@@ -523,10 +523,11 @@ public class JennyNavigation extends Thread{
         double curHeading = orientation.getOrientation();
         double rps;
         double distanceFromHeading = 0;
-        distanceFromHeading = desiredHeading - orientation.getOrientation();
-        if(distanceFromHeading > 180) distanceFromHeading = 360 - distanceFromHeading;
+        distanceFromHeading = desiredHeading - curHeading;
+        if(distanceFromHeading > 180) distanceFromHeading = distanceFromHeading - 360;
         else if(distanceFromHeading < -180) distanceFromHeading = 360 + distanceFromHeading;
-        if(distanceFromHeading > 0){
+        Log.d("Distance From Heading", "" + distanceFromHeading);
+        if(distanceFromHeading >= 0 && distanceFromHeading <= 180){
             while(Math.abs(distanceFromHeading) > HEADING_THRESHOLD && mode.opModeIsActive()){
                 //heading always positive
                 Log.d("Distance From Heading","" + distanceFromHeading);
@@ -538,13 +539,13 @@ public class JennyNavigation extends Thread{
                 curHeading = orientation.getOrientation();
                 Log.d("Cur Heading", "" + curHeading);
                 distanceFromHeading = desiredHeading - curHeading;
-                if(distanceFromHeading > 180) distanceFromHeading = 360 - distanceFromHeading;
+                if(distanceFromHeading > 180) distanceFromHeading = distanceFromHeading - 360;
                 else if(distanceFromHeading < -180) distanceFromHeading = 360 + distanceFromHeading;
             }
             brake();
         }
 
-        else if(distanceFromHeading < 0){
+        else if((distanceFromHeading <= 360 && distanceFromHeading >= 180) || distanceFromHeading < 0){
             while(Math.abs(distanceFromHeading) > HEADING_THRESHOLD && mode.opModeIsActive()){
                 //heading always positive
                 //Log.d("Heading", Double.toString(curHeading));
@@ -556,7 +557,7 @@ public class JennyNavigation extends Thread{
                 curHeading = orientation.getOrientation();
                 Log.d("Cur Heading", "" + curHeading);
                 distanceFromHeading = desiredHeading - curHeading;
-                if(distanceFromHeading > 180) distanceFromHeading = 360 - distanceFromHeading;
+                if(distanceFromHeading > 180) distanceFromHeading = distanceFromHeading - 360;
                 else if(distanceFromHeading < -180) distanceFromHeading = 360 + distanceFromHeading;
             }
             brake();

@@ -39,12 +39,12 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import Actions.ArialDepositor;
 import Actions.JewelJouster;
 import Autonomous.REVColorDistanceSensorController.*;
 import DriveEngine.JennyNavigation;
 import SensorHandlers.JennySensorTelemetry;
 import Actions.JennyFlagController;
-import Actions.JennyO1BGlyphExtender;
 import Actions.JennyO1BRAD;
 
 import static Autonomous.RelicRecoveryField.BLUE_ALLIANCE_2;
@@ -64,7 +64,7 @@ public class AutoWiringTest extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
     JennyNavigation navigation;
     JennyO1BRAD rad;
-    JennyO1BGlyphExtender glyphSystem;
+    ArialDepositor glyphSystem;
     JennySensorTelemetry sensorTelemetry;
     JennyFlagController flagController;
     JewelJouster jewelJouster;
@@ -80,7 +80,7 @@ public class AutoWiringTest extends LinearOpMode {
         try {
             navigation = new JennyNavigation(hardwareMap, startLocations[BLUE_ALLIANCE_2], 0, "RobotConfig/JennyV2.json");
             rad = new JennyO1BRAD(hardwareMap);
-            glyphSystem = new JennyO1BGlyphExtender(hardwareMap);
+            glyphSystem = new ArialDepositor(hardwareMap);
             sensorTelemetry = new JennySensorTelemetry(hardwareMap, 0, 0);
             flagController = new JennyFlagController(hardwareMap);
             jewelJouster = new JewelJouster("jewelJouster", hardwareMap);
@@ -120,17 +120,17 @@ public class AutoWiringTest extends LinearOpMode {
             }
         }
 
-        double liftPosition = glyphSystem.getLiftPosition();
+        double liftPosition = glyphSystem.getLiftMotorPosition();
         glyphSystem.setLiftPower(0.3);
         sleep(DEFAULT_SLEEP_DELAY_MILLIS);
-        glyphSystem.pauseLift();
-        double newLiftPosition = glyphSystem.getLiftPosition();
+        glyphSystem.stopLift();
+        double newLiftPosition = glyphSystem.getLiftMotorPosition();
         if(newLiftPosition > liftPosition) miscMotorCount++;
-        liftPosition = glyphSystem.getLiftPosition();
+        liftPosition = glyphSystem.getLiftMotorPosition();
         glyphSystem.setLiftPower(-0.3);
         sleep(DEFAULT_SLEEP_DELAY_MILLIS);
-        glyphSystem.pauseLift();
-        newLiftPosition = glyphSystem.getLiftPosition();
+        glyphSystem.stopLift();
+        newLiftPosition = glyphSystem.getLiftMotorPosition();
         if(liftPosition > newLiftPosition) miscMotorCount++;
         if(miscMotorCount == 2) miscMotorOk = true;
         if(miscMotorOk) {

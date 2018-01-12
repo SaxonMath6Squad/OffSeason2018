@@ -34,28 +34,27 @@ package Testers;
 
 import android.util.Log;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import Actions.JennyO1BGlyphExtender;
+import Actions.ArialDepositor;
 
 /*
     An opmode to test if all our drive wheels are working correctly
  */
-@TeleOp(name="Auto Wiring Test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
-@Disabled
+@TeleOp(name="Glyph Auto Level Placement Test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
+//@Disabled
 public class LiftToPositionTest extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
-    JennyO1BGlyphExtender glyphSystem;
+    ArialDepositor glyphSystem;
     double position = 0;
     @Override
     public void runOpMode() {
         try {
-            glyphSystem = new JennyO1BGlyphExtender(hardwareMap);
+            glyphSystem = new ArialDepositor(hardwareMap);
         }
         catch (Exception e){
             Log.e("Error!" , e.toString());
@@ -69,14 +68,24 @@ public class LiftToPositionTest extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()){
-            if(gamepad1.a) { position+=0.25; while (gamepad1.a); }
-            else if(gamepad1.b) { position-=0.25; while (gamepad1.b); }
-            if(gamepad1.right_trigger > 0.1) glyphSystem.startGlyphBelt();
-            else if(gamepad1.right_bumper) glyphSystem.reverseGlyphBelt();
-            else glyphSystem.pauseBelt();
-            if(position < 0) position = 0;
-            else if(position > 20) position = 20;
-            glyphSystem.liftToPosition(position);
+            if(gamepad1.a) {
+                glyphSystem.goToGlyphLevel(ArialDepositor.GLYPH_PLACEMENT_LEVEL.GROUND);
+                while (gamepad1.a);
+            }
+            else if(gamepad1.b) {
+                glyphSystem.goToGlyphLevel(ArialDepositor.GLYPH_PLACEMENT_LEVEL.ROW1);
+                while (gamepad1.b);
+            }
+            else if(gamepad1.x) {
+                glyphSystem.goToGlyphLevel(ArialDepositor.GLYPH_PLACEMENT_LEVEL.ROW2);
+                while (gamepad1.x);
+            }
+            else if(gamepad1.y) {
+                glyphSystem.goToGlyphLevel(ArialDepositor.GLYPH_PLACEMENT_LEVEL.ROW3);
+                while (gamepad1.y);
+            }
+
+
 
             telemetry.addData("Position ", Double.toString(position));
             telemetry.update();

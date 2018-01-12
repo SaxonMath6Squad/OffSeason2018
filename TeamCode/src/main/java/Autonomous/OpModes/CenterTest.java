@@ -8,11 +8,11 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import java.util.ArrayList;
 
+import Actions.ArialDepositor;
 import Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor;
 import Autonomous.VuforiaHelper;
 import DriveEngine.JennyNavigation;
 import SensorHandlers.JennySensorTelemetry;
-import Actions.JennyO1BGlyphExtender;
 
 import static Autonomous.RelicRecoveryField.BLUE_ALLIANCE_2;
 import static Autonomous.RelicRecoveryField.startLocations;
@@ -33,7 +33,7 @@ public class CenterTest extends LinearOpMode{
 
     JennyNavigation nav;
     JennySensorTelemetry sensorTelemetry;
-    JennyO1BGlyphExtender glyphSystem;
+    ArialDepositor glyphSystem;
     CryptoBoxColumnImageProcessor cryptoBoxFinder;
     VuforiaHelper vuforia;
 
@@ -44,7 +44,7 @@ public class CenterTest extends LinearOpMode{
             vuforia = new VuforiaHelper();
             cryptoBoxFinder = new CryptoBoxColumnImageProcessor(80,100,.1,1);
             sensorTelemetry = new JennySensorTelemetry(hardwareMap, 0, 0);
-            glyphSystem = new JennyO1BGlyphExtender(hardwareMap);
+            glyphSystem = new ArialDepositor(hardwareMap);
         } catch (Exception e){
             throw new RuntimeException(e);
         }

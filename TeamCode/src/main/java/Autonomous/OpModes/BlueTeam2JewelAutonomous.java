@@ -30,51 +30,54 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
 TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package Testers;
+package Autonomous.OpModes;
 
 import android.util.Log;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import Actions.ArialDepositor;
 import Actions.JewelJouster;
 import DriveEngine.JennyNavigation;
-import Actions.JennyFlagController;
-import Actions.JennyO1BRAD;
+import SensorHandlers.JennySensorTelemetry;
 
+import static Autonomous.REVColorDistanceSensorController.color.BLUE;
+import static Autonomous.REVColorDistanceSensorController.color.UNKNOWN;
 import static Autonomous.RelicRecoveryField.BLUE_ALLIANCE_2;
 import static Autonomous.RelicRecoveryField.startLocations;
-
+import static DriveEngine.JennyNavigation.ADJUSTING_SPEED_IN_PER_SEC;
+import static DriveEngine.JennyNavigation.DEFAULT_SLEEP_DELAY_MILLIS;
+import static DriveEngine.JennyNavigation.NORTH;
+import static DriveEngine.JennyNavigation.SOUTH;
+import Autonomous.REVColorDistanceSensorController;
 /*
-    An opmode to test if all our drive wheels are working correctly
+    An opmode to test knocking off the correct jewel
  */
-@TeleOp(name="Servo Zero Test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
+@Autonomous(name="Jewel Joust Test BLUE", group="Linear Opmode")  // @Autonomous(...) is the other common choice
 //@Disabled
-public class ServoZeroTest extends LinearOpMode {
+public class BlueTeam2JewelAutonomous extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
     JennyNavigation navigation;
-    JennyO1BRAD rad;
-    //JennySensorTelemetry sensorTelemetry;
-    JewelJouster jouster;
-    JennyFlagController flagController;
-
+    ArialDepositor glyphSystem;
+    JennySensorTelemetry sensorTelemetry;
+    JewelJouster jewelJouster;
+    //ImuHandler imuHandler;
     @Override
     public void runOpMode() {
-        int servo = 0;
-        double position = 0;
+        //imuHandler = new ImuHandler("imu", hardwareMap);
         try {
             navigation = new JennyNavigation(hardwareMap, startLocations[BLUE_ALLIANCE_2], 0, "RobotConfig/JennyV2.json");
-            rad = new JennyO1BRAD(hardwareMap);
-            jouster = new JewelJouster("jewelJouster",hardwareMap);
-            flagController = new JennyFlagController(hardwareMap);
+            glyphSystem = new ArialDepositor(hardwareMap);
+            sensorTelemetry = new JennySensorTelemetry(hardwareMap, 0, 0);
+            jewelJouster = new JewelJouster("jewelJouster", hardwareMap);
         }
         catch (Exception e){
-            Log.e("Error!" , e.toString());
-            throw new RuntimeException("System Creation Error! " + e.toString());
-
+            Log.e("Error!" , "Jenny Navigation: " + e.toString());
+            throw new RuntimeException("Navigation Creation Error! " + e.toString());
         }
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -83,45 +86,30 @@ public class ServoZeroTest extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
-        while (opModeIsActive()){
-            if(gamepad1.dpad_up){
-                position++;
-                while(gamepad1.dpad_up);
-            } else if(gamepad1.dpad_down){
-                position--;
-                while(gamepad1.dpad_down);
+        //sensorTelemetry.jewelJoust.setPosition(JEWEL_JOUST_ACTIVE_POSITION);
+        jewelJouster.setPosition(JewelJouster.EXTENDION_MODE.HIT);
+        sleep(500);
+        REVColorDistanceSensorController.color jewelColor = jewelJouster.getJewelColor();
+        if(jewelColor != UNKNOWN){
+            if(jewelColor == BLUE){
+                telemetry.addData("Jewel Color","BLUE");
+                navigation.turnToHeading(350, this);
             }
-            if(gamepad1.start){
-                servo++;
-                if(servo > 3) servo = 0;
-                if(servo == 1) position = 90;
-                while (gamepad1.start);
+            else {
+                //navigation.driveDistance(2, NORTH, ADJUSTING_SPEED_IN_PER_SEC, this);
+                navigation.turnToHeading(10, this);
+                telemetry.addData("Jewel Color","RED");
+                //sleep(DEFAULT_SLEEP_DELAY_MILLIS);
             }
-            if(position >= 180) position = 180;
-            if(position <= 0) position = 0;
-
-            switch (servo){
-                case 0:
-                    telemetry.addData("Servo", "Jewel Joust");
-                    jouster.setDegree(position);
-                    break;
-                case 1:
-                    telemetry.addData("Servo", "RAD Grabber");
-                    rad.setGrabberPosition(position);
-                    break;
-                case 2:
-                    telemetry.addData("Servo", "Flag Spinner");
-                    flagController.setFlagSpinnerPosition(position);
-                    break;
-                case 3:
-                    telemetry.addData("Servo", "Flag Waver");
-                    flagController.setFlagWaverPosition(position);
-                    break;
-            }
-            telemetry.addData("Position", Double.toString(position));
-            telemetry.update();
+        }
+        else{
+            telemetry.addData("Jewel Color","UNKOWN");
         }
 
+        telemetry.update();
+        navigation.brake();
+        while(opModeIsActive());
         navigation.stopNavigation();
+//        glyphSystem.stopNavigation();
     }
 }

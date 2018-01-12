@@ -72,7 +72,7 @@ public class TurnToHeadingTest extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
-        navigation.turnToHeading(-90,this);
+        navigation.turnToHeading(270,this);
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 

@@ -90,6 +90,9 @@ public class RADTest extends LinearOpMode {
             else if(gamepad1.b){
                 RAD.releaseRelic();
             }
+            else {
+                RAD.stopRelic();
+            }
 
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.update();
