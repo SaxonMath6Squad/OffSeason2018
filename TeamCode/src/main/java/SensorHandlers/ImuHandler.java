@@ -105,6 +105,10 @@ public class ImuHandler extends Thread{
         }
     }
 
+    public double getOrientationOffset(){
+        return  orientationOffset;
+    }
+
     public Location getLocation(){
         Position p = imu.getPosition();
         Location l = new Location(p.x,p.y);

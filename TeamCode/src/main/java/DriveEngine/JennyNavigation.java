@@ -129,20 +129,20 @@ public class JennyNavigation extends Thread{
     private void updateLocation(){
         HeadingVector travelVector = wheelVectors[0].addVectors(wheelVectors);
         travelVector = new HeadingVector(travelVector.x()/2, travelVector.y()/2);
-        Log.d("Wheel", "Dx: " + travelVector.x() + " Dy:" + travelVector.y());
+        //Log.d("Wheel", "Dx: " + travelVector.x() + " Dy:" + travelVector.y());
         double headingOfRobot = travelVector.getHeading();
-        Log.d("WHeel Heading", "" + headingOfRobot);
-        Log.d("Orientation heading", "" + robotHeading);
+        //Log.d("WHeel Heading", "" + headingOfRobot);
+        //Log.d("Orientation heading", "" + robotHeading);
         double magnitudeOfRobot = travelVector.getMagnitude();
-        Log.d("Magnitude","" + magnitudeOfRobot);
+        //Log.d("Magnitude","" + magnitudeOfRobot);
         double actualHeading = (headingOfRobot + robotHeading)%360;
 
-        Log.d("Robot Heading", "" + actualHeading);
+        //Log.d("Robot Heading", "" + actualHeading);
         robotMovementVector.calculateVector(actualHeading, magnitudeOfRobot);
         double deltaX = robotMovementVector.x();
         double deltaY = robotMovementVector.y();
         myLocation.addXY(deltaX, deltaY);
-        Log.d("Location","X:" + myLocation.getX() + " Y:" + myLocation.getY());
+        //Log.d("Location","X:" + myLocation.getX() + " Y:" + myLocation.getY());
 
     }
 
@@ -239,63 +239,65 @@ public class JennyNavigation extends Thread{
     public void driveOnHeadingIMU(int heading, double desiredVelocity, long delayTimeMillis, LinearOpMode mode) {
         desiredVelocity = Math.abs(desiredVelocity);
         double curOrientation = orientation.getOrientation();
-        curOrientation += (heading - curOrientation);
+        //curOrientation += (heading - curOrientation);
         double distanceFromHeading = 0;
-        distanceFromHeading = curOrientation - heading;
-        if(distanceFromHeading > 180) distanceFromHeading -= 360;
-        else if(distanceFromHeading < -180) distanceFromHeading += 360;
-        headingController.setSp(0);
+        distanceFromHeading = heading - curOrientation;
+        //if(distanceFromHeading > 180) distanceFromHeading -= 360;
+        if(distanceFromHeading < -180) distanceFromHeading += 360;
+        headingController.setSp(heading);
         double deltaVelocity = Math.abs(headingController.calculatePID(distanceFromHeading));
-        //Log.d("heading", Double.toString(heading));
-        //Log.d("Distance from heading", Double.toString(distanceFromHeading));
-        //Log.d("Current heading", Double.toString(curOrientation));
+        Log.d("heading", Double.toString(heading));
+        Log.d("Distance from heading", Double.toString(distanceFromHeading));
+        Log.d("Current heading", Double.toString(curOrientation));
         //Log.d("Delta velocity", Double.toString(deltaVelocity));
         //Log.d("Desired Velocity", Double.toString(desiredVelocity));
         //mode.telemetry.addData("Wanted heading", heading);
         //mode.telemetry.addData("Current heading", curOrientation);
         //mode.telemetry.addData("Dist from heading", distanceFromHeading);
-//        if(heading - curHeading < 0) curHeading -= 360;
+    //if(heading - curHeading < 0) curHeading -= 360;
 //        else if(heading - curHeading > 180) curHeading +=360;
-        double [] velocities = determineMotorVelocitiesToDriveOnHeading(heading,desiredVelocity);
-        if(distanceFromHeading < 0){
-            if(heading == NORTH) {
+        double [] velocities = determineMotorVelocitiesToDriveOnHeading(distanceFromHeading,desiredVelocity);
+        if(distanceFromHeading  < 0){
+            if((int)(heading - orientation.getOrientationOffset()+.5) == NORTH) {
                 velocities[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR] += deltaVelocity;
                 velocities[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR] -= deltaVelocity;
                 velocities[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR] += deltaVelocity;
                 velocities[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR] -= deltaVelocity;
-            } else if(heading == SOUTH) {
+            } else if((int)(heading - orientation.getOrientationOffset()+.5) == SOUTH) {
                 velocities[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR] -= deltaVelocity;
                 velocities[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR] += deltaVelocity;
                 velocities[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR] -= deltaVelocity;
                 velocities[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR] += deltaVelocity;
-            } else if(heading == WEST){
+            } else if((int)(heading - orientation.getOrientationOffset()+.5) == WEST){
+                mode.telemetry.addData("Dir Mov:","WEST");
+                mode.telemetry.update();
                 velocities[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR] -= deltaVelocity;
                 velocities[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR] -= deltaVelocity;
                 velocities[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR] += deltaVelocity;
                 velocities[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR] += deltaVelocity;
-            } else if(heading == EAST){
+            } else if((int)(heading - orientation.getOrientationOffset()+.5) == EAST){
                 velocities[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR] += deltaVelocity;
                 velocities[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR] += deltaVelocity;
                 velocities[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR] -= deltaVelocity;
                 velocities[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR] -= deltaVelocity;
             }
         } else {
-            if(heading == NORTH) {
+            if((int)(heading - orientation.getOrientationOffset()+.5) == NORTH) {
                 velocities[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR] -= deltaVelocity;
                 velocities[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR] += deltaVelocity;
                 velocities[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR] -= deltaVelocity;
                 velocities[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR] += deltaVelocity;
-            } else if(heading == SOUTH){
+            } else if((int)(heading - orientation.getOrientationOffset()+.5) == SOUTH){
                 velocities[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR] += deltaVelocity;
                 velocities[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR] -= deltaVelocity;
                 velocities[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR] += deltaVelocity;
                 velocities[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR] -= deltaVelocity;
-            } else if(heading == WEST){
+            } else if((int)(heading - orientation.getOrientationOffset()+.5) == WEST){
                 velocities[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR] += deltaVelocity;
                 velocities[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR] += deltaVelocity;
                 velocities[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR] -= deltaVelocity;
                 velocities[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR] -= deltaVelocity;
-            } else if(heading == EAST){
+            } else if((int)(heading - orientation.getOrientationOffset()+.5) == EAST){
                 velocities[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR] -= deltaVelocity;
                 velocities[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR] -= deltaVelocity;
                 velocities[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR] += deltaVelocity;
@@ -316,8 +318,8 @@ public class JennyNavigation extends Thread{
         //curOrientation += (heading - curOrientation);
         double distanceFromHeading = 0;
         distanceFromHeading = heading - curOrientation;
-        if(distanceFromHeading > 180) distanceFromHeading -= 360;
-        else if(distanceFromHeading < -180) distanceFromHeading += 360;
+        //if(distanceFromHeading > 180) distanceFromHeading -= 360;
+        if(distanceFromHeading < 0) distanceFromHeading += 360;
         headingController.setSp(0);
         Log.d("Distance From Heading","" + distanceFromHeading);
         double deltaVelocity = Math.abs(headingController.calculatePID(distanceFromHeading));
@@ -328,7 +330,7 @@ public class JennyNavigation extends Thread{
         the idea behind this is to isolate the 'left' and 'right' side of the desired heading
         weight the wheels based upon their sin or cos as determined in the wheel vectoring
         add to the robot
-
+        */
         int [] leftSideIndexes = {0,0,0,0};
         int [] rightSideIndexes = {0,0,0,0};
         if(heading > 315 || heading <= 45){
@@ -350,62 +352,62 @@ public class JennyNavigation extends Thread{
             rightSideIndexes[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR] = 1;
         }
         else if(heading > 225 && heading <= 315){
-            leftSideIndexes[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR] = 1;
-            leftSideIndexes[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR] = 1;
-            rightSideIndexes[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR] = 1;
-            rightSideIndexes[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR] = 1;
+            rightSideIndexes[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR] = 1;
+            rightSideIndexes[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR] = 1;
+            leftSideIndexes[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR] = 1;
+            leftSideIndexes[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR] = 1;
         }
-*/
+
         //weight the wheels appropriately
         double [] velocities = determineMotorVelocitiesToDriveOnHeading(distanceFromHeading,desiredVelocity);
-        /*
+
         for(int i = 0; i < driveMotors.length; i ++){
             if(leftSideIndexes[i] == 1) {
                 if(distanceFromHeading > 0){
                     if(i%2 == 0){
-                        velocities[i] += deltaVelocity*Math.sin(Math.toRadians(heading + 45));
+                        velocities[i] += Math.abs(deltaVelocity*Math.sin(Math.toRadians(distanceFromHeading + 45)));
                     }
                     else {
-                        velocities[i] += deltaVelocity * Math.cos(Math.toRadians(heading + 45));
+                        velocities[i] += Math.abs(deltaVelocity * Math.cos(Math.toRadians(distanceFromHeading + 45)));
                     }
                 }
                 else if(distanceFromHeading < 0){
                     if(i%2 == 0){
-                        velocities[i] -= deltaVelocity*Math.sin(Math.toRadians(heading + 45));
+                        velocities[i] -= Math.abs(deltaVelocity*Math.sin(Math.toRadians(distanceFromHeading + 45)));
                     }
                     else {
-                        velocities[i] -= deltaVelocity * Math.cos(Math.toRadians(heading + 45));
+                        velocities[i] -= Math.abs(deltaVelocity * Math.cos(Math.toRadians(distanceFromHeading + 45)));
                     }
                 }
             }
             if(rightSideIndexes[i] == 1){
                 if(distanceFromHeading > 0){
                     if(i%2 == 0){
-                        velocities[i] -= deltaVelocity*Math.sin(Math.toRadians(heading + 45));
+                        velocities[i] -= Math.abs(deltaVelocity*Math.sin(Math.toRadians(distanceFromHeading + 45)));
                     }
                     else {
-                        velocities[i] -= deltaVelocity * Math.cos(Math.toRadians(heading + 45));
+                        velocities[i] -= Math.abs(deltaVelocity * Math.cos(Math.toRadians(distanceFromHeading + 45)));
                     }
                 }
                 else if(distanceFromHeading < 0){
                     if(i%2 == 0){
-                        velocities[i] += deltaVelocity*Math.sin(Math.toRadians(heading + 45));
+                        velocities[i] += Math.abs(deltaVelocity*Math.sin(Math.toRadians(distanceFromHeading + 45)));
                     }
                     else {
-                        velocities[i] += deltaVelocity * Math.cos(Math.toRadians(heading + 45));
+                        velocities[i] += Math.abs(deltaVelocity * Math.cos(Math.toRadians(distanceFromHeading + 45)));
                     }
                 }
             }
         }
 
-//        velocities[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR] += deltaVelocity * Math.sin(Math.toRadians(heading + 45));
-//        velocities[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR] += Math.cos(Math.toRadians(heading + 45));
-//        velocities[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR] += Math.sin(Math.toRadians(heading + 45));
-//        velocities[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR] += Math.cos(Math.toRadians(heading + 45));
-//        for(int i = 0; i < velocities.length; i ++){
-//            Log.d("Velocity: " + i, "" + velocities[i] + "in/s");
-//        }
-*/
+        velocities[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR] += deltaVelocity * Math.sin(Math.toRadians(heading + 45));
+        velocities[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR] += Math.cos(Math.toRadians(heading + 45));
+        velocities[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR] += Math.sin(Math.toRadians(heading + 45));
+        velocities[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR] += Math.cos(Math.toRadians(heading + 45));
+        for(int i = 0; i < velocities.length; i ++){
+            Log.d("Velocity: " + i, "" + velocities[i] + "in/s");
+        }
+
 
         applyMotorVelocities(velocities);
         mode.sleep(delayTimeMillis);
@@ -425,7 +427,7 @@ public class JennyNavigation extends Thread{
         while(distanceTraveled < distanceInInches && mode.opModeIsActive()){
             startTime = System.currentTimeMillis();
             //from our motor posisition, determine location
-            newDriveOnHeadingIMU(heading,desiredVelocity,0,mode);
+            driveOnHeadingIMU((int)(heading + .5),desiredVelocity,0,mode);
             motorPositionsInches = getMotorPositionsInches();
             deltaInches = new double[4];
             averagePosition = 0;
