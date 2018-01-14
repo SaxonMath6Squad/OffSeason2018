@@ -38,65 +38,58 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import SensorHandlers.JennySensorTelemetry;
-import Actions.JennyO1BRAD;
-
-import static SensorHandlers.JennySensorTelemetry.RAD_LIMIT;
+import Actions.ArialDepositor;
 
 /*
-    An opmode to test our RAD
+    An opmode to test if all our drive wheels are working correctly
  */
-@TeleOp(name="RAD test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
+@TeleOp(name="Glyph Auto Level Placement Test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
 //@Disabled
-public class RADTest extends LinearOpMode {
+public class LiftToPositionTest extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
-    JennyO1BRAD RAD;
-    JennySensorTelemetry sensorTelemetry;
-
+    ArialDepositor glyphSystem;
+    double position = 0;
     @Override
     public void runOpMode() {
-        try{
-            RAD = new JennyO1BRAD(hardwareMap);
-            sensorTelemetry = new JennySensorTelemetry(hardwareMap, 0, 0);
+        try {
+            glyphSystem = new ArialDepositor(hardwareMap);
         }
-        catch(Exception e){
-            Log.e("Error!","Jenny Wheel Picker: " + e.toString());
-            return;
-        }
+        catch (Exception e){
+            Log.e("Error!" , e.toString());
+            throw new RuntimeException("System Creation Error! " + e.toString());
 
+        }
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
-        runtime.reset();
 
-        // run until the end of the match (driver presses STOP)
-        while (opModeIsActive()) {
-            if(gamepad1.right_trigger > 0.1){
-                RAD.extendRAD();
+        while (opModeIsActive()){
+            if(gamepad1.a) {
+                glyphSystem.goToGlyphLevel(ArialDepositor.GLYPH_PLACEMENT_LEVEL.GROUND);
+                while (gamepad1.a);
             }
-            else if(gamepad1.left_trigger > 0.1 && !sensorTelemetry.isPressed(RAD_LIMIT)){
-                RAD.retractRAD();
+            else if(gamepad1.b) {
+                glyphSystem.goToGlyphLevel(ArialDepositor.GLYPH_PLACEMENT_LEVEL.ROW1);
+                while (gamepad1.b);
             }
-            else {
-                RAD.pauseRADExtender();
+            else if(gamepad1.x) {
+                glyphSystem.goToGlyphLevel(ArialDepositor.GLYPH_PLACEMENT_LEVEL.ROW2);
+                while (gamepad1.x);
             }
-            if(gamepad1.a){
-                RAD.grabRelic();
-            }
-            else if(gamepad1.b){
-                RAD.releaseRelic();
-            }
-            else {
-                RAD.stopRelic();
+            else if(gamepad1.y) {
+                glyphSystem.goToGlyphLevel(ArialDepositor.GLYPH_PLACEMENT_LEVEL.ROW3);
+                while (gamepad1.y);
             }
 
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
+
+
+            telemetry.addData("Position ", Double.toString(position));
             telemetry.update();
         }
-        RAD.stop();
+        glyphSystem.stop();
     }
 }

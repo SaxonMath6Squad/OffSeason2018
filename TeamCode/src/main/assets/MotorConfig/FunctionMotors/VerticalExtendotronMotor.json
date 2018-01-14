@@ -1,17 +1,3 @@
 {
-  "TicksPerRev":"1120",
-  "MAX_RPM":"315",
-  "MAX_MOTOR_RPM":"160",
-  "WHEEL_DIAMETER":"4.00",
-  "GEAR_RATIO":"1",
-  "P":".5",
-  "I":".05",
-  "D":".0",
-  "I_LIMIT":".05",
-  "MOTOR_POWER_VELOCITY_CONVERSION":".02",
-  "MAX_RPMM":"5000",
-  "MAX_VELOCITY":"10",
-  "POWER_OFFSET":"0.08",
-  "POWER_SCALE":"0.06", //in rev per sec
-  "DECELERATION_DISTANCE":"0.8" //in % of the dist travelled
+  "WHEEL_DIAMETER":"4.00"
 }

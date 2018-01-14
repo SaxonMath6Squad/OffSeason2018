@@ -1,5 +1,7 @@
 package MotorControllers;
 
+import android.util.Log;
+
 /**
  * Created by Jordan on 8/5/2017.
  */
@@ -34,6 +36,7 @@ public class PIDController {
     public double getI(){return Ki;}
     public double getD(){return Kd;}
     public void setIMax(double cap) {I_CAP = cap;}
+
     public double getSp(){
         return setPoint;
     }
@@ -45,7 +48,9 @@ public class PIDController {
     public double calculatePID(double pointValue){
         double deltaTime = (System.currentTimeMillis() - timeAtLastCalculation)/1000.0;
         error = setPoint - pointValue;
+        Log.d("PID Error","" + error);
         P = Kp * error;
+        Log.d("P","" + P);
         tempI = Ki * error * deltaTime;
         I += tempI;
         if(Ki == 0) I = 0;
@@ -53,9 +58,11 @@ public class PIDController {
             if(I > 0 && I >I_CAP) I = I_CAP;
             else if(I < 0 && I < -I_CAP) I = -I_CAP;
         }
+        Log.d("I","" + I);
         D = Kd * (prevError - error) / deltaTime;
         prevError = error;
         timeAtLastCalculation = System.currentTimeMillis();
+        Log.d("D","" + D);
         return P + I + D;
     }
 

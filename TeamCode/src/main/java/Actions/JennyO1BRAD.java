@@ -1,14 +1,11 @@
-package Systems;
+package Actions;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import Actions.ServoGrippers;
-import Actions.ServoHandler;
-import Actions.SpoolMotor;
-import MotorControllers.NewMotorController;
+import MotorControllers.MotorController;
 
 
 /**
@@ -22,19 +19,25 @@ public class JennyO1BRAD {
     ServoHandler RADGrabber;
     SpoolMotor RADExtender;
     HardwareMap hardwareMap;
+    final double EXTEND = 95;
+    final double NEUTRAL = 90;
+    final double RETRACT = 60;
 
     public JennyO1BRAD(HardwareMap hw) throws InterruptedException{
         hardwareMap = hw;
         try {
             RADExtender =
-                    new SpoolMotor(new NewMotorController("radExtender", "MotorConfig/FunctionMotors/RADExtender.json", hardwareMap),
+                    new SpoolMotor(new MotorController("radExtender", "MotorConfig/FunctionMotors/RADExtender.json", hardwareMap),
                     10, 10, 100, hardwareMap);
+            RADExtender.setDirection(DcMotorSimple.Direction.REVERSE);
             RADGrabber = new ServoHandler("radGrabber", hardwareMap);
         } catch (Exception e){
             throw new RuntimeException(e.toString());
         }
         RADGrabber.setDirection(Servo.Direction.FORWARD);
-        RADExtender.setDirection(DcMotorSimple.Direction.FORWARD);
+        RADGrabber.setServoRanges(RETRACT, EXTEND);
+        RADGrabber.setDegree(NEUTRAL);
+        RADExtender.setDirection(DcMotorSimple.Direction.REVERSE);
         RADExtender.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
@@ -54,12 +57,22 @@ public class JennyO1BRAD {
     }
 
     public int grabRelic(){
-        RADGrabber.incrementDegree(5);
+        RADGrabber.setDegree(RETRACT);
         return 0;
     }
 
     public int releaseRelic(){
-        RADGrabber.incrementDegree(-5);
+        RADGrabber.setDegree(EXTEND);
+        return 0;
+    }
+
+    public int stopRelic(){
+        RADGrabber.setDegree(NEUTRAL);
+        return 0;
+    }
+
+    public int setGrabberPosition(double positionInDeg){
+        RADGrabber.setDegree(positionInDeg);
         return 0;
     }
 

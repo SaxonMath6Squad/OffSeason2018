@@ -39,16 +39,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import DriveEngine.JennyNavigation;
-import SensorHandlers.JennySensorTelemetry;
-import Systems.JennyO1BPickAndExtend;
-import Systems.JennyO1BRAD;
 
 import static Autonomous.RelicRecoveryField.BLUE_ALLIANCE_2;
-import static Autonomous.RelicRecoveryField.GROUND;
-import static Autonomous.RelicRecoveryField.ROW1;
-import static Autonomous.RelicRecoveryField.ROW2;
-import static Autonomous.RelicRecoveryField.ROW3;
-import static Autonomous.RelicRecoveryField.ROW4;
 import static Autonomous.RelicRecoveryField.startLocations;
 
 /*

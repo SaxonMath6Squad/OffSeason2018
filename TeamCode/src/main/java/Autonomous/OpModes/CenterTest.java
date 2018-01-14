@@ -1,29 +1,23 @@
 package Autonomous.OpModes;
 
 import android.graphics.Bitmap;
-import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-
 import java.util.ArrayList;
 
+import Actions.ArialDepositor;
 import Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor;
 import Autonomous.VuforiaHelper;
 import DriveEngine.JennyNavigation;
 import SensorHandlers.JennySensorTelemetry;
-import Systems.JennyO1BPickAndExtend;
 
 import static Autonomous.RelicRecoveryField.BLUE_ALLIANCE_2;
-import static Autonomous.RelicRecoveryField.CRYPTOBOX_APPROACH_TIME_LIMIT;
-import static Autonomous.RelicRecoveryField.RIGHT_COLUMN_DISTANCE_TO_STONE_INCHES;
 import static Autonomous.RelicRecoveryField.startLocations;
 import static DriveEngine.JennyNavigation.EAST;
 import static DriveEngine.JennyNavigation.NORTH;
-import static DriveEngine.JennyNavigation.SOUTH;
 import static DriveEngine.JennyNavigation.WEST;
 
 /**
@@ -39,7 +33,7 @@ public class CenterTest extends LinearOpMode{
 
     JennyNavigation nav;
     JennySensorTelemetry sensorTelemetry;
-    JennyO1BPickAndExtend glyphSystem;
+    ArialDepositor glyphSystem;
     CryptoBoxColumnImageProcessor cryptoBoxFinder;
     VuforiaHelper vuforia;
 
@@ -50,7 +44,7 @@ public class CenterTest extends LinearOpMode{
             vuforia = new VuforiaHelper();
             cryptoBoxFinder = new CryptoBoxColumnImageProcessor(80,100,.1,1);
             sensorTelemetry = new JennySensorTelemetry(hardwareMap, 0, 0);
-            glyphSystem = new JennyO1BPickAndExtend(hardwareMap);
+            glyphSystem = new ArialDepositor(hardwareMap);
         } catch (Exception e){
             throw new RuntimeException(e);
         }

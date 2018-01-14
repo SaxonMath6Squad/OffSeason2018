@@ -30,41 +30,54 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
 TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package Testers;
+package Autonomous.OpModes;
 
 import android.util.Log;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import Actions.ArialDepositor;
+import Actions.JewelJouster;
 import DriveEngine.JennyNavigation;
+import SensorHandlers.JennySensorTelemetry;
 
+import static Autonomous.REVColorDistanceSensorController.color.BLUE;
+import static Autonomous.REVColorDistanceSensorController.color.UNKNOWN;
 import static Autonomous.RelicRecoveryField.BLUE_ALLIANCE_2;
 import static Autonomous.RelicRecoveryField.startLocations;
-
+import static DriveEngine.JennyNavigation.ADJUSTING_SPEED_IN_PER_SEC;
+import static DriveEngine.JennyNavigation.DEFAULT_SLEEP_DELAY_MILLIS;
+import static DriveEngine.JennyNavigation.NORTH;
+import static DriveEngine.JennyNavigation.SOUTH;
+import Autonomous.REVColorDistanceSensorController;
 /*
-    An opmode to test our turnToHeading function
+    An opmode to test knocking off the correct jewel
  */
-@TeleOp(name="Turn test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
+@Autonomous(name="Jewel Joust Test BLUE", group="Linear Opmode")  // @Autonomous(...) is the other common choice
 //@Disabled
-public class TurnToHeadingTest extends LinearOpMode {
+public class BlueTeam2JewelAutonomous extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
     JennyNavigation navigation;
+    ArialDepositor glyphSystem;
+    JennySensorTelemetry sensorTelemetry;
+    JewelJouster jewelJouster;
     //ImuHandler imuHandler;
     @Override
     public void runOpMode() {
         //imuHandler = new ImuHandler("imu", hardwareMap);
         try {
             navigation = new JennyNavigation(hardwareMap, startLocations[BLUE_ALLIANCE_2], 0, "RobotConfig/JennyV2.json");
+            glyphSystem = new ArialDepositor(hardwareMap);
+            sensorTelemetry = new JennySensorTelemetry(hardwareMap, 0, 0);
+            jewelJouster = new JewelJouster("jewelJouster", hardwareMap);
         }
         catch (Exception e){
             Log.e("Error!" , "Jenny Navigation: " + e.toString());
             throw new RuntimeException("Navigation Creation Error! " + e.toString());
-
         }
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -72,15 +85,31 @@ public class TurnToHeadingTest extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
-        navigation.turnToHeading(270,this);
-        // run until the end of the match (driver presses STOP)
-        while (opModeIsActive()) {
 
-
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-            //telemetry.addData("Current Heading", imuHandler.getOrientation());
-            telemetry.update();
+        //sensorTelemetry.jewelJoust.setPosition(JEWEL_JOUST_ACTIVE_POSITION);
+        jewelJouster.setPosition(JewelJouster.EXTENDION_MODE.HIT);
+        sleep(500);
+        REVColorDistanceSensorController.color jewelColor = jewelJouster.getJewelColor();
+        if(jewelColor != UNKNOWN){
+            if(jewelColor == BLUE){
+                telemetry.addData("Jewel Color","BLUE");
+                navigation.turnToHeading(350, this);
+            }
+            else {
+                //navigation.driveDistance(2, NORTH, ADJUSTING_SPEED_IN_PER_SEC, this);
+                navigation.turnToHeading(10, this);
+                telemetry.addData("Jewel Color","RED");
+                //sleep(DEFAULT_SLEEP_DELAY_MILLIS);
+            }
         }
+        else{
+            telemetry.addData("Jewel Color","UNKOWN");
+        }
+
+        telemetry.update();
+        navigation.brake();
+        while(opModeIsActive());
         navigation.stopNavigation();
+//        glyphSystem.stopNavigation();
     }
 }

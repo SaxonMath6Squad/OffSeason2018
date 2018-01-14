@@ -32,30 +32,38 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package Testers;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import android.util.Log;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import Actions.ServoHandler;
+import DriveEngine.JennyNavigation;
+import MotorControllers.PIDController;
+
+import static Autonomous.RelicRecoveryField.BLUE_ALLIANCE_2;
+import static Autonomous.RelicRecoveryField.startLocations;
 
 /*
-    An opmode to test the belt for our glyph system
+    An opmode to test if all our drive wheels are working correctly
  */
-@TeleOp(name="Glyph conveyor test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
-@Disabled
-public class GlyphConveyorTest extends LinearOpMode {
+@TeleOp(name="Auto Orient Test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
+//@Disabled
+public class AutoOrientTest extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
-    ServoHandler servo;
-
-
+    JennyNavigation navigation;
     @Override
     public void runOpMode() {
-        servo = new ServoHandler("servo", hardwareMap);
-        servo.setDirection(Servo.Direction.FORWARD);
+        try {
+            navigation = new JennyNavigation(hardwareMap, startLocations[BLUE_ALLIANCE_2], 0, "RobotConfig/JennyV2.json");
+        }
+        catch (Exception e){
+            Log.e("Error!" , "Jenny Navigation: " + e.toString());
+            throw new RuntimeException("Navigation Creation Error! " + e.toString());
+
+        }
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
@@ -63,16 +71,28 @@ public class GlyphConveyorTest extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
-        // run until the end of the match (driver presses STOP)
-        while (opModeIsActive()) {
+        while (opModeIsActive()){
+            if(gamepad1.left_stick_button){
+                navigation.setOrientationOffset(360 - navigation.getOrientation());
+            }
+
             if(gamepad1.a){
-                servo.setPosition(1.0);
+                navigation.turnToHeading(JennyNavigation.SOUTH, this);
             }
-            if(!gamepad1.a){
-                servo.setPosition(0.51);
+            else if(gamepad1.b){
+                navigation.turnToHeading(JennyNavigation.EAST, this);
             }
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.update();
+            else if(gamepad1.x){
+                navigation.turnToHeading(JennyNavigation.WEST, this);
+            }
+            else if(gamepad1.y){
+                navigation.turnToHeading(JennyNavigation.NORTH, this);
+            }
+            else {
+                navigation.brake();
+            }
         }
+
+        navigation.stopNavigation();
     }
 }

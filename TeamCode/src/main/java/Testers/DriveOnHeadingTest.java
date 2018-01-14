@@ -38,34 +38,31 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import SensorHandlers.JennySensorTelemetry;
-import Actions.JennyO1BRAD;
+import DriveEngine.JennyNavigation;
 
-import static SensorHandlers.JennySensorTelemetry.RAD_LIMIT;
+import static Autonomous.RelicRecoveryField.BLUE_ALLIANCE_2;
+import static Autonomous.RelicRecoveryField.startLocations;
 
 /*
-    An opmode to test our RAD
+    An opmode to test if all our drive wheels are working correctly
  */
-@TeleOp(name="RAD test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
+@TeleOp(name="Drive On Heading Test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
 //@Disabled
-public class RADTest extends LinearOpMode {
+public class DriveOnHeadingTest extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
-    JennyO1BRAD RAD;
-    JennySensorTelemetry sensorTelemetry;
-
+    JennyNavigation navigation;
     @Override
     public void runOpMode() {
-        try{
-            RAD = new JennyO1BRAD(hardwareMap);
-            sensorTelemetry = new JennySensorTelemetry(hardwareMap, 0, 0);
+        try {
+            navigation = new JennyNavigation(hardwareMap, startLocations[BLUE_ALLIANCE_2], 0, "RobotConfig/JennyV2.json");
         }
-        catch(Exception e){
-            Log.e("Error!","Jenny Wheel Picker: " + e.toString());
-            return;
-        }
+        catch (Exception e){
+            Log.e("Error!" , "Jenny Navigation: " + e.toString());
+            throw new RuntimeException("Navigation Creation Error! " + e.toString());
 
+        }
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
@@ -73,30 +70,14 @@ public class RADTest extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
-        // run until the end of the match (driver presses STOP)
-        while (opModeIsActive()) {
-            if(gamepad1.right_trigger > 0.1){
-                RAD.extendRAD();
-            }
-            else if(gamepad1.left_trigger > 0.1 && !sensorTelemetry.isPressed(RAD_LIMIT)){
-                RAD.retractRAD();
-            }
-            else {
-                RAD.pauseRADExtender();
-            }
-            if(gamepad1.a){
-                RAD.grabRelic();
-            }
-            else if(gamepad1.b){
-                RAD.releaseRelic();
-            }
-            else {
-                RAD.stopRelic();
-            }
-
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.update();
+        while (opModeIsActive()){
+            while (gamepad1.a) navigation.newDriveOnHeadingIMU(JennyNavigation.SOUTH, 10, 10, this);
+            while (gamepad1.b) navigation.newDriveOnHeadingIMU(JennyNavigation.EAST, 10, 10, this);
+            while (gamepad1.x) navigation.newDriveOnHeadingIMU(JennyNavigation.WEST, 10, 10, this);
+            while (gamepad1.y) navigation.newDriveOnHeadingIMU(JennyNavigation.NORTH, 10, 10, this);
+            navigation.brake();
         }
-        RAD.stop();
+
+        navigation.stopNavigation();
     }
 }

@@ -1,11 +1,9 @@
 package Actions;
 
-import android.util.Log;
-
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import MotorControllers.NewMotorController;
+import MotorControllers.MotorController;
 
 /**
  * Created by robotics on 11/7/17.
@@ -16,7 +14,7 @@ import MotorControllers.NewMotorController;
     ex: our extendotron lift motor
  */
 public class SpoolMotor implements ActionHandler{
-    NewMotorController motor;
+    MotorController motor;
     HardwareMap hardwareMap;
     private double extendSpeedInPerSecond = 0;
     private double retractSpeedInPerSecond = 0;
@@ -24,7 +22,7 @@ public class SpoolMotor implements ActionHandler{
     private long startTickLocation = 0;
     private double maxExtendLoc;
 
-    public SpoolMotor(NewMotorController m, double extendInPerSec, double retractInPerSec, double maxEtendInches, HardwareMap h){
+    public SpoolMotor(MotorController m, double extendInPerSec, double retractInPerSec, double maxEtendInches, HardwareMap h){
         hardwareMap = h;
         motor = m;
 //        motor.setMotorControllerMode(MotorController.MotorControllerMode.SPEED_CONTROLLER);

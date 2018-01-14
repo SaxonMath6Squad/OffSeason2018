@@ -17,7 +17,7 @@ import java.io.InputStream;
 /*
     A class to more easily and reliably control our DC motors
  */
-public class NewMotorController extends Thread {
+public class MotorController extends Thread {
     //config file values
     private long maxTicksPerSecond = 0;
     private long ticksPerRevolution = 0;
@@ -43,7 +43,7 @@ public class NewMotorController extends Thread {
 
     HardwareMap hardwareMap;
 
-    public NewMotorController(DcMotor m, String configFileLoc, HardwareMap hw)throws IOException {
+    public MotorController(DcMotor m, String configFileLoc, HardwareMap hw)throws IOException {
         hardwareMap = hw;
         motor = m;
         motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -73,7 +73,7 @@ public class NewMotorController extends Thread {
         });
     }
 
-    public NewMotorController(String motorName, String configFileLoc, HardwareMap hw) throws IOException{
+    public MotorController(String motorName, String configFileLoc, HardwareMap hw) throws IOException{
         this(hw.dcMotor.get(motorName), configFileLoc, hw);
     }
 
@@ -109,7 +109,7 @@ public class NewMotorController extends Thread {
         try {
             currentRPS = tachometer.getRotationsPerSecond();
         } catch(Exception e){
-            Log.e("NewMotorController Err",e.toString());
+            Log.e("MotorController Err",e.toString());
             shouldRun = false;
             throw new RuntimeException(e);
         }
@@ -175,7 +175,7 @@ public class NewMotorController extends Thread {
         } catch (Exception e){
             Log.e("Motorcontroller Error", "SetTicksPerSecondVelocity: " + e.toString());
             shouldRun = false;
-            throw e;
+            throw new RuntimeException(e);
         }
         //Log.d("MotorPow", "" + getMotorPower() + " %");
 

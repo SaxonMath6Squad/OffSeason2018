@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import MotorControllers.NewMotorController;
+import MotorControllers.MotorController;
 
 /**
  * Created by robotics on 11/15/17.
@@ -14,7 +14,7 @@ import MotorControllers.NewMotorController;
     A class to control our glyph picker with two motors (one for each wheel)
  */
 public class WheelPickerDoubleMotor implements ActionHandler {
-    NewMotorController wheelMotors[] = new NewMotorController[2];
+    MotorController wheelMotors[] = new MotorController[2];
     private final int LEFT_MOTOR = 0,RIGHT_MOTOR = 1;
     HardwareMap hardwareMap;
     private double WHEEL_POWERS = 1;
@@ -22,8 +22,8 @@ public class WheelPickerDoubleMotor implements ActionHandler {
 
     public WheelPickerDoubleMotor(HardwareMap hw) throws Exception{
         hardwareMap = hw;
-        wheelMotors[LEFT_MOTOR] = new NewMotorController("leftGlyphMotor", "MotorConfig/DriveMotors/NewHolonomicDriveMotorConfig.json", hardwareMap);
-        wheelMotors[RIGHT_MOTOR] = new NewMotorController("rightGlyphMotor", "MotorConfig/DriveMotors/NewHolonomicDriveMotorConfig.json", hardwareMap);
+        wheelMotors[LEFT_MOTOR] = new MotorController("leftGlyphMotor", "MotorConfig/DriveMotors/NewHolonomicDriveMotorConfig.json", hardwareMap);
+        wheelMotors[RIGHT_MOTOR] = new MotorController("rightGlyphMotor", "MotorConfig/DriveMotors/NewHolonomicDriveMotorConfig.json", hardwareMap);
         wheelMotors[LEFT_MOTOR].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         wheelMotors[RIGHT_MOTOR].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         wheelMotors[LEFT_MOTOR].setMotorDirection(DcMotorSimple.Direction.FORWARD);

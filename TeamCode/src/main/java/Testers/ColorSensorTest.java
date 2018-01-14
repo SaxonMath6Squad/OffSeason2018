@@ -42,11 +42,11 @@ import com.qualcomm.robotcore.hardware.DistanceSensor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-import Autonomous.ColorModeController;
+import Autonomous.REVColorDistanceSensorController;
 
 /*
  * This is an example LinearOpMode that shows how to use
- * the REV Robotics ColorModeController-Distance Sensor.
+ * the REV Robotics REVColorDistanceSensorController-Distance Sensor.
  *
  * It assumes the sensor is configured with the name "sensor_color_distance".
  *
@@ -57,17 +57,17 @@ import Autonomous.ColorModeController;
 /*
     An opmode to test the REV color distance sensor with our ColorModeSensor class colors
  */
-@TeleOp(name = "ColorModeController Sensor Test", group = "Sensor")
+@TeleOp(name = "REVColorDistanceSensorController Sensor Test", group = "Sensor")
 @Disabled
 public class ColorSensorTest extends LinearOpMode {
 
     /**
-     * Note that the REV Robotics ColorModeController-Distance incorporates two sensors into one device.
+     * Note that the REV Robotics REVColorDistanceSensorController-Distance incorporates two sensors into one device.
      * It has a light/distance (range) sensor.  It also has an RGB color sensor.
      * The light/distance sensor saturates at around 2" (5cm).  This means that targets that are 2"
      * or closer will display the same value for distance/light detected.
      *
-     * Although you configure a single REV Robotics ColorModeController-Distance sensor in your configuration file,
+     * Although you configure a single REV Robotics REVColorDistanceSensorController-Distance sensor in your configuration file,
      * you can treat the sensor as two separate sensors that share the same name in your op mode.
      *
      * In this example, we represent the detected color by a hue, saturation, and value color
@@ -108,9 +108,9 @@ public class ColorSensorTest extends LinearOpMode {
         int relativeLayoutId = hardwareMap.appContext.getResources().getIdentifier("RelativeLayout", "id", hardwareMap.appContext.getPackageName());
         final View relativeLayout = ((Activity) hardwareMap.appContext).findViewById(relativeLayoutId);
 
-        ColorModeController.color detectedColor;
+        REVColorDistanceSensorController.color detectedColor;
 
-        ColorModeController colorSensor = new ColorModeController(ColorModeController.type.GLYPH_STACK_O_TRON, sensorColor);
+        REVColorDistanceSensorController colorSensor = new REVColorDistanceSensorController(REVColorDistanceSensorController.type.GLYPH_STACK_O_TRON, sensorColor, sensorDistance);
         // wait for the start button to be pressed.
         waitForStart();
 
@@ -138,7 +138,7 @@ public class ColorSensorTest extends LinearOpMode {
 //            telemetry.addData("Hue", hsvValues[0]);
             telemetry.addData("Saturation", hsvValues[1]);
 //            telemetry.addData("Threshold: ", threshold);
-//            telemetry.addData("Distance To ColorModeController: ", distanceToColor);
+//            telemetry.addData("Distance To REVColorDistanceSensorController: ", distanceToColor);
             detectedColor = colorSensor.getColor();
             telemetry.addData("Color: ", detectedColor.toString());
             Log.d("Distance in cm", Double.toString(sensorDistance.getDistance(DistanceUnit.CM)));

@@ -2,9 +2,11 @@ Actions are any objects or things that are meant to be activated or run during t
 
 These can include ball shooters, propellors, arms, etc.
 
+This year, our actions include the GlyphPicker, GlyphExtender, RAD, JewelJouster, and the Flag Controller
+
 These are meant to be stored in objects that implement the ActionHandler interface and have distinct functions to call
 
-If operations are meant to be threaded, use the start doing action
+These operations can be threaded or instantaneous.
 
 IMPORTANT:
-    Any motors or servos that are run MUST be initialized in our hardware map so that we can kill them appropriately
+    Any Actions must implement the stop() function which de-initializes any motors, servos, or sensors the Action uses.

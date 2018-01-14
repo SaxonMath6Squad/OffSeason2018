@@ -24,8 +24,16 @@ public class CryptoBoxColumnImageProcessor {
     public static final double FAR_AWAY_MIN_PERCENT_COLUMN_CHECK = 0.1;
     public static final int CLOSE_UP_MIN_COLUMN_WIDTH = 3;
     public static final int FAR_AWAY_MIN_COLUMN_WIDTH = 1;
-
+    public enum CRYPTOBOX_COLOR {BLUE,RED};
+    CRYPTOBOX_COLOR colorToFind = CRYPTOBOX_COLOR.BLUE;
     public CryptoBoxColumnImageProcessor(int desiredHeight, int desiredWidth, double percentColumnCheck, int minColumnWidth){
+        imageHeight = desiredHeight;
+        imageWidth = desiredWidth;
+        percentRequiredInColumnToCheck = percentColumnCheck;
+        minimumColumnWidth = minColumnWidth;
+    }
+    public CryptoBoxColumnImageProcessor(int desiredHeight, int desiredWidth, double percentColumnCheck, int minColumnWidth, CRYPTOBOX_COLOR color){
+        colorToFind = color;
         imageHeight = desiredHeight;
         imageWidth = desiredWidth;
         percentRequiredInColumnToCheck = percentColumnCheck;
@@ -128,9 +136,11 @@ public class CryptoBoxColumnImageProcessor {
         int[] pixels = new int[width * height];
         bmp.getPixels(pixels, 0, width, 0, 0, width, height);
         long collapseStart = System.currentTimeMillis();
-        int [] blueFrequencyByColumn = collapseVerticallyByBlueCount(pixels,width,height);
+        int [] frequencyByColumn = null;
+        if(colorToFind == CRYPTOBOX_COLOR.BLUE) frequencyByColumn = collapseVerticallyByBlueCount(pixels,width,height);
+        else if(colorToFind == CRYPTOBOX_COLOR.RED) frequencyByColumn = collapseVerticallyByRedCount(pixels,width,height);
         Log.d("CF IMG PROC", "Collapse Time: " + (System.currentTimeMillis() - collapseStart));
-        ArrayList<Integer> interestingColumns = getColumnsWithRequiredBlueCount(blueFrequencyByColumn);
+        ArrayList<Integer> interestingColumns = getColumnsWithRequiredBlueCount(frequencyByColumn);
         ArrayList<Integer> columnBounds = getColumnBounds(interestingColumns);
         for (int i = 0; i < columnBounds.size(); i++) {
             Log.d("Bound", columnBounds.get(i).toString());
@@ -142,7 +152,8 @@ public class CryptoBoxColumnImageProcessor {
         }
         Log.d("# of Columns", "" + columnCenters.size());
         if(shouldModifyImage){
-            showBluePixels(pixels,height,width, Color.GREEN);
+            if(colorToFind == CRYPTOBOX_COLOR.BLUE) showBluePixels(pixels,height,width, Color.GREEN);
+            else if(colorToFind == CRYPTOBOX_COLOR.RED)
             showColumnCenters(pixels,height,width,columnCenters,Color.RED);
             bmp.setPixels(pixels,0,width,0,0,width,height);
         }
@@ -208,7 +219,27 @@ public class CryptoBoxColumnImageProcessor {
             }
         }
     }
-    
+
+    public void showRedPixels(int [] pixels, int height, int width, int colorToReplaceWith){
+        for (int c = 0; c < width; c++) {
+            int numberOfBluePixels = 0;
+            for (int r = 0; r < height; r++) {
+                int color = pixels[r * width + c];
+                int[] rgba = {Color.red(color), Color.blue(color), Color.green(color), Color.alpha(color)};
+                float[] hsv = new float[3];
+                Color.colorToHSV(color, hsv);
+                //check for blue
+                if (checkIfRed(hsv)) {
+                    rgba[0] = 0;
+                    rgba[1] = 250;
+                    rgba[2] = 250;
+                    pixels[r * width + c] = colorToReplaceWith;
+                    numberOfBluePixels++;
+                }
+            }
+        }
+    }
+
     public boolean isCentered(int desiredCenter, int imageCenter){
         boolean centered = false;
         if(imageCenter > desiredCenter){
@@ -231,6 +262,20 @@ public class CryptoBoxColumnImageProcessor {
             for(int r = 0; r < imageHeight; r ++){
                 int color = pixels[r*imageWidth + c];
                 if(checkIfBlue(color)){
+                    toReturn[c] ++;
+                }
+            }
+        }
+        return toReturn;
+    }
+
+    public int [] collapseVerticallyByRedCount(int [] pixels, int imageWidth, int imageHeight){
+        //collapse into a single, frequency based
+        int [] toReturn = new int[imageWidth];
+        for(int c = 0; c < imageWidth; c ++){
+            for(int r = 0; r < imageHeight; r ++){
+                int color = pixels[r*imageWidth + c];
+                if(checkIfRed(color)){
                     toReturn[c] ++;
                 }
             }
@@ -265,12 +310,29 @@ public class CryptoBoxColumnImageProcessor {
         }
         return false;
     }
+    public boolean checkIfRed(float [] hsl){
+        if (hsl[0] > 320 || hsl[0] < 40) {
+            //make sure it's not a white red
+            if (hsl[1] > .7) {
+                //make sure it's not a black red
+                if (hsl[2] > .3) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
     public boolean checkIfBlue(int color){
         float [] hsl = new float[3];
         Color.colorToHSV(color,hsl);
         return checkIfBlue(hsl);
     }
-
+    
+    public boolean checkIfRed(int color){
+        float [] hsl = new float[3];
+        Color.colorToHSV(color,hsl);
+        return checkIfRed(hsl);
+    }
 
 
 
