@@ -78,19 +78,16 @@ public class NewCenterOnCryptobox extends LinearOpMode {
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
     JennyNavigation navigation;
-    ArialDepositor glyphSystem;
     JennySensorTelemetry sensorTelemetry;
-    JewelJouster jewelJouster;
     VuforiaHelper vuforia;
-    RelicRecoveryVuMark mark;
     CryptoBoxColumnImageProcessor cryptoBoxFinder;
     @Override
     public void runOpMode() {
         try {
-            navigation = new JennyNavigation(hardwareMap, startLocations[BLUE_ALLIANCE_2], 189, "RobotConfig/JennyV2.json");
+            navigation = new JennyNavigation(hardwareMap, startLocations[BLUE_ALLIANCE_2], 0, "RobotConfig/JennyV2.json");
             sensorTelemetry = new JennySensorTelemetry(hardwareMap, 0, 0);
             vuforia = new VuforiaHelper();
-            cryptoBoxFinder = new CryptoBoxColumnImageProcessor(DESIRED_HEIGHT, DESIRED_WIDTH, CLOSE_UP_MIN_PERCENT_COLUMN_CHECK, CLOSE_UP_MIN_COLUMN_WIDTH, CryptoBoxColumnImageProcessor.CRYPTOBOX_COLOR.RED);
+            cryptoBoxFinder = new CryptoBoxColumnImageProcessor(DESIRED_HEIGHT, DESIRED_WIDTH, CLOSE_UP_MIN_PERCENT_COLUMN_CHECK, CLOSE_UP_MIN_COLUMN_WIDTH, CryptoBoxColumnImageProcessor.CRYPTOBOX_COLOR.BLUE);
         }
         catch (Exception e){
             Log.e("Error!" , "Jenny Navigation: " + e.toString());
@@ -99,44 +96,49 @@ public class NewCenterOnCryptobox extends LinearOpMode {
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
+        waitForStart();
+
         Bitmap curImage = null;
         ArrayList<Integer> coloredColumns;
         long startTime = System.currentTimeMillis();
         curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
         coloredColumns = cryptoBoxFinder.findColumns(curImage, false);
         while (coloredColumns.size() == 0 && opModeIsActive()) {
-            navigation.correctedDriveOnHeadingIMU(SOUTH, ADJUSTING_SPEED_IN_PER_SEC, 0, this);
+            navigation.correctedDriveOnHeadingIMU(EAST, ADJUSTING_SPEED_IN_PER_SEC, 0, this);
             curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
-            coloredColumns = cryptoBoxFinder.findColumnCenters(curImage, false);
+            coloredColumns = cryptoBoxFinder.findColumns(curImage, false);
         }
         navigation.brake();
 
-        while (!centerOnCryptoBox(0, coloredColumns, SOUTH, NORTH) && opModeIsActive()) {
+        while (!centerOnCryptoBox(0, coloredColumns, EAST, WEST) && opModeIsActive()) {
             curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
-            coloredColumns = cryptoBoxFinder.findColumnCenters(curImage, false);
+            coloredColumns = cryptoBoxFinder.findColumns(curImage, false);
         }
         navigation.brake();
 
         while(opModeIsActive());
         navigation.stopNavigation();
-        glyphSystem.stop();
-//        glyphSystem.stopNavigation();
+        sensorTelemetry.stopSensorTelemetry();
     }
 
     public boolean centerOnCryptoBox(int column, ArrayList<Integer> columns, int primaryDirection, int secondaryDirection){
+        Log.d("Seen columns", Integer.toString(columns.size()));
         if(columns.size() == 0){
             navigation.correctedDriveOnHeadingIMU(primaryDirection, ADJUSTING_SPEED_IN_PER_SEC, 0, this);
             return false;
         }
-        else if(Math.abs(columns.get(column).intValue() -  DESIRED_WIDTH/2)< DESIRED_WIDTH/15){
+        else if(Math.abs(columns.get(column).intValue() -  DESIRED_WIDTH/2)< DESIRED_WIDTH/8){
             //keep driving the hint
-            navigation.correctedDriveOnHeadingIMU(primaryDirection,SLOW_SPEED_IN_PER_SEC,this);
+            Log.d("Column location", columns.get(column).toString());
+            navigation.correctedDriveOnHeadingIMU(primaryDirection,ADJUSTING_SPEED_IN_PER_SEC,this);
         }
-        else if(Math.abs(columns.get(column).intValue() -  DESIRED_WIDTH/2)> DESIRED_WIDTH/15){
+        else if(Math.abs(columns.get(column).intValue() -  DESIRED_WIDTH/2)> DESIRED_WIDTH/8){
             //keep driving the hint
-            navigation.correctedDriveOnHeadingIMU(secondaryDirection,SLOW_SPEED_IN_PER_SEC,this);
+            Log.d("Column location", columns.get(column).toString());
+            navigation.correctedDriveOnHeadingIMU(secondaryDirection,ADJUSTING_SPEED_IN_PER_SEC,this);
         }
         else {
+            Log.d("Column location", columns.get(column).toString());
             navigation.brake();
             return true;
         }
