@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.OrientationSensor;
 
 import java.io.InputStream;
 
@@ -61,7 +60,6 @@ public class JennyNavigation extends Thread{
 
     public ImuHandler orientation;
     private double orientationOffset = 0;
-    private long timeAtAccelerationStart;
     private volatile boolean shouldRun = true;
 
     private final double HEADING_THRESHOLD = 2;
@@ -151,7 +149,6 @@ public class JennyNavigation extends Thread{
         updateHeading();
         wheelVectors = getWheelVectors();
         updateLocation();
-        //updateLastMotorPositionsInInches();
     }
 
     private void safetySleep(long time){
@@ -183,7 +180,7 @@ public class JennyNavigation extends Thread{
             driveMotors[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR] = new MotorController(reader.getString("BACK_LEFT_MOTOR_NAME"), "MotorConfig/DriveMotors/NewHolonomicDriveMotorConfig.json", hardwareMap);
             driveMotors[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR] = new MotorController(reader.getString("BACK_RIGHT_MOTOR_NAME"), "MotorConfig/DriveMotors/NewHolonomicDriveMotorConfig.json", hardwareMap);
             for (int i = 0; i < driveMotors.length; i++) {
-                driveMotors[i].setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                driveMotors[i].setMotorRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
             }
             if(reader.getString("DRIVE_MOTOR_BRAKING_MODE").equals("BRAKE")){
                 for (int i = 0; i < driveMotors.length; i++) {
@@ -313,6 +310,10 @@ public class JennyNavigation extends Thread{
         mode.sleep(delayTimeMillis);
     }
 
+    public void correctedDriveOnHeadingIMU(int heading, double desiredVelocity, LinearOpMode mode){
+        correctedDriveOnHeadingIMU(heading,desiredVelocity,DEFAULT_DELAY_MILLIS,mode);
+    }
+
     public void correctedDriveOnHeadingIMU(int heading, double desiredVelocity, long delayTimeMillis, LinearOpMode mode) {
         desiredVelocity = Math.abs(desiredVelocity);
         double curOrientation = orientation.getOrientation();
@@ -393,7 +394,7 @@ public class JennyNavigation extends Thread{
         for(int i = 0; i < velocities.length; i ++){
             Log.d("Velocity: " + i, "" + velocities[i] + "in/s");
         }
-        Log.d("lmm" , " " + driveMotors[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR].getMotorMode().toString());
+        Log.d("lmm" , " " + driveMotors[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR].getMotorRunMode().toString());
         applyMotorVelocities(velocities);
         mode.sleep(delayTimeMillis);
     }
@@ -734,27 +735,6 @@ public class JennyNavigation extends Thread{
         return vectors;
     }
 
-    public void setLastMotorPositionsInInchesToOneInch(){
-        for(int i = 0; i < lastMotorPositionsInInches.length; i ++){
-            lastMotorPositionsInInches[i] = 1;
-        }
-    }
-
-    public HeadingVector[] getWheelVectorsTest(){
-        double [] deltaWheelPositions = {1,1,1,1};
-        HeadingVector [] vectors = new HeadingVector[4];
-        for(int i = 0; i < vectors.length; i++){
-            vectors[i] = new HeadingVector();
-        }
-        vectors[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR].calculateVector(FL_WHEEL_HEADING_OFFSET,deltaWheelPositions[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR]);
-        vectors[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR].calculateVector(FR_WHEEL_HEADING_OFFSET,deltaWheelPositions[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR]);
-        vectors[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR].calculateVector(BL_WHEEL_HEADING_OFFSET,deltaWheelPositions[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR]);
-        vectors[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR].calculateVector(BR_WHEEL_HEADING_OFFSET,deltaWheelPositions[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR]);
-        for (int i = 0; i < vectors.length; i++){
-            Log.d("Vector " + Integer.toString(i), "x: " + vectors[i].x() + ", y: " + vectors[i].y() + ", magnitude: " + vectors[i].getMagnitude());
-        }
-        return vectors;
-    }
 
     public void driveTowardsCryptobox(int team, double cryptoBoxCenterX, double imageCenterX, double desiredSpeed, long delayTimeMillis, LinearOpMode mode){
         double velocities[] = new double[4];

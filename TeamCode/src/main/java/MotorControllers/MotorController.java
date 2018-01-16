@@ -24,8 +24,6 @@ public class MotorController extends Thread {
     private double wheelDiameterInInches = 0;
     private double percentPerTickPerSec;
     private double powerOffset;
-
-
     //user set and program updated variables
     private volatile long desiredTicksPerSecVelocity = 0;
     private long currentTicksPerSec = 0;
@@ -38,7 +36,6 @@ public class MotorController extends Thread {
     private boolean shouldLog = false;
     private volatile boolean shouldRun = false;
     MotorTachometer tachometer;
-
     private long LOOP_MILLIS = 200;
 
     HardwareMap hardwareMap;
@@ -50,13 +47,13 @@ public class MotorController extends Thread {
         motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         //read the config file. If error received, fail entire initialization
         if(readConfig(configFileLoc) != 1){
-            Log.e(logTag + " MotorController Error","Config File Read Failed! Killing self!");
+            logError("MotorController Error","Config File Read Failed! Killing self!");
             shouldRun = false;
             throw new IOException("Failed to parse Motor Config File: " + configFileLoc);
         }
         tachometer = new MotorTachometer(m,ticksPerRevolution, MotorTachometer.RPS_SMOOTHER.NONE);
         shouldRun = true;
-        Log.d("Ticks per rev", Double.toString(ticksPerRevolution));
+        logDebug("Ticks per rev", Double.toString(ticksPerRevolution));
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -77,7 +74,14 @@ public class MotorController extends Thread {
         this(hw.dcMotor.get(motorName), configFileLoc, hw);
     }
 
-    public DcMotor.RunMode getMotorMode(){
+    public MotorController(String motorName, String configFileLoc, String debugTag, HardwareMap hw) throws IOException {
+        this(hw.dcMotor.get(motorName), configFileLoc, hw);
+        shouldLog = true;
+        logTag = debugTag;
+    }
+
+
+    public DcMotor.RunMode getMotorRunMode(){
         return motor.getMode();
     }
 
@@ -89,7 +93,7 @@ public class MotorController extends Thread {
         motor.setDirection(dir);
     }
 
-    public void setMotorMode(DcMotor.RunMode mode){
+    public void setMotorRunMode(DcMotor.RunMode mode){
         motor.setMode(mode);
     }
 
@@ -109,7 +113,7 @@ public class MotorController extends Thread {
         try {
             currentRPS = tachometer.getRotationsPerSecond();
         } catch(Exception e){
-            Log.e("MotorController Err",e.toString());
+            logError("MotorController Err",e.toString());
             shouldRun = false;
             throw new RuntimeException(e);
         }
@@ -124,7 +128,7 @@ public class MotorController extends Thread {
             stream = hardwareMap.appContext.getAssets().open(fileLoc);
         }
         catch(Exception e){
-            Log.d("Error: ",e.toString());
+            logError("Error: ",e.toString());
         }
         JsonConfigReader reader = new JsonConfigReader(stream);
         try{
@@ -136,7 +140,7 @@ public class MotorController extends Thread {
             //maxTicksPerSecond = (long)(maxRPS * ticksPerRevolution + .5);
             maxTicksPerSecond = (long) motor.getMotorType().getAchieveableMaxTicksPerSecondRounded();
         } catch(Exception e){
-            Log.e(logTag + " MotorController Error", "Config File Read Fail: " + e.toString());
+            logError(logTag + " MotorController Error", "Config File Read Fail: " + e.toString());
             return 0;
         }
         return 1;
@@ -173,7 +177,7 @@ public class MotorController extends Thread {
         try {
             motor.setPower((double) ticksPerSec / motor.getMotorType().getAchieveableMaxTicksPerSecondRounded());
         } catch (Exception e){
-            Log.e("Motorcontroller Error", "SetTicksPerSecondVelocity: " + e.toString());
+            logError("Motorcontroller Error", "SetTicksPerSecondVelocity: " + e.toString());
             shouldRun = false;
             throw new RuntimeException(e);
         }
@@ -201,7 +205,17 @@ public class MotorController extends Thread {
 
     public void setPosition(double positionInInches){
         int positionInTicks = (int)(positionInInches/(wheelDiameterInInches*Math.PI)*ticksPerRevolution);
-        Log.d("Desired tick", Double.toString(positionInTicks));
+        logDebug("Desired tick", Double.toString(positionInTicks));
         motor.setTargetPosition(positionInTicks);
+    }
+
+    private void logDebug(String main, String sub){
+        if(shouldLog){
+            Log.d(logTag, main + ":" + sub);
+        }
+    }
+
+    private void logError(String main, String sub){
+        Log.d(motor.getDeviceName(), logTag + ":" + main + ":" + sub);
     }
 }

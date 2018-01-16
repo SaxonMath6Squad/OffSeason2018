@@ -32,6 +32,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package Autonomous.OpModes;
 
+import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -45,6 +46,7 @@ import java.util.ArrayList;
 import Actions.ArialDepositor;
 import Actions.JewelJouster;
 import Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor;
+import Autonomous.REVColorDistanceSensorController;
 import Autonomous.VuforiaHelper;
 import DriveEngine.JennyNavigation;
 import SensorHandlers.JennySensorTelemetry;
@@ -53,18 +55,25 @@ import static Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor.CLOSE_UP_
 import static Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor.CLOSE_UP_MIN_PERCENT_COLUMN_CHECK;
 import static Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor.DESIRED_HEIGHT;
 import static Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor.DESIRED_WIDTH;
+import static Autonomous.REVColorDistanceSensorController.color.RED;
+import static Autonomous.REVColorDistanceSensorController.color.UNKNOWN;
 import static Autonomous.RelicRecoveryField.BLUE_ALLIANCE_2;
 import static Autonomous.RelicRecoveryField.startLocations;
 import static DriveEngine.JennyNavigation.ADJUSTING_SPEED_IN_PER_SEC;
+import static DriveEngine.JennyNavigation.DEFAULT_SLEEP_DELAY_MILLIS;
+import static DriveEngine.JennyNavigation.EAST;
+import static DriveEngine.JennyNavigation.MED_SPEED_IN_PER_SEC;
 import static DriveEngine.JennyNavigation.NORTH;
+import static DriveEngine.JennyNavigation.SLOW_SPEED_IN_PER_SEC;
 import static DriveEngine.JennyNavigation.SOUTH;
+import static DriveEngine.JennyNavigation.WEST;
 
 /*
     An opmode to test knocking off the correct jewel
  */
-@Autonomous(name="SinTest", group="Linear Opmode")  // @Autonomous(...) is the other common choice
+@Autonomous(name="New Center On Column", group="Linear Opmode")  // @Autonomous(...) is the other common choice
 //@Disabled
-public class RobotSinWave extends LinearOpMode {
+public class NewCenterOnCryptobox extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
@@ -75,78 +84,59 @@ public class RobotSinWave extends LinearOpMode {
     VuforiaHelper vuforia;
     RelicRecoveryVuMark mark;
     CryptoBoxColumnImageProcessor cryptoBoxFinder;
-    //ImuHandler imuHandler;
     @Override
     public void runOpMode() {
-        //imuHandler = new ImuHandler("imu", hardwareMap);
         try {
-            navigation = new JennyNavigation(hardwareMap, startLocations[BLUE_ALLIANCE_2], 11, "RobotConfig/JennyV2.json");
-            glyphSystem = new ArialDepositor(hardwareMap);
+            navigation = new JennyNavigation(hardwareMap, startLocations[BLUE_ALLIANCE_2], 189, "RobotConfig/JennyV2.json");
             sensorTelemetry = new JennySensorTelemetry(hardwareMap, 0, 0);
-            jewelJouster = new JewelJouster("jewelJouster", hardwareMap);
             vuforia = new VuforiaHelper();
-            cryptoBoxFinder = new CryptoBoxColumnImageProcessor(DESIRED_HEIGHT, DESIRED_WIDTH, CLOSE_UP_MIN_PERCENT_COLUMN_CHECK, CLOSE_UP_MIN_COLUMN_WIDTH);
+            cryptoBoxFinder = new CryptoBoxColumnImageProcessor(DESIRED_HEIGHT, DESIRED_WIDTH, CLOSE_UP_MIN_PERCENT_COLUMN_CHECK, CLOSE_UP_MIN_COLUMN_WIDTH, CryptoBoxColumnImageProcessor.CRYPTOBOX_COLOR.RED);
         }
         catch (Exception e){
             Log.e("Error!" , "Jenny Navigation: " + e.toString());
             throw new RuntimeException("Navigation Creation Error! " + e.toString());
         }
-        vuforia.loadCipherAssets();
+
         telemetry.addData("Status", "Initialized");
         telemetry.update();
-
-        // Wait for the game to start (driver presses PLAY)
-        while(!isStarted() && !isStopRequested());
-        if(isStopRequested()){
-            navigation.stopNavigation();
-            return;
-        }
-        runtime.reset();
+        Bitmap curImage = null;
+        ArrayList<Integer> coloredColumns;
         long startTime = System.currentTimeMillis();
-        while (opModeIsActive()){
-            //lets create a panning motion....
-            navigation.turnToHeading(215 - 20*Math.sin((System.currentTimeMillis() - startTime)/1000.0),this);
-            mark = vuforia.getMark();
-            switch (mark){
-                case LEFT:
-                    telemetry.addData("Mark", "LEFT");
-                    break;
-                case CENTER:
-                    telemetry.addData("Mark", "CENTER");
-                    break;
-                case RIGHT:
-                    telemetry.addData("Mark", "RIGHT");
-                    break;
-                case UNKNOWN:
-                    telemetry.addData("Mark", "UNKNOWN");
-                    break;
-                default:
-                    telemetry.addData("Mark", "HUH");
-                    break;
-            }
-            telemetry.update();
+        curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
+        coloredColumns = cryptoBoxFinder.findColumns(curImage, false);
+        while (coloredColumns.size() == 0 && opModeIsActive()) {
+            navigation.correctedDriveOnHeadingIMU(SOUTH, ADJUSTING_SPEED_IN_PER_SEC, 0, this);
+            curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
+            coloredColumns = cryptoBoxFinder.findColumnCenters(curImage, false);
         }
+        navigation.brake();
 
+        while (!centerOnCryptoBox(0, coloredColumns, SOUTH, NORTH) && opModeIsActive()) {
+            curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
+            coloredColumns = cryptoBoxFinder.findColumnCenters(curImage, false);
+        }
+        navigation.brake();
+
+        while(opModeIsActive());
         navigation.stopNavigation();
+        glyphSystem.stop();
 //        glyphSystem.stopNavigation();
     }
 
-    public boolean centerOnCryptoBox(int column, ArrayList<Integer> centers, int dirHint){
-        if(cryptoBoxFinder.imageWidth/2 < centers.get(column).intValue()){
-            if(cryptoBoxFinder.imageWidth/2  - centers.get(column).intValue() < centers.get(column).intValue()/10){
-                navigation.newDriveOnHeadingIMU(SOUTH, ADJUSTING_SPEED_IN_PER_SEC, 0, this);
-            } else {
-                navigation.brake();
-                return true;
-            }
-        } else if(cryptoBoxFinder.imageWidth/2  > centers.get(column).intValue()){
-            if(centers.get(column).intValue() - cryptoBoxFinder.imageWidth/2  > centers.get(column).intValue()/10){
-                navigation.newDriveOnHeadingIMU(NORTH, ADJUSTING_SPEED_IN_PER_SEC, 0, this);
-            } else {
-                navigation.brake();
-                return true;
-            }
-        } else {
+    public boolean centerOnCryptoBox(int column, ArrayList<Integer> columns, int primaryDirection, int secondaryDirection){
+        if(columns.size() == 0){
+            navigation.correctedDriveOnHeadingIMU(primaryDirection, ADJUSTING_SPEED_IN_PER_SEC, 0, this);
+            return false;
+        }
+        else if(Math.abs(columns.get(column).intValue() -  DESIRED_WIDTH/2)< DESIRED_WIDTH/15){
+            //keep driving the hint
+            navigation.correctedDriveOnHeadingIMU(primaryDirection,SLOW_SPEED_IN_PER_SEC,this);
+        }
+        else if(Math.abs(columns.get(column).intValue() -  DESIRED_WIDTH/2)> DESIRED_WIDTH/15){
+            //keep driving the hint
+            navigation.correctedDriveOnHeadingIMU(secondaryDirection,SLOW_SPEED_IN_PER_SEC,this);
+        }
+        else {
             navigation.brake();
             return true;
         }

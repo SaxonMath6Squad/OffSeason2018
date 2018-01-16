@@ -44,7 +44,7 @@ public class SpoolMotor implements ActionHandler{
     }
 
     public DcMotor.RunMode getMotorControllerMode() {
-        return motor.getMotorMode();
+        return motor.getMotorRunMode();
     }
 
     public void retract()
@@ -96,7 +96,7 @@ public class SpoolMotor implements ActionHandler{
     }
 
     public void setMode(DcMotor.RunMode mode){
-        motor.setMotorMode(mode);
+        motor.setMotorRunMode(mode);
     }
 
 //    public int extendToPosition(double inch){

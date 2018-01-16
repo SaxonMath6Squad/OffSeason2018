@@ -80,7 +80,7 @@ public class RunToPositionTest extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            navigation.driveMotors[0].setMotorMode(DcMotor.RunMode.RUN_TO_POSITION);
+            navigation.driveMotors[0].setMotorRunMode(DcMotor.RunMode.RUN_TO_POSITION);
             navigation.driveMotors[0].setPosition(4*Math.PI);
             navigation.driveMotors[0].setMotorPower(0.5);
 
