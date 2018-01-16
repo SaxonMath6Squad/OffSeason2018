@@ -52,7 +52,9 @@ import static Actions.ArialDepositor.ROW3_PLACEMENT_HEIGHT;
 import static Actions.ArialDepositor.ROW4_PLACEMENT_HEIGHT;
 import static Autonomous.RelicRecoveryField.BLUE_ALLIANCE_2;
 import static Autonomous.RelicRecoveryField.startLocations;
+import static DriveEngine.JennyNavigation.HIGH_SPEED_IN_PER_SEC;
 import static DriveEngine.JennyNavigation.NORTH;
+import static DriveEngine.JennyNavigation.SLOW_SPEED_IN_PER_SEC;
 import static SensorHandlers.JennySensorTelemetry.RAD_LIMIT;
 
 /*
@@ -133,8 +135,8 @@ public class JennyO1B extends LinearOpMode {
 
             if(rightJoystick.magnitude() < .1){
                 if(!isSlowMode)
-                navigation.driveOnHeading(leftJoystick.angle(), leftJoystick.magnitude() * 50);
-                else navigation.driveOnHeading(leftJoystick.angle(), leftJoystick.magnitude() * 10);
+                navigation.driveOnHeading(leftJoystick.angle(), leftJoystick.magnitude() * HIGH_SPEED_IN_PER_SEC);
+                else navigation.driveOnHeading(leftJoystick.angle(), leftJoystick.magnitude() * SLOW_SPEED_IN_PER_SEC);
             }
             else {
                 if(!isSlowMode) navigation.turn(rightJoystick.magnitude() * rightJoystick.x()/Math.abs(rightJoystick.x()));
