@@ -89,7 +89,7 @@ public class BlueTeam1GlyphAutonomous extends LinearOpMode {
     public void runOpMode() {
         //imuHandler = new ImuHandler("imu", hardwareMap);
         try {
-            navigation = new JennyNavigation(hardwareMap, startLocations[BLUE_ALLIANCE_2], 11, "RobotConfig/JennyV2.json");
+            navigation = new JennyNavigation(hardwareMap, startLocations[BLUE_ALLIANCE_2], 9, "RobotConfig/JennyV2.json");
             glyphSystem = new ArialDepositor(hardwareMap);
             sensorTelemetry = new JennySensorTelemetry(hardwareMap, 0, 0);
             jewelJouster = new JewelJouster("jewelJouster", hardwareMap);
@@ -107,24 +107,24 @@ public class BlueTeam1GlyphAutonomous extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
-//        jewelJouster.setPosition(JewelJouster.EXTENDION_MODE.HIT);
-//        sleep(500);
-//        REVColorDistanceSensorController.color jewelColor = jewelJouster.getJewelColor();
-//        if(jewelColor != UNKNOWN){
-//            if(jewelColor == BLUE){
-//                telemetry.addData("Jewel Color","BLUE");
-//                navigation.turnToHeading(0, this);
-//            }
-//            else {
-//                //navigation.driveDistance(2, NORTH, ADJUSTING_SPEED_IN_PER_SEC, this);
-//                navigation.turnToHeading(20, this);
-//                telemetry.addData("Jewel Color","RED");
-//                //sleep(DEFAULT_SLEEP_DELAY_MILLIS);
-//            }
-//        }
-//        else{
-//            telemetry.addData("Jewel Color","UNKOWN");
-//        }
+        jewelJouster.setPosition(JewelJouster.EXTENDION_MODE.HIT);
+        sleep(750);
+        REVColorDistanceSensorController.color jewelColor = jewelJouster.getJewelColor();
+        if(jewelColor != UNKNOWN){
+            if(jewelColor == BLUE){
+                telemetry.addData("Jewel Color","BLUE");
+                navigation.turnToHeading(0, this);
+            }
+            else {
+                //navigation.driveDistance(2, NORTH, ADJUSTING_SPEED_IN_PER_SEC, this);
+                navigation.turnToHeading(20, this);
+                telemetry.addData("Jewel Color","RED");
+                //sleep(DEFAULT_SLEEP_DELAY_MILLIS);
+            }
+        }
+        else{
+            telemetry.addData("Jewel Color","UNKOWN");
+        }
         jewelJouster.setPosition(JewelJouster.EXTENDION_MODE.STORE);
         navigation.turnToHeading(0, this);
         telemetry.update();
@@ -200,16 +200,17 @@ public class BlueTeam1GlyphAutonomous extends LinearOpMode {
         }
         navigation.brake();
         sleep(DEFAULT_SLEEP_DELAY_MILLIS);
+        navigation.driveDistance(1, EAST, SLOW_SPEED_IN_PER_SEC, this);
         glyphSystem.goToGlyphLevel(ArialDepositor.GLYPH_PLACEMENT_LEVEL.ROW1);
         navigation.driveDistance(9, SOUTH, ADJUSTING_SPEED_IN_PER_SEC, this);
         sleep(DEFAULT_SLEEP_DELAY_MILLIS);
         glyphSystem.startBelt();
         sleep(2000);
         glyphSystem.stopBelt();
-        navigation.driveDistance(4, NORTH, ADJUSTING_SPEED_IN_PER_SEC, this);
+        navigation.driveDistance(5, NORTH, ADJUSTING_SPEED_IN_PER_SEC, this);
         glyphSystem.goToGlyphLevel(ArialDepositor.GLYPH_PLACEMENT_LEVEL.GROUND);
-        navigation.driveDistance(10, SOUTH, SLOW_SPEED_IN_PER_SEC, this);
-        navigation.driveDistance(2, NORTH, SLOW_SPEED_IN_PER_SEC, this);
+//        navigation.driveDistance(10, SOUTH, SLOW_SPEED_IN_PER_SEC, this);
+//        navigation.driveDistance(2, NORTH, SLOW_SPEED_IN_PER_SEC, this);
         while(opModeIsActive());
         navigation.stopNavigation();
         glyphSystem.stop();
@@ -219,6 +220,7 @@ public class BlueTeam1GlyphAutonomous extends LinearOpMode {
     public boolean centerOnCryptoBox(int column, ArrayList<Integer> centers, int dirHint){
         if(centers.size() == 0){
             navigation.newDriveOnHeadingIMU(dirHint, ADJUSTING_SPEED_IN_PER_SEC, 0, this);
+            return false;
         }
         if(cryptoBoxFinder.imageWidth/2 < centers.get(column).intValue()){
             if(cryptoBoxFinder.imageWidth/2  - centers.get(column).intValue() < centers.get(column).intValue()/10){

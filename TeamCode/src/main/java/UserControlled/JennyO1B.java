@@ -117,9 +117,10 @@ public class JennyO1B extends LinearOpMode {
         rightJoystick = new JoystickHandler(gamepad1,JoystickHandler.RIGHT_JOYSTICK);
         telemetry.addData("Status", "Initialized");
         telemetry.update();
-        jouster.setPosition(JewelJouster.EXTENDION_MODE.NEUTRAL);
+        jouster.setPosition(JewelJouster.EXTENDION_MODE.STORE);
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
+        jouster.setPosition(JewelJouster.EXTENDION_MODE.NEUTRAL);
         runtime.reset();
         boolean isSlowMode = false;
 
@@ -255,6 +256,12 @@ public class JennyO1B extends LinearOpMode {
                 RAD.grabRelic();
             }
             else if(gamepad1.y){
+                RAD.releaseRelic();
+            }
+            else if(gamepad2.dpad_up && !gamepad1.x && !gamepad1.y){
+                RAD.grabRelic();
+            }
+            else if(gamepad2.dpad_down && !gamepad1.x && !gamepad1.y){
                 RAD.releaseRelic();
             }
             else {

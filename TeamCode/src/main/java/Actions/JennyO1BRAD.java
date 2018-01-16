@@ -19,9 +19,9 @@ public class JennyO1BRAD {
     ServoHandler RADGrabber;
     SpoolMotor RADExtender;
     HardwareMap hardwareMap;
-    final double EXTEND = 95;
+    final double EXTEND = 160;
     final double NEUTRAL = 90;
-    final double RETRACT = 60;
+    final double RETRACT = 20;
 
     public JennyO1BRAD(HardwareMap hw) throws InterruptedException{
         hardwareMap = hw;

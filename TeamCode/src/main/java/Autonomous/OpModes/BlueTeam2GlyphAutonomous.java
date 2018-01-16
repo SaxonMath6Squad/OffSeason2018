@@ -89,7 +89,7 @@ public class BlueTeam2GlyphAutonomous extends LinearOpMode {
     public void runOpMode() {
         //imuHandler = new ImuHandler("imu", hardwareMap);
         try {
-            navigation = new JennyNavigation(hardwareMap, startLocations[BLUE_ALLIANCE_2], 11, "RobotConfig/JennyV2.json");
+            navigation = new JennyNavigation(hardwareMap, startLocations[BLUE_ALLIANCE_2], 9, "RobotConfig/JennyV2.json");
             glyphSystem = new ArialDepositor(hardwareMap);
             sensorTelemetry = new JennySensorTelemetry(hardwareMap, 0, 0);
             jewelJouster = new JewelJouster("jewelJouster", hardwareMap);
@@ -197,13 +197,14 @@ public class BlueTeam2GlyphAutonomous extends LinearOpMode {
         }
         navigation.brake();
         sleep(DEFAULT_SLEEP_DELAY_MILLIS);
+        navigation.driveDistance(1, NORTH, SLOW_SPEED_IN_PER_SEC, this);
         glyphSystem.goToGlyphLevel(ArialDepositor.GLYPH_PLACEMENT_LEVEL.ROW1);
         navigation.driveDistance(8, EAST, ADJUSTING_SPEED_IN_PER_SEC, this);
         sleep(DEFAULT_SLEEP_DELAY_MILLIS);
         glyphSystem.startBelt();
         sleep(2000);
         glyphSystem.stopBelt();
-        navigation.driveDistance(4, WEST, ADJUSTING_SPEED_IN_PER_SEC, this);
+        navigation.driveDistance(5, WEST, ADJUSTING_SPEED_IN_PER_SEC, this);
         glyphSystem.goToGlyphLevel(ArialDepositor.GLYPH_PLACEMENT_LEVEL.GROUND);
         while(opModeIsActive());
         navigation.stopNavigation();
@@ -212,6 +213,10 @@ public class BlueTeam2GlyphAutonomous extends LinearOpMode {
     }
 
     public boolean centerOnCryptoBox(int column, ArrayList<Integer> centers, int dirHint){
+        if(centers.size() == 0){
+            navigation.correctedDriveOnHeadingIMU(dirHint, ADJUSTING_SPEED_IN_PER_SEC, 0, this);
+            return false;
+        }
         if(cryptoBoxFinder.imageWidth/2 < centers.get(column).intValue()){
             if(cryptoBoxFinder.imageWidth/2  - centers.get(column).intValue() < centers.get(column).intValue()/10){
                 navigation.correctedDriveOnHeadingIMU(SOUTH, ADJUSTING_SPEED_IN_PER_SEC, 0, this);

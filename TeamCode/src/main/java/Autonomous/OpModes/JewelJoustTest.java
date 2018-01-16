@@ -89,7 +89,7 @@ public class JewelJoustTest extends LinearOpMode {
 
         //sensorTelemetry.jewelJoust.setPosition(JEWEL_JOUST_ACTIVE_POSITION);
         jewelJouster.setPosition(JewelJouster.EXTENDION_MODE.READ);
-        sleep(250);
+        sleep(500);
         if(jewelJouster.getJewelColor() == BLUE){
             navigation.turnToHeading(15, this);
             jewelJouster.setPosition(JewelJouster.EXTENDION_MODE.HIT);

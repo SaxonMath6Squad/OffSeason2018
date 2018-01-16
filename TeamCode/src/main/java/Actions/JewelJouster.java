@@ -16,7 +16,7 @@ public class JewelJouster implements ActionHandler {
     private HardwareMap hardwareMap;
     public enum EXTENDION_MODE {STORE, READ, HIT, NEUTRAL};
     private EXTENDION_MODE curMode = EXTENDION_MODE.STORE;
-    private static final double STORE_POSITION = 90.0;
+    private static final double STORE_POSITION = 104.0;
     private static final double NEUTRAL_POSITION = 85.0;
     private static final double READ_POSITION = 41.0;
     private static final double HIT_POSITION = 19.0;
