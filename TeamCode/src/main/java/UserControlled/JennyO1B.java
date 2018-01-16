@@ -57,6 +57,9 @@ import static SensorHandlers.JennySensorTelemetry.RAD_LIMIT;
 
 /*
     An opmode for the User Controlled portion of the game
+    This code was used for the first regional qualifier at Asheville NC
+    Limited autonomous, no ciphers on red team, glyphs close but not always scored.
+    We won 1st place
  */
 @TeleOp(name="Jenny O1B User Controlled", group="Linear Opmode")  // @Autonomous(...) is the other common choice
 //@Disabled
