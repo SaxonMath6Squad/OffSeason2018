@@ -59,6 +59,10 @@ public class JennyFlagController extends Thread{
         flagShouldMove = true;
     }
 
+    public void pauseFlag() {
+        flagShouldMove = false;
+    }
+
     public void stopFlag(){
         flagShouldMove = false;
         shouldRun = false;
