@@ -127,12 +127,12 @@ public class NewCenterOnCryptobox extends LinearOpMode {
             navigation.correctedDriveOnHeadingIMU(primaryDirection, ADJUSTING_SPEED_IN_PER_SEC, 0, this);
             return false;
         }
-        else if(Math.abs(columns.get(column).intValue() -  DESIRED_WIDTH/2)< DESIRED_WIDTH/8){
+        else if(columns.get(column).intValue() -  DESIRED_WIDTH/2 < -DESIRED_WIDTH/8){
             //keep driving the hint
             Log.d("Column location", columns.get(column).toString());
             navigation.correctedDriveOnHeadingIMU(primaryDirection,ADJUSTING_SPEED_IN_PER_SEC,this);
         }
-        else if(Math.abs(columns.get(column).intValue() -  DESIRED_WIDTH/2)> DESIRED_WIDTH/8){
+        else if(columns.get(column).intValue() -  DESIRED_WIDTH/2 > DESIRED_WIDTH/8){
             //keep driving the hint
             Log.d("Column location", columns.get(column).toString());
             navigation.correctedDriveOnHeadingIMU(secondaryDirection,ADJUSTING_SPEED_IN_PER_SEC,this);
