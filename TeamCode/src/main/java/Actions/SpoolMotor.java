@@ -25,7 +25,6 @@ public class SpoolMotor implements ActionHandler{
     public SpoolMotor(MotorController m, double extendInPerSec, double retractInPerSec, double maxEtendInches, HardwareMap h){
         hardwareMap = h;
         motor = m;
-//        motor.setMotorControllerMode(MotorController.MotorControllerMode.SPEED_CONTROLLER);
         m.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         retractSpeedInPerSecond = retractInPerSec;
         extendSpeedInPerSecond = extendInPerSec;
@@ -39,7 +38,6 @@ public class SpoolMotor implements ActionHandler{
     }
 
     public void extend(){
-//        if(motor.getMotorControllerMode() != MotorController.MotorControllerMode.SPEED_CONTROLLER) motor.setMotorControllerMode(MotorController.MotorControllerMode.SPEED_CONTROLLER);
         motor.setInchesPerSecondVelocity(extendSpeedInPerSecond);
     }
 
@@ -49,7 +47,6 @@ public class SpoolMotor implements ActionHandler{
 
     public void retract()
     {
-//        if(motor.getMotorControllerMode() != MotorController.MotorControllerMode.SPEED_CONTROLLER) motor.setMotorControllerMode(MotorController.MotorControllerMode.SPEED_CONTROLLER);
         motor.setInchesPerSecondVelocity(-retractSpeedInPerSecond);
     }
 
@@ -99,25 +96,6 @@ public class SpoolMotor implements ActionHandler{
         motor.setMotorRunMode(mode);
     }
 
-//    public int extendToPosition(double inch){
-//        if(!motor.isAlive()){
-//            Log.e("Spool Error","Motor killed!");
-//            return -1;
-//        }
-//
-////        if(motor.getMotorControllerMode() != MotorController.MotorControllerMode.RUN_TO_POSITION) motor.setMotorControllerMode(MotorController.MotorControllerMode.RUN_TO_POSITION);
-//
-//        if(motor.getInchesFromStart() < inch){
-//            motor.setInchesPerSecondVelocity(extendSpeedInPerSecond);
-//        }
-//
-//        else if(motor.getInchesFromStart() > inch){
-//            motor.setInchesPerSecondVelocity(-retractSpeedInPerSecond);
-//        }
-//        motor.setInchesToTravel(inch - motor.getInchesFromStart());
-//        return 0;
-//    }
-
     @Override
     public boolean doAction(String action, long maxTimeAllowed) {
         return false;
@@ -135,8 +113,6 @@ public class SpoolMotor implements ActionHandler{
 
     @Override
     public void stop() {
-//        motor.setMotorControllerMode(MotorController.MotorControllerMode.SPEED_CONTROLLER);
-
         motor.setInchesPerSecondVelocity(0);
         motor.killMotorController();
     }

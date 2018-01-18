@@ -18,7 +18,6 @@ public class JennyO1BGlyphPicker implements ActionHandler {
     HardwareMap hardwareMap;
     private double WHEEL_POWERS = 1;
 
-
     public JennyO1BGlyphPicker(HardwareMap hw) throws Exception{
         hardwareMap = hw;
         wheelMotor = new MotorController("glyphMotor", "MotorConfig/DriveMotors/NewHolonomicDriveMotorConfig.json", hardwareMap);

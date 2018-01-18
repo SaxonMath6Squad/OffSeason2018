@@ -160,38 +160,6 @@ public class CryptoBoxColumnImageProcessor {
         return columnCenters;
     }
 
-    /*
-    public ArrayList<Integer> findColumns(Bitmap bmp, boolean shouldModifyImage){
-        Log.d("CF IMG ","Height: " + bmp.getHeight() + " Width: " + bmp.getWidth());
-        if(bmp.getHeight() > imageHeight && bmp.getWidth() > imageWidth){
-            bmp = scaleBmp(bmp);
-        }
-        ArrayList<Integer> columnCenters = new ArrayList<Integer>();
-        int width = bmp.getWidth(), height = bmp.getHeight();
-        int[] pixels = new int[width * height];
-        bmp.getPixels(pixels, 0, width, 0, 0, width, height);
-        long collapseStart = System.currentTimeMillis();
-        double [] blueFrequencyByColumn = collapseVerticallyByBluePercent(pixels,width,height);
-        Log.d("CF IMG PROC", "Collapse Time: " + (System.currentTimeMillis() - collapseStart));
-        ArrayList<Integer> interestingColumns = getColumnsWithRequiredPercentBlue(blueFrequencyByColumn);
-        ArrayList<Integer> columnBounds = getColumnBounds(interestingColumns);
-        for (int i = 0; i < columnBounds.size(); i++) {
-            Log.d("Bound", columnBounds.get(i).toString());
-        }
-        //get average column locations
-        columnCenters = getColumnCenters(columnBounds);
-        for (int i = 0; i < columnCenters.size(); i++) {
-            Log.d("Centers", columnCenters.get(i).toString());
-        }
-        Log.d("# of Columns", "" + columnCenters.size());
-        if(shouldModifyImage){
-            showBluePixels(pixels,height,width, Color.GREEN);
-            showColumnCenters(pixels,height,width,columnCenters,Color.RED);
-        }
-        return columnCenters;
-    }
-     */
-
     private void showColumnCenters(int [] pixels, int height, int width, ArrayList<Integer> columnCenters, int colorToShowWith){
         for (int i = 0; i < columnCenters.size(); i++) {
             for (int r = 0; r < height; r++) {
@@ -333,8 +301,4 @@ public class CryptoBoxColumnImageProcessor {
         Color.colorToHSV(color,hsl);
         return checkIfRed(hsl);
     }
-
-
-
-
 }

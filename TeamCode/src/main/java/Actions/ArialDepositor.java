@@ -24,24 +24,22 @@ public class ArialDepositor implements ActionHandler {
     REVColorDistanceSensorController glyphSensor;
     HardwareMap hardwareMap;
     double currentPosition = 0;
-    final double UNKNOWN_DISTANCE = -1;
     private final static double FAST_RETRACT_SPEED = 10.0;
     private final static double FAST_EXTEND_SPEED = 15.0;
     private final static double SLOW_RETRACT_SPEED = 1.0;
     private final static double SLOW_EXTEND_SPEED = 5.0;
 
-    public final static int LIFT_MOTOR = 4;
-    public final static int GLYPH_MOTOR = 5;
     public final static int TICKS_PER_REV = 1120;
     public final static double EXTENDOTRON_DIAMETER_INCHES = 1.18;
 
-    public enum GLYPH_PLACEMENT_LEVEL{GROUND,ROW1,ROW2,ROW3,ROW4};
+    public enum GLYPH_PLACEMENT_LEVEL{GROUND,ROW1,ROW2,ROW3,ROW4,ROW1_AND_2,ROW3_AND_4};
     public final static double GROUND_LEVEL_PLACEMENT_HEIGHT = 0;
     public final static double ROW1_PLACEMENT_HEIGHT = 6;
     public final static double ROW2_PLACEMENT_HEIGHT = 12;
     public final static double ROW3_PLACEMENT_HEIGHT = 18;
     public final static double ROW4_PLACEMENT_HEIGHT = 24;
-    GLYPH_PLACEMENT_LEVEL desiredLevel;
+    public final static double ROW1_AND_2_PLACEMENT_HEIGHT = 13;
+    public final static double ROW3_AND_4_PLACEMENT_HEIGHT = 26;
 
     public ArialDepositor(HardwareMap hw) throws Exception{
         hardwareMap = hw;
@@ -110,6 +108,12 @@ public class ArialDepositor implements ActionHandler {
                 break;
             case ROW4:
                 goToLiftPosition(ROW4_PLACEMENT_HEIGHT);
+                break;
+            case ROW1_AND_2:
+                goToLiftPosition(ROW1_AND_2_PLACEMENT_HEIGHT);
+                break;
+            case ROW3_AND_4:
+                goToLiftPosition(ROW3_AND_4_PLACEMENT_HEIGHT);
                 break;
         }
     }

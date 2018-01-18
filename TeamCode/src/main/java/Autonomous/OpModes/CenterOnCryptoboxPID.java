@@ -63,7 +63,7 @@ import static DriveEngine.JennyNavigation.WEST;
  */
 @Autonomous(name="New Center On Column PID", group="Linear Opmode")  // @Autonomous(...) is the other common choice
 //@Disabled
-public class NewCenterOnCryptoboxPID extends LinearOpMode {
+public class CenterOnCryptoboxPID extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
@@ -119,21 +119,17 @@ public class NewCenterOnCryptoboxPID extends LinearOpMode {
             navigation.correctedDriveOnHeadingIMU(primaryDirection, SLOW_SPEED_IN_PER_SEC, 0, this);
             return false;
         }
-        else if(columns.get(column).intValue() -  DESIRED_WIDTH/2 < -DESIRED_WIDTH/8){
+        else if(columns.get(column) -  DESIRED_WIDTH/2 < -DESIRED_WIDTH/8 || columns.get(column) -  DESIRED_WIDTH/2 > DESIRED_WIDTH/8){
             //keep driving the hint
             Log.d("Column location", columns.get(column).toString());
-            cameraPIDController.setSp(-DESIRED_WIDTH/8);
+            cameraPIDController.setSp(0);
             double distToColumn = columns.get(column) - DESIRED_WIDTH/2;
-            double speedCorrection = cameraPIDController.calculatePID(distToColumn);
-            navigation.correctedDriveOnHeadingIMU(primaryDirection,ADJUSTING_SPEED_IN_PER_SEC + speedCorrection,this);
-        }
-        else if(columns.get(column).intValue() -  DESIRED_WIDTH/2 > DESIRED_WIDTH/8){
-            //keep driving the hint
-            Log.d("Column location", columns.get(column).toString());
-            cameraPIDController.setSp(DESIRED_WIDTH/8);
-            double distToColumn = columns.get(column) - DESIRED_WIDTH/2;
-            double speedCorrection = cameraPIDController.calculatePID(distToColumn);
-            navigation.correctedDriveOnHeadingIMU(secondaryDirection,ADJUSTING_SPEED_IN_PER_SEC + speedCorrection,this);
+            if(Math.abs(distToColumn) < 5){
+                navigation.brake();
+                return true;
+            }
+            double velocityCorrection = cameraPIDController.calculatePID(distToColumn);
+            navigation.correctedDriveOnHeadingIMU((velocityCorrection < 0)? primaryDirection:secondaryDirection,ADJUSTING_SPEED_IN_PER_SEC + velocityCorrection,this);
         }
         else {
             Log.d("Column location", columns.get(column).toString());

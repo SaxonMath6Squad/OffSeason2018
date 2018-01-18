@@ -39,6 +39,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import Actions.ArialDepositor;
+import Actions.JennyFlagController;
 import Actions.JennyO1BGlyphPicker;
 import Actions.JewelJouster;
 import DriveEngine.JennyNavigation;
@@ -76,8 +77,11 @@ public class JennyO1B extends LinearOpMode {
     JennyO1BRAD RAD;
     JewelJouster jouster;
     JennySensorTelemetry sensorTelemetry;
+    JennyFlagController flagController;
     boolean autoLiftPositionMode = false;
-    double[] liftPosition = new double[]{GROUND_LEVEL_PLACEMENT_HEIGHT, ROW1_PLACEMENT_HEIGHT, ROW2_PLACEMENT_HEIGHT, ROW3_PLACEMENT_HEIGHT, ROW4_PLACEMENT_HEIGHT};
+    boolean paralaxedControl = false;
+    boolean flagOn = false;
+    ArialDepositor.GLYPH_PLACEMENT_LEVEL[] liftPosition = new ArialDepositor.GLYPH_PLACEMENT_LEVEL[]{ArialDepositor.GLYPH_PLACEMENT_LEVEL.GROUND, ArialDepositor.GLYPH_PLACEMENT_LEVEL.ROW1_AND_2, ArialDepositor.GLYPH_PLACEMENT_LEVEL.ROW3_AND_4};
 
     int position = 0;
 
@@ -118,6 +122,7 @@ public class JennyO1B extends LinearOpMode {
             throw new RuntimeException("Glyph Picker! " + e.toString());
         }
         sensorTelemetry = new JennySensorTelemetry(hardwareMap, 0, 0);
+        flagController = new JennyFlagController(hardwareMap);
         leftJoystick = new JoystickHandler(gamepad1,JoystickHandler.LEFT_JOYSTICK);
         rightJoystick = new JoystickHandler(gamepad1,JoystickHandler.RIGHT_JOYSTICK);
         telemetry.addData("Status", "Initialized");
@@ -131,20 +136,20 @@ public class JennyO1B extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            //DRIVE
 
+            //DRIVE
             if(rightJoystick.magnitude() < .1){
                 if(!isSlowMode)
-                navigation.driveOnHeading(leftJoystick.angle(), leftJoystick.magnitude() * HIGH_SPEED_IN_PER_SEC);
-                else navigation.driveOnHeading(leftJoystick.angle(), leftJoystick.magnitude() * SLOW_SPEED_IN_PER_SEC);
+                navigation.driveOnHeading((paralaxedControl)? (leftJoystick.angle() - 90)%360:leftJoystick.angle(), leftJoystick.magnitude() * HIGH_SPEED_IN_PER_SEC);
+                else navigation.driveOnHeading((paralaxedControl)? (leftJoystick.angle() - 90)%360:leftJoystick.angle(), leftJoystick.magnitude() * SLOW_SPEED_IN_PER_SEC);
             }
             else {
                 if(!isSlowMode) navigation.turn(rightJoystick.magnitude() * rightJoystick.x()/Math.abs(rightJoystick.x()));
                 else navigation.turn(.1 * rightJoystick.magnitude() * rightJoystick.x()/Math.abs(rightJoystick.x()));
             }
-            if(gamepad1.start){
+            if(gamepad1.left_bumper && gamepad1.right_bumper){
                 isSlowMode = !isSlowMode;
-                while(gamepad1.start);
+                while(gamepad1.left_bumper && gamepad1.right_bumper);
             }
 
             //GLYPH GRABBER
@@ -164,7 +169,7 @@ public class JennyO1B extends LinearOpMode {
                         glyphLift.slowExtend();
                     }
                 }
-                else if (gamepad1.right_bumper && !sensorTelemetry.isPressed(sensorTelemetry.EXTEND_LIMIT)){
+                else if (gamepad1.right_bumper && !gamepad1.left_bumper && !sensorTelemetry.isPressed(sensorTelemetry.EXTEND_LIMIT)){
                     if(!isSlowMode){
                         glyphLift.retract();
                     }
@@ -215,10 +220,10 @@ public class JennyO1B extends LinearOpMode {
 
                 if (position <= 0) position = 0;
                 if (position >= liftPosition.length - 1) position = liftPosition.length - 1;
-                glyphLift.goToLiftPosition(liftPosition[position]);
+                glyphLift.goToGlyphLevel(liftPosition[position]);
             }
             if(gamepad1.back || gamepad2.back) {
-                autoLiftPositionMode = (autoLiftPositionMode)? false:true;
+                autoLiftPositionMode = !autoLiftPositionMode;
                 while (gamepad1.back || gamepad2.back);
             }
 
@@ -226,7 +231,7 @@ public class JennyO1B extends LinearOpMode {
             if(!sensorTelemetry.isPressed(sensorTelemetry.EXTEND_LIMIT)) {
                 glyphLift.setBeltPower(.25);
                 if (gamepad1.left_trigger > 0.1) glyphLift.startBelt();
-                else if (gamepad1.left_bumper) glyphLift.reverseBelt();
+                else if (gamepad1.left_bumper && !gamepad1.right_bumper) glyphLift.reverseBelt();
                 else if (gamepad2.left_trigger > 0.1 && gamepad1.right_trigger < 0.1 && gamepad1.left_trigger < 0.1 && !gamepad1.right_bumper && !gamepad1.left_bumper)
                     glyphLift.startBelt();
                 else if (gamepad2.left_bumper && gamepad1.right_trigger < 0.1 && gamepad1.left_trigger < 0.1 && !gamepad1.right_bumper && !gamepad1.left_bumper)
@@ -236,7 +241,7 @@ public class JennyO1B extends LinearOpMode {
             } else {
                 glyphLift.setBeltPower(1);
                 if (gamepad1.left_trigger > 0.1) glyphLift.startBelt();
-                else if (gamepad1.left_bumper) glyphLift.reverseBelt();
+                else if (gamepad1.left_bumper && !gamepad1.right_bumper) glyphLift.reverseBelt();
                 else if (gamepad2.left_trigger > 0.1 && gamepad1.right_trigger < 0.1 && gamepad1.left_trigger < 0.1 && !gamepad1.right_bumper && !gamepad1.left_bumper)
                     glyphLift.startBelt();
                 else if (gamepad2.left_bumper && gamepad1.right_trigger < 0.1 && gamepad1.left_trigger < 0.1 && !gamepad1.right_bumper && !gamepad1.left_bumper)
@@ -257,27 +262,32 @@ public class JennyO1B extends LinearOpMode {
             }
 
             //RAD Grabber
-            if(gamepad1.x){
+            if(gamepad2.dpad_up){
                 RAD.grabRelic();
             }
-            else if(gamepad1.y){
-                RAD.releaseRelic();
-            }
-            else if(gamepad2.dpad_up && !gamepad1.x && !gamepad1.y){
-                RAD.grabRelic();
-            }
-            else if(gamepad2.dpad_down && !gamepad1.x && !gamepad1.y){
+            else if(gamepad2.dpad_down){
                 RAD.releaseRelic();
             }
             else {
                 RAD.stopRelic();
             }
 
+            //MISC
+            if(gamepad1.start){
+                paralaxedControl = !paralaxedControl;
+                while (gamepad1.start);
+            }
             if(gamepad1.right_stick_button){
                 navigation.turnToHeading(NORTH, this);
             }
             if(gamepad1.left_stick_button){
-                navigation.setOrientationOffset(0);
+                navigation.setOrientationOffset(360 - navigation.getOrientation());
+            }
+            if(gamepad2.start){
+                if(flagOn) flagController.pauseFlag();
+                else flagController.startFlag();
+                flagOn = !flagOn;
+                while (gamepad2.start);
             }
 
             jouster.setPosition(JewelJouster.EXTENDION_MODE.NEUTRAL);
@@ -289,5 +299,8 @@ public class JennyO1B extends LinearOpMode {
         glyphLift.stop();
         RAD.stop();
         sensorTelemetry.stopTelemetryLogging();
+        glyphPicker.stop();
+        flagController.stopFlag();
+        jouster.stop();
     }
 }

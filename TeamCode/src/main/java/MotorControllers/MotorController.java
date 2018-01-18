@@ -22,14 +22,8 @@ public class MotorController extends Thread {
     private long maxTicksPerSecond = 0;
     private long ticksPerRevolution = 0;
     private double wheelDiameterInInches = 0;
-    private double percentPerTickPerSec;
-    private double powerOffset;
     //user set and program updated variables
-    private volatile long desiredTicksPerSecVelocity = 0;
     private long currentTicksPerSec = 0;
-    private long startTick = 0;
-    private long endPosition = 0;
-    private long ticksToTravel; // reflect + and -
     private long curTickLocation = 0;
     DcMotor motor;
     private String logTag = "";
