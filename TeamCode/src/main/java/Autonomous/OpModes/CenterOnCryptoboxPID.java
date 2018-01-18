@@ -119,7 +119,7 @@ public class CenterOnCryptoboxPID extends LinearOpMode {
             navigation.correctedDriveOnHeadingIMU(primaryDirection, SLOW_SPEED_IN_PER_SEC, 0, this);
             return false;
         }
-        else if(Math.abs(columns.get(column) -  DESIRED_WIDTH/2) < -DESIRED_WIDTH/8){
+        else if(Math.abs(columns.get(column) -  DESIRED_WIDTH/2) < DESIRED_WIDTH/8){
             //keep driving the hint
             Log.d("Column location", columns.get(column).toString());
             cameraPIDController.setSp(0);
