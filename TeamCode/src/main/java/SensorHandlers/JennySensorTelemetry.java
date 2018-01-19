@@ -40,8 +40,7 @@ public class JennySensorTelemetry implements RobotSensorTelemetry {
     private double wheelDiameter;
     private double ticksPerRev;
     private double ftToTicksFactor = 12;
-    public static final int EXTEND_LIMIT = 0;
-    public static final int RAD_LIMIT = 1;
+    public static final int RAD_LIMIT = 0;
     public static final int COLOR_DISTANCE_SENSOR = 0;
     //public static final double JEWEL_JOUST_ACTIVE_POSITION = 35;
    // public static final double JEWEL_JOUST_STORE_POSITION = 100;
@@ -56,7 +55,6 @@ public class JennySensorTelemetry implements RobotSensorTelemetry {
         startPositionX = positionX;
         startPositionY = positionY;
         colorSensors[COLOR_DISTANCE_SENSOR] = new REVColorDistanceSensorController(REVColorDistanceSensorController.type.JEWEL_SNATCH_O_MATIC, "jewelSensor", hardwareMap);
-        limitSwitches[EXTEND_LIMIT] = hardwareMap.touchSensor.get("extendLimit");
         limitSwitches[RAD_LIMIT] = hardwareMap.touchSensor.get("radLimit");
         try {
             reader = new JsonConfigReader(h.appContext.getAssets().open("MotorConfig/DriveMotors/HolonomicDriveMotorConfig.json"));
@@ -145,7 +143,7 @@ public class JennySensorTelemetry implements RobotSensorTelemetry {
         stopTelemetryLogging();
     }
 
-    public REVColorDistanceSensorController.color getColor(int sensor){
+    public REVColorDistanceSensorController.color getColor(){
         return colorSensors[COLOR_DISTANCE_SENSOR].getColor();
     }
 }

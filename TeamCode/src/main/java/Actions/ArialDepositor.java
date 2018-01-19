@@ -5,6 +5,7 @@ import android.util.Log;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
@@ -22,8 +23,10 @@ public class ArialDepositor implements ActionHandler {
     SpoolMotor leftLiftMotor;
     SpoolMotor belt;
     REVColorDistanceSensorController glyphSensor;
+    TouchSensor extendLimit;
     HardwareMap hardwareMap;
     double currentPosition = 0;
+    long liftPositionOffset = 0;
     private final static double FAST_RETRACT_SPEED = 10.0;
     private final static double FAST_EXTEND_SPEED = 15.0;
     private final static double SLOW_RETRACT_SPEED = 1.0;
@@ -47,7 +50,7 @@ public class ArialDepositor implements ActionHandler {
         belt = new SpoolMotor(new MotorController("belt", "MotorConfig/FunctionMotors/BeltMotor.json", hardwareMap), 10, 10, 100, hardwareMap);
         belt.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         glyphSensor = new REVColorDistanceSensorController(REVColorDistanceSensorController.type.GLYPH_STACK_O_TRON, "glyphSensor", hardwareMap);
-        //belt.setDirection(DcMotorSimple.Direction.REVERSE);
+        extendLimit = hardwareMap.touchSensor.get("extendLimit");
     }
 
     public void extend(){
@@ -82,15 +85,14 @@ public class ArialDepositor implements ActionHandler {
             Log.d("Extendotron", "Tick " + Long.toString(leftLiftMotor.getPosition()));
             Log.d("Extendotron", "Inch " + Double.toString(currentPosition));
         }
-        goToLiftPosition(currentPosition);
+        goToLiftPosition(currentPosition - liftPositionOffset);
     }
 
     public void goToLiftPosition(double positionInInches){
         leftLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        leftLiftMotor.setPosition(positionInInches);
+        leftLiftMotor.setPosition(positionInInches + liftPositionOffset);
         leftLiftMotor.setPower(1);
     }
-
 
     public void goToGlyphLevel(GLYPH_PLACEMENT_LEVEL level){
         switch(level){
@@ -116,6 +118,10 @@ public class ArialDepositor implements ActionHandler {
                 goToLiftPosition(ROW3_AND_4_PLACEMENT_HEIGHT);
                 break;
         }
+    }
+
+    public void setLiftPositionOffset(long offset){
+        liftPositionOffset = offset;
     }
 
     public void setLiftPower(double power){
@@ -156,6 +162,10 @@ public class ArialDepositor implements ActionHandler {
 
     public double getDistance(DistanceUnit unit){
         return glyphSensor.getDistance(unit);
+    }
+
+    public boolean isPressed(){
+        return extendLimit.isPressed();
     }
 
     @Override

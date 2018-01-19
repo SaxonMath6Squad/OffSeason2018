@@ -169,7 +169,7 @@ public class JennyO1B extends LinearOpMode {
                         glyphLift.slowExtend();
                     }
                 }
-                else if (gamepad1.right_bumper && !gamepad1.left_bumper && !sensorTelemetry.isPressed(sensorTelemetry.EXTEND_LIMIT)){
+                else if (gamepad1.right_bumper && !gamepad1.left_bumper && !glyphLift.isPressed()){
                     if(!isSlowMode){
                         glyphLift.retract();
                     }
@@ -180,13 +180,15 @@ public class JennyO1B extends LinearOpMode {
                 else if (gamepad2.right_trigger > 0.1 && gamepad1.right_trigger < 0.1 && gamepad1.left_trigger < 0.1 && !gamepad1.right_bumper && !gamepad1.left_bumper){
                     if(!isSlowMode){
                         glyphLift.extend();
+                        if(glyphLift.isPressed()) glyphLift.setLiftPositionOffset(glyphLift.getLiftMotorPosition());
                     }
                     else {
                         glyphLift.slowExtend();
+                        if(glyphLift.isPressed()) glyphLift.setLiftPositionOffset(glyphLift.getLiftMotorPosition());
                     }
                 }
 
-                else if (gamepad2.right_bumper && gamepad1.right_trigger < 0.1 && gamepad1.left_trigger < 0.1 && !gamepad1.right_bumper && !gamepad1.left_bumper && !sensorTelemetry.isPressed(sensorTelemetry.EXTEND_LIMIT)){
+                else if (gamepad2.right_bumper && gamepad1.right_trigger < 0.1 && gamepad1.left_trigger < 0.1 && !gamepad1.right_bumper && !gamepad1.left_bumper && !glyphLift.isPressed()){
                     if(!isSlowMode){
                         glyphLift.retract();
                     }
@@ -194,7 +196,7 @@ public class JennyO1B extends LinearOpMode {
                         glyphLift.slowRetract();
                     }
                 }
-                else if(!sensorTelemetry.isPressed(sensorTelemetry.EXTEND_LIMIT)) {
+                else if(!glyphLift.isPressed()) {
                     glyphLift.stopLift();
                 }
                 else
@@ -221,6 +223,7 @@ public class JennyO1B extends LinearOpMode {
                 if (position <= 0) position = 0;
                 if (position >= liftPosition.length - 1) position = liftPosition.length - 1;
                 glyphLift.goToGlyphLevel(liftPosition[position]);
+                if(glyphLift.isPressed()) glyphLift.setLiftPositionOffset(glyphLift.getLiftMotorPosition());
             }
             if(gamepad1.back || gamepad2.back) {
                 autoLiftPositionMode = !autoLiftPositionMode;
@@ -228,7 +231,7 @@ public class JennyO1B extends LinearOpMode {
             }
 
             //GLYPH ROLLER
-            if(!sensorTelemetry.isPressed(sensorTelemetry.EXTEND_LIMIT)) {
+            if(!glyphLift.isPressed()) {
                 glyphLift.setBeltPower(.25);
                 if (gamepad1.left_trigger > 0.1) glyphLift.startBelt();
                 else if (gamepad1.left_bumper && !gamepad1.right_bumper) glyphLift.reverseBelt();
