@@ -243,32 +243,32 @@ public class JennyNavigation extends Thread{
         if(distanceFromHeading < -180) distanceFromHeading += 360;
         if(curOrientation > 315 || curOrientation <= 45){
             headingController.setSp(0);
-            Log.d("Setpoint", "" + 0);
+            //Log.d("Setpoint", "" + 0);
         }
         else if(curOrientation > 45 && curOrientation <= 135){
             headingController.setSp(90);
-            Log.d("Setpoint", "" + 90);
+            //Log.d("Setpoint", "" + 90);
         }
         else if(curOrientation > 135 && curOrientation <= 225){
             headingController.setSp(180);
-            Log.d("Setpoint", "" + 180);
+            //Log.d("Setpoint", "" + 180);
         }
         else if(curOrientation > 225 && curOrientation <= 315){
             headingController.setSp(270);
-            Log.d("Setpoint", "" + 270);
+            //Log.d("Setpoint", "" + 270);
         }
-        Log.d("SetPoint Actual", "" + headingController.getSp());
+        //Log.d("SetPoint Actual", "" + headingController.getSp());
 
         double distanceFromSetPoint = headingController.getSp() - curOrientation;
         if(distanceFromSetPoint < -180) distanceFromSetPoint += 360;
         else if(distanceFromSetPoint > 180) distanceFromSetPoint -= 360;
         double deltaVelocity = headingController.calculatePID(distanceFromSetPoint + headingController.getSp()); //isue with this line...
-        Log.d("heading", Double.toString(heading));
+        //Log.d("heading", Double.toString(heading));
 
-        Log.d("Distance from heading", Double.toString(distanceFromHeading));
-        Log.d("Current heading", Double.toString(curOrientation));
-        Log.d("Distance From Zero","" + (distanceFromSetPoint));
-        Log.d("Delta velocity", Double.toString(deltaVelocity));
+//        Log.d("Distance from heading", Double.toString(distanceFromHeading));
+//        Log.d("Current heading", Double.toString(curOrientation));
+//        Log.d("Distance From Zero","" + (distanceFromSetPoint));
+//        Log.d("Delta velocity", Double.toString(deltaVelocity));
         //Log.d("Desired Velocity", Double.toString(desiredVelocity));
         //mode.telemetry.addData("Wanted heading", heading);
         //mode.telemetry.addData("Current heading", curOrientation);
@@ -280,7 +280,7 @@ public class JennyNavigation extends Thread{
         double [] velocities = determineMotorVelocitiesToDriveOnHeading(heading - curOrientation,desiredVelocity);
         //real quick, make distance from heading always positive
 
-        Log.d("distance from f heading", Double.toString(distanceFromHeading));
+//        Log.d("distance from f heading", Double.toString(distanceFromHeading));
 
         if(distanceFromHeading > 315 || distanceFromHeading <= 45){
             velocities[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR] -= deltaVelocity;
@@ -310,10 +310,10 @@ public class JennyNavigation extends Thread{
             velocities[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR] += deltaVelocity;
         }
 
-        for(int i = 0; i < velocities.length; i ++){
-            Log.d("Velocity: " + i, "" + velocities[i] + "in/s");
-        }
-        Log.d("lmm" , " " + driveMotors[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR].getMotorRunMode().toString());
+//        for(int i = 0; i < velocities.length; i ++){
+//            Log.d("Velocity: " + i, "" + velocities[i] + "in/s");
+//        }
+//        Log.d("lmm" , " " + driveMotors[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR].getMotorRunMode().toString());
         applyMotorVelocities(velocities);
         mode.sleep(delayTimeMillis);
     }
@@ -369,9 +369,9 @@ public class JennyNavigation extends Thread{
 //            mode.sleep(10);
         }
         brake();
-        for (int i = 0; i < driveMotors.length; i++) {
-            Log.d("Inch from start", Integer.toString(i) + ": " + driveMotors[i].getInchesFromStart());
-        }
+//        for (int i = 0; i < driveMotors.length; i++) {
+//            Log.d("Inch from start", Integer.toString(i) + ": " + driveMotors[i].getInchesFromStart());
+//        }
     }
 
     long [] getMotorPositionsTicks(){
@@ -432,18 +432,18 @@ public class JennyNavigation extends Thread{
         distanceFromHeading = desiredHeading - curHeading;
         if(distanceFromHeading > 180) distanceFromHeading = distanceFromHeading - 360;
         else if(distanceFromHeading < -180) distanceFromHeading = 360 + distanceFromHeading;
-        Log.d("Distance From Heading", "" + distanceFromHeading);
+//        Log.d("Distance From Heading", "" + distanceFromHeading);
         if(distanceFromHeading >= 0 && distanceFromHeading <= 180){
             while(Math.abs(distanceFromHeading) > HEADING_THRESHOLD && mode.opModeIsActive()){
                 //heading always positive
-                Log.d("Distance From Heading","" + distanceFromHeading);
+//                Log.d("Distance From Heading","" + distanceFromHeading);
                 //Log.d("Heading", Double.toString(curHeading));
                 rps = turnController.calculatePID(distanceFromHeading);
-                Log.d("RPS", Double.toString(rps));
+//                Log.d("RPS", Double.toString(rps));
                 turn(-rps);
                 mode.sleep(5);
                 curHeading = orientation.getOrientation();
-                Log.d("Cur Heading", "" + curHeading);
+//                Log.d("Cur Heading", "" + curHeading);
                 distanceFromHeading = desiredHeading - curHeading;
                 if(distanceFromHeading > 180) distanceFromHeading = distanceFromHeading - 360;
                 else if(distanceFromHeading < -180) distanceFromHeading = 360 + distanceFromHeading;
@@ -455,13 +455,13 @@ public class JennyNavigation extends Thread{
             while(Math.abs(distanceFromHeading) > HEADING_THRESHOLD && mode.opModeIsActive()){
                 //heading always positive
                 //Log.d("Heading", Double.toString(curHeading));
-                Log.d("Distance From Heading","" + distanceFromHeading);
+//                Log.d("Distance From Heading","" + distanceFromHeading);
                 rps = turnController.calculatePID(distanceFromHeading);
-                Log.d("RPS", Double.toString(rps));
+//                Log.d("RPS", Double.toString(rps));
                 turn(-rps);
                 mode.sleep(5);
                 curHeading = orientation.getOrientation();
-                Log.d("Cur Heading", "" + curHeading);
+//                Log.d("Cur Heading", "" + curHeading);
                 distanceFromHeading = desiredHeading - curHeading;
                 if(distanceFromHeading > 180) distanceFromHeading = distanceFromHeading - 360;
                 else if(distanceFromHeading < -180) distanceFromHeading = 360 + distanceFromHeading;

@@ -123,6 +123,7 @@ public class MotorController extends Thread {
         }
         catch(Exception e){
             logError("Error: ",e.toString());
+            throw new RuntimeException(e);
         }
         JsonConfigReader reader = new JsonConfigReader(stream);
         try{

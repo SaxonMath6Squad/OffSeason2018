@@ -57,7 +57,7 @@ public class JennySensorTelemetry implements RobotSensorTelemetry {
         colorSensors[COLOR_DISTANCE_SENSOR] = new REVColorDistanceSensorController(REVColorDistanceSensorController.type.JEWEL_SNATCH_O_MATIC, "jewelSensor", hardwareMap);
         limitSwitches[RAD_LIMIT] = hardwareMap.touchSensor.get("radLimit");
         try {
-            reader = new JsonConfigReader(h.appContext.getAssets().open("MotorConfig/DriveMotors/HolonomicDriveMotorConfig.json"));
+            reader = new JsonConfigReader(h.appContext.getAssets().open("MotorConfig/DriveMotors/NewHolonomicDriveMotorConfig.json"));
         } catch (Exception e){
             Log.d("Error: ", e.toString());
         }

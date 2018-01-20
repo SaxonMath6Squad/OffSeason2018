@@ -127,7 +127,7 @@ public class CryptoBoxColumnImageProcessor {
     }
 
     public ArrayList<Integer> findColumns(Bitmap bmp, boolean shouldModifyImage){
-        Log.d("CF IMG ","Height: " + bmp.getHeight() + " Width: " + bmp.getWidth());
+        //Log.d("CF IMG ","Height: " + bmp.getHeight() + " Width: " + bmp.getWidth());
         if(bmp.getHeight() > imageHeight && bmp.getWidth() > imageWidth){
             bmp = scaleBmp(bmp);
         }
@@ -139,18 +139,18 @@ public class CryptoBoxColumnImageProcessor {
         int [] frequencyByColumn = null;
         if(colorToFind == CRYPTOBOX_COLOR.BLUE) frequencyByColumn = collapseVerticallyByBlueCount(pixels,width,height);
         else if(colorToFind == CRYPTOBOX_COLOR.RED) frequencyByColumn = collapseVerticallyByRedCount(pixels,width,height);
-        Log.d("CF IMG PROC", "Collapse Time: " + (System.currentTimeMillis() - collapseStart));
+        //Log.d("CF IMG PROC", "Collapse Time: " + (System.currentTimeMillis() - collapseStart));
         ArrayList<Integer> interestingColumns = getColumnsWithRequiredBlueCount(frequencyByColumn);
         ArrayList<Integer> columnBounds = getColumnBounds(interestingColumns);
-        for (int i = 0; i < columnBounds.size(); i++) {
-            Log.d("Bound", columnBounds.get(i).toString());
-        }
+//        for (int i = 0; i < columnBounds.size(); i++) {
+//            Log.d("Bound", columnBounds.get(i).toString());
+//        }
         //get average column locations
         columnCenters = getColumnCenters(columnBounds);
-        for (int i = 0; i < columnCenters.size(); i++) {
-            Log.d("Centers", columnCenters.get(i).toString());
-        }
-        Log.d("# of Columns", "" + columnCenters.size());
+//        for (int i = 0; i < columnCenters.size(); i++) {
+//            Log.d("Centers", columnCenters.get(i).toString());
+//        }
+//        Log.d("# of Columns", "" + columnCenters.size());
         if(shouldModifyImage){
             if(colorToFind == CRYPTOBOX_COLOR.BLUE) showBluePixels(pixels,height,width, Color.GREEN);
             else if(colorToFind == CRYPTOBOX_COLOR.RED)

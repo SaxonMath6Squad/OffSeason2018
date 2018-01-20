@@ -219,7 +219,7 @@ public class BlueTeam1GlyphAutonomous extends LinearOpMode {
 
     public boolean centerOnCryptoBox(int column, ArrayList<Integer> centers, int dirHint){
         if(centers.size() == 0){
-            navigation.newDriveOnHeadingIMU(dirHint, ADJUSTING_SPEED_IN_PER_SEC, 0, this);
+            navigation.correctedDriveOnHeadingIMU(dirHint, ADJUSTING_SPEED_IN_PER_SEC, 0, this);
             return false;
         }
         if(cryptoBoxFinder.imageWidth/2 < centers.get(column).intValue()){

@@ -41,6 +41,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import java.util.ArrayList;
 
+import Actions.ArialDepositor;
 import Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor;
 import Autonomous.VuforiaHelper;
 import DriveEngine.JennyNavigation;
@@ -55,21 +56,23 @@ import static Autonomous.RelicRecoveryField.BLUE_ALLIANCE_2;
 import static Autonomous.RelicRecoveryField.startLocations;
 import static DriveEngine.JennyNavigation.ADJUSTING_SPEED_IN_PER_SEC;
 import static DriveEngine.JennyNavigation.EAST;
+import static DriveEngine.JennyNavigation.NORTH;
 import static DriveEngine.JennyNavigation.SLOW_SPEED_IN_PER_SEC;
 import static DriveEngine.JennyNavigation.WEST;
 
 /*
     An opmode to test knocking off the correct jewel
  */
-@Autonomous(name="New Center On Column PID", group="Linear Opmode")  // @Autonomous(...) is the other common choice
+@Autonomous(name="New Center On Column And Score", group="Linear Opmode")  // @Autonomous(...) is the other common choice
 //@Disabled
-public class CenterOnCryptoboxPID extends LinearOpMode {
+public class CenterOnCryptoBoxAndScore extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
     JennyNavigation navigation;
     JennySensorTelemetry sensorTelemetry;
     VuforiaHelper vuforia;
+    ArialDepositor depositor;
     CryptoBoxColumnImageProcessor cryptoBoxFinder;
     PIDController cameraPIDController;
 
@@ -80,6 +83,7 @@ public class CenterOnCryptoboxPID extends LinearOpMode {
         try {
             navigation = new JennyNavigation(hardwareMap, startLocations[BLUE_ALLIANCE_2], 0, "RobotConfig/JennyV2.json");
             sensorTelemetry = new JennySensorTelemetry(hardwareMap, 0, 0);
+            depositor = new ArialDepositor(hardwareMap);
             vuforia = new VuforiaHelper();
             cryptoBoxFinder = new CryptoBoxColumnImageProcessor(DESIRED_HEIGHT, DESIRED_WIDTH, CLOSE_UP_MIN_PERCENT_COLUMN_CHECK, CLOSE_UP_MIN_COLUMN_WIDTH, CryptoBoxColumnImageProcessor.CRYPTOBOX_COLOR.BLUE);
         }
@@ -108,12 +112,20 @@ public class CenterOnCryptoboxPID extends LinearOpMode {
             curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
             coloredColumns = cryptoBoxFinder.findColumns(curImage, false);
         }
-        sleep(2000);
+        sleep(500);
         curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
         coloredColumns = cryptoBoxFinder.findColumns(curImage, false);
         int targetColumnIndex = findCryptoColumnClosestToDesired(coloredColumns, CRYPTO_COLUMN_TARGET_POSITION);
         telemetry.addData("Seek Status", "Obtained, delta Pixels:" + Math.abs(coloredColumns.get(targetColumnIndex) - CRYPTO_COLUMN_TARGET_POSITION));
         telemetry.update();
+        depositor.goToGlyphLevel(ArialDepositor.GLYPH_PLACEMENT_LEVEL.ROW1);
+        sleep(1000);
+        depositor.startBelt();
+        sleep(1000);
+        depositor.stopBelt();
+        navigation.correctedDriveOnHeadingIMU(NORTH,ADJUSTING_SPEED_IN_PER_SEC,this);
+        depositor.goToGlyphLevel(ArialDepositor.GLYPH_PLACEMENT_LEVEL.GROUND);
+        sleep(1000);
 //        while (coloredColumns.size() == 0 && opModeIsActive()) {
 //            navigation.correctedDriveOnHeadingIMU(EAST, ADJUSTING_SPEED_IN_PER_SEC, 0, this);
 //            curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);

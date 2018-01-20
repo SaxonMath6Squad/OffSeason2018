@@ -61,7 +61,7 @@ import static DriveEngine.JennyNavigation.DEFAULT_SLEEP_DELAY_MILLIS;
 import static DriveEngine.JennyNavigation.LONG_SLEEP_DELAY_MILLIS;
 import static DriveEngine.JennyNavigation.MED_SLEEP_DELAY_MILLIS;
 import static SensorHandlers.JennySensorTelemetry.COLOR_DISTANCE_SENSOR;
-import static SensorHandlers.JennySensorTelemetry.EXTEND_LIMIT;
+
 import static SensorHandlers.JennySensorTelemetry.RAD_LIMIT;
 
 /*
@@ -139,12 +139,12 @@ public class AutoWiringTest extends LinearOpMode {
 
         //TODO: USE EXTEND TO POSITION INSTEAD, BRINGING IT TO THE TOP
         //EXTEND
-        boolean liftSwitch = sensorTelemetry.isPressed(EXTEND_LIMIT);
+        boolean liftSwitch = sensorTelemetry.isPressed(RAD_LIMIT);
         double liftPosition = glyphPlacement.getLiftMotorPosition();
         glyphPlacement.setLiftPower(0.3);
         sleep(LONG_SLEEP_DELAY_MILLIS);
         glyphPlacement.stopLift();
-        if(liftSwitch && !sensorTelemetry.isPressed(EXTEND_LIMIT)) liftSwitch = true;
+        if(liftSwitch && !sensorTelemetry.isPressed(RAD_LIMIT)) liftSwitch = true;
         else liftSwitch = false;
         double newLiftPosition = glyphPlacement.getLiftMotorPosition();
         if(newLiftPosition > liftPosition) miscMotorCount++;
@@ -169,7 +169,7 @@ public class AutoWiringTest extends LinearOpMode {
         jewelJouster.setPosition(JewelJouster.EXTENDION_MODE.HIT);
         sleep(DEFAULT_SLEEP_DELAY_MILLIS);
         color[] detectedColors = new color[3];
-        detectedColors[0] = sensorTelemetry.getColor(COLOR_DISTANCE_SENSOR);
+        //detectedColors[0] = sensorTelemetry.getColor(COLOR_DISTANCE_SENSOR);
         detectedColors[1] = jewelJouster.getJewelColor();
         detectedColors[2] = glyphPlacement.getColor();
         for(int i = 0; i < detectedColors.length; i++){
@@ -231,14 +231,14 @@ public class AutoWiringTest extends LinearOpMode {
         telemetry.addData("Press", "Extend Limit");
         telemetry.update();
         sleep(MED_SLEEP_DELAY_MILLIS);
-        if(sensorTelemetry.isPressed(EXTEND_LIMIT)){
+        if(sensorTelemetry.isPressed(RAD_LIMIT)){
             telemetry.addData("Release", "Extend Limit");
         } else {
             telemetry.addData("Error", "Extend Limit not pressed!");
         }
         telemetry.update();
         sleep(MED_SLEEP_DELAY_MILLIS);
-        if(!sensorTelemetry.isPressed(EXTEND_LIMIT)){
+        if(!sensorTelemetry.isPressed(RAD_LIMIT)){
             telemetry.addData("Extend Limit", "OK!");
         } else {
             telemetry.addData("Error", "Extend Limit not released!");
