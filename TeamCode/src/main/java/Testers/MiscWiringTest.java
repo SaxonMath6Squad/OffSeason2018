@@ -39,33 +39,33 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import Actions.ArialDepositor;
+import DriveEngine.JennyNavigation;
+
+import static Autonomous.RelicRecoveryField.BLUE_ALLIANCE_2;
+import static Autonomous.RelicRecoveryField.startLocations;
 
 /*
     An opmode to test if all our drive wheels are working correctly
  */
-@TeleOp(name="Go To Glyph Level Test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
+@TeleOp(name="Lift Encoder Test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
 //@Disabled
-public class GoToGlyphLevelTest extends LinearOpMode {
+public class MiscWiringTest extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
-    ArialDepositor glyphLift;
+    ArialDepositor glyphPlacer;
     @Override
     public void runOpMode() {
         try {
-            glyphLift = new ArialDepositor(hardwareMap);
+            glyphPlacer = new ArialDepositor(hardwareMap);
         }
         catch (Exception e){
-            Log.e("Error!" , "Glyph Lift: " + e.toString());
-            throw new RuntimeException("Glyph Lift Creation Error! " + e.toString());
+            Log.e("Error!" , "Jenny Navigation: " + e.toString());
+            throw new RuntimeException("Navigation Creation Error! " + e.toString());
 
         }
-        ArialDepositor.GLYPH_PLACEMENT_LEVEL[] levels = new ArialDepositor.GLYPH_PLACEMENT_LEVEL[]
-                {ArialDepositor.GLYPH_PLACEMENT_LEVEL.GROUND,
-                ArialDepositor.GLYPH_PLACEMENT_LEVEL.ROW1_AND_2,
-                ArialDepositor.GLYPH_PLACEMENT_LEVEL.ROW3_AND_4};
-        int position = 0;
-
+        //leftJoystick = new JoystickHandler(gamepad1,JoystickHandler.LEFT_JOYSTICK);
+        //rightJoystick = new JoystickHandler(gamepad1,JoystickHandler.RIGHT_JOYSTICK);
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
@@ -73,24 +73,11 @@ public class GoToGlyphLevelTest extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
-        while (opModeIsActive()){
-            if(gamepad1.right_trigger > 0.1){
-                position++;
-                while (gamepad1.right_trigger > 0.1);
-            } else if(gamepad1.right_bumper){
-                position--;
-                while (gamepad1.right_bumper);
-            }
-            if(position < 0) position = 0;
-            else if(position > levels.length-1) position = levels.length-1;
-            glyphLift.goToGlyphLevel(levels[position]);
-            telemetry.addData("Position", position);
-            telemetry.addData("Tick", glyphLift.getLiftMotorPosition());
-            telemetry.addData("Inch",glyphLift.getGlyphInch());
-            telemetry.addData("Offset", glyphLift.getLiftPositionOffsetTicks());
+        // run until the end of the match (driver presses STOP)
+        while (opModeIsActive()) {
+            telemetry.addData("Encoder value", glyphPlacer.getLiftMotorPosition());
             telemetry.update();
         }
-
-        glyphLift.stop();
+        glyphPlacer.stop();
     }
 }

@@ -86,7 +86,7 @@ public class BlueTeam2JewelAutonomous extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
-        //sensorTelemetry.jewelJoust.setPosition(JEWEL_JOUST_ACTIVE_POSITION);
+        //sensorTelemetry.jewelJoust.setPositionInches(JEWEL_JOUST_ACTIVE_POSITION);
         jewelJouster.setPosition(JewelJouster.EXTENDION_MODE.HIT);
         sleep(500);
         REVColorDistanceSensorController.color jewelColor = jewelJouster.getJewelColor();

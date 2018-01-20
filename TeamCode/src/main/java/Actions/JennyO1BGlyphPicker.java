@@ -16,7 +16,7 @@ import MotorControllers.MotorController;
 public class JennyO1BGlyphPicker implements ActionHandler {
     MotorController wheelMotor;
     HardwareMap hardwareMap;
-    private double WHEEL_POWERS = 1;
+    private double WHEEL_POWERS = 0.4;
 
     public JennyO1BGlyphPicker(HardwareMap hw) throws Exception{
         hardwareMap = hw;

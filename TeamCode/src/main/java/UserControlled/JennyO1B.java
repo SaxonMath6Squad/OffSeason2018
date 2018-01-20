@@ -32,30 +32,40 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package UserControlled;
 
+import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import java.util.ArrayList;
+
 import Actions.ArialDepositor;
 import Actions.JennyFlagController;
 import Actions.JennyO1BGlyphPicker;
 import Actions.JewelJouster;
+import Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor;
+import Autonomous.VuforiaHelper;
 import DriveEngine.JennyNavigation;
+import MotorControllers.PIDController;
 import SensorHandlers.JennySensorTelemetry;
 import Actions.JennyO1BRAD;
 
-import static Actions.ArialDepositor.GROUND_LEVEL_PLACEMENT_HEIGHT;
-import static Actions.ArialDepositor.ROW1_PLACEMENT_HEIGHT;
-import static Actions.ArialDepositor.ROW2_PLACEMENT_HEIGHT;
-import static Actions.ArialDepositor.ROW3_PLACEMENT_HEIGHT;
-import static Actions.ArialDepositor.ROW4_PLACEMENT_HEIGHT;
+import static Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor.CLOSE_UP_MIN_COLUMN_WIDTH;
+import static Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor.CLOSE_UP_MIN_PERCENT_COLUMN_CHECK;
+import static Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor.DESIRED_HEIGHT;
+import static Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor.DESIRED_WIDTH;
 import static Autonomous.RelicRecoveryField.BLUE_ALLIANCE_2;
+import static Autonomous.RelicRecoveryField.CRYPTOBOX_COLORED_COLUMN_WIDTHS_INCHES;
+import static Autonomous.RelicRecoveryField.CRYPTOBOX_SCORING_COLUMN_WIDTHS_INCHES;
 import static Autonomous.RelicRecoveryField.startLocations;
+import static DriveEngine.JennyNavigation.DEFAULT_SLEEP_DELAY_MILLIS;
+import static DriveEngine.JennyNavigation.EAST;
 import static DriveEngine.JennyNavigation.HIGH_SPEED_IN_PER_SEC;
 import static DriveEngine.JennyNavigation.NORTH;
 import static DriveEngine.JennyNavigation.SLOW_SPEED_IN_PER_SEC;
+import static DriveEngine.JennyNavigation.WEST;
 import static SensorHandlers.JennySensorTelemetry.RAD_LIMIT;
 
 /*
@@ -84,6 +94,13 @@ public class JennyO1B extends LinearOpMode {
     ArialDepositor.GLYPH_PLACEMENT_LEVEL[] liftPosition = new ArialDepositor.GLYPH_PLACEMENT_LEVEL[]{ArialDepositor.GLYPH_PLACEMENT_LEVEL.GROUND, ArialDepositor.GLYPH_PLACEMENT_LEVEL.ROW1_AND_2, ArialDepositor.GLYPH_PLACEMENT_LEVEL.ROW3_AND_4};
 
     int position = 0;
+    PIDController cameraPIDController;
+    VuforiaHelper vuforia;
+    CryptoBoxColumnImageProcessor cryptoBoxFinder;
+
+    int CRYPTO_COLUMN_TARGET_POSITION = 67;
+    Bitmap curImage = null;
+    ArrayList<Integer> coloredColumns;
 
     @Override
     public void runOpMode() {
@@ -125,6 +142,9 @@ public class JennyO1B extends LinearOpMode {
         flagController = new JennyFlagController(hardwareMap);
         leftJoystick = new JoystickHandler(gamepad1,JoystickHandler.LEFT_JOYSTICK);
         rightJoystick = new JoystickHandler(gamepad1,JoystickHandler.RIGHT_JOYSTICK);
+        cameraPIDController = new PIDController(10.0/DESIRED_WIDTH,0,0);
+        vuforia = new VuforiaHelper();
+        cryptoBoxFinder = new CryptoBoxColumnImageProcessor(DESIRED_HEIGHT, DESIRED_WIDTH, CLOSE_UP_MIN_PERCENT_COLUMN_CHECK, CLOSE_UP_MIN_COLUMN_WIDTH, CryptoBoxColumnImageProcessor.CRYPTOBOX_COLOR.BLUE);
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         jouster.setPosition(JewelJouster.EXTENDION_MODE.STORE);
@@ -140,8 +160,8 @@ public class JennyO1B extends LinearOpMode {
             //DRIVE
             if(rightJoystick.magnitude() < .1){
                 if(!isSlowMode)
-                navigation.driveOnHeading((paralaxedControl)? (leftJoystick.angle() - 90)%360:leftJoystick.angle(), leftJoystick.magnitude() * HIGH_SPEED_IN_PER_SEC);
-                else navigation.driveOnHeading((paralaxedControl)? (leftJoystick.angle() - 90)%360:leftJoystick.angle(), leftJoystick.magnitude() * SLOW_SPEED_IN_PER_SEC);
+                navigation.driveOnHeading((paralaxedControl)? (leftJoystick.angle() + 90)%360:leftJoystick.angle(), leftJoystick.magnitude() * HIGH_SPEED_IN_PER_SEC);
+                else navigation.driveOnHeading((paralaxedControl)? (leftJoystick.angle() + 90)%360:leftJoystick.angle(), leftJoystick.magnitude() * SLOW_SPEED_IN_PER_SEC);
             }
             else {
                 if(!isSlowMode) navigation.turn(rightJoystick.magnitude() * rightJoystick.x()/Math.abs(rightJoystick.x()));
@@ -180,11 +200,11 @@ public class JennyO1B extends LinearOpMode {
                 else if (gamepad2.right_trigger > 0.1 && gamepad1.right_trigger < 0.1 && gamepad1.left_trigger < 0.1 && !gamepad1.right_bumper && !gamepad1.left_bumper){
                     if(!isSlowMode){
                         glyphLift.extend();
-                        if(glyphLift.isPressed()) glyphLift.setLiftPositionOffset(glyphLift.getLiftMotorPosition());
+                        if(glyphLift.isPressed()) glyphLift.setLiftPositionOffsetTicks(glyphLift.getLiftMotorPosition());
                     }
                     else {
                         glyphLift.slowExtend();
-                        if(glyphLift.isPressed()) glyphLift.setLiftPositionOffset(glyphLift.getLiftMotorPosition());
+                        if(glyphLift.isPressed()) glyphLift.setLiftPositionOffsetTicks(glyphLift.getLiftMotorPosition());
                     }
                 }
 
@@ -223,9 +243,9 @@ public class JennyO1B extends LinearOpMode {
                 if (position <= 0) position = 0;
                 if (position >= liftPosition.length - 1) position = liftPosition.length - 1;
                 glyphLift.goToGlyphLevel(liftPosition[position]);
-                if(glyphLift.isPressed()) glyphLift.setLiftPositionOffset(glyphLift.getLiftMotorPosition());
+                if(glyphLift.isPressed()) glyphLift.setLiftPositionOffsetTicks(glyphLift.getLiftMotorPosition());
             }
-            if(gamepad1.back || gamepad2.back) {
+            if(gamepad2.back) {
                 autoLiftPositionMode = !autoLiftPositionMode;
                 while (gamepad1.back || gamepad2.back);
             }
@@ -254,10 +274,10 @@ public class JennyO1B extends LinearOpMode {
             }
 
             //RAD Extender
-            if(gamepad1.dpad_up){
+            if(gamepad2.dpad_right){
                 RAD.extendRAD();
             }
-            else if(gamepad1.dpad_down && !sensorTelemetry.isPressed(RAD_LIMIT)){
+            else if(gamepad2.dpad_left && !sensorTelemetry.isPressed(RAD_LIMIT)){
                 RAD.retractRAD();
             }
             else {
@@ -276,7 +296,7 @@ public class JennyO1B extends LinearOpMode {
             }
 
             //MISC
-            if(gamepad1.start){
+            if(gamepad1.back){
                 paralaxedControl = !paralaxedControl;
                 while (gamepad1.start);
             }
@@ -286,7 +306,35 @@ public class JennyO1B extends LinearOpMode {
             if(gamepad1.left_stick_button){
                 navigation.setOrientationOffset(360 - navigation.getOrientation());
             }
-            if(gamepad2.start){
+            if(gamepad1.x){
+                curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
+                coloredColumns = cryptoBoxFinder.findColumns(curImage, false);
+                while(!centerOnCryptoBoxClosestToCenter(0,coloredColumns,EAST,WEST) && opModeIsActive() && !gamepad1.dpad_up && !gamepad1.a && !gamepad1.b){
+                    curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
+                    coloredColumns = cryptoBoxFinder.findColumns(curImage, false);
+                }
+            }
+            if(gamepad1.dpad_left){
+                navigation.driveDistance(CRYPTOBOX_SCORING_COLUMN_WIDTHS_INCHES, WEST, SLOW_SPEED_IN_PER_SEC, this);
+                sleep(DEFAULT_SLEEP_DELAY_MILLIS);
+                curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
+                coloredColumns = cryptoBoxFinder.findColumns(curImage, false);
+                while(!centerOnCryptoBoxClosestToCenter(0,coloredColumns,WEST,EAST) && opModeIsActive() && !gamepad1.dpad_up && !gamepad1.a && !gamepad1.b){
+                    curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
+                    coloredColumns = cryptoBoxFinder.findColumns(curImage, false);
+                }
+            }
+            else if(gamepad1.dpad_right){
+                navigation.driveDistance(CRYPTOBOX_SCORING_COLUMN_WIDTHS_INCHES, EAST, SLOW_SPEED_IN_PER_SEC, this);
+                sleep(DEFAULT_SLEEP_DELAY_MILLIS);
+                curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
+                coloredColumns = cryptoBoxFinder.findColumns(curImage, false);
+                while(!centerOnCryptoBoxClosestToCenter(0,coloredColumns,EAST,WEST) && opModeIsActive() && !gamepad1.dpad_up && !gamepad1.a && !gamepad1.b){
+                    curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
+                    coloredColumns = cryptoBoxFinder.findColumns(curImage, false);
+                }
+            }
+            if(gamepad2.left_stick_button){
                 if(flagOn) flagController.pauseFlag();
                 else flagController.startFlag();
                 flagOn = !flagOn;
@@ -305,5 +353,48 @@ public class JennyO1B extends LinearOpMode {
         glyphPicker.stop();
         flagController.stopFlag();
         jouster.stop();
+    }
+
+    public int findCryptoColumnClosestToDesired(ArrayList<Integer> columns, int desiredLocationOnScreen){
+        if(columns.size() == 0){
+            return -1;
+        }
+        int minDelta = Math.abs(desiredLocationOnScreen - columns.get(0));
+        int minDeltaIndex = 0;
+        for(int i = 1; i < columns.size(); i ++){
+            if(Math.abs(desiredLocationOnScreen - columns.get(i)) < minDelta){
+                minDelta = Math.abs(desiredLocationOnScreen - columns.get(i));
+                minDeltaIndex = i;
+            }
+        }
+        Log.d("Target Column","" + minDeltaIndex);
+        return minDeltaIndex;
+    }
+
+    public boolean centerOnCryptoBoxClosestToCenter(int column, ArrayList<Integer> columns, int primaryDirection, int secondaryDirection){
+        Log.d("Seen columns", Integer.toString(columns.size()));
+        if(columns.size() == 0){
+            navigation.correctedDriveOnHeadingIMU(primaryDirection, SLOW_SPEED_IN_PER_SEC, 0, this);
+            Log.d("Seek Status","Not found, moving in primary dir");
+            return false;
+        }
+        int targetColumnIndex = findCryptoColumnClosestToDesired(columns, CRYPTO_COLUMN_TARGET_POSITION);
+        if(targetColumnIndex != -1) {
+            if (Math.abs(columns.get(targetColumnIndex) - CRYPTO_COLUMN_TARGET_POSITION) > DESIRED_WIDTH/20.0) {
+                Log.d("Delta Pixels","" + Math.abs(columns.get(targetColumnIndex) - CRYPTO_COLUMN_TARGET_POSITION));
+                //keep driving the hint
+                Log.d("Column location", columns.get(column).toString());
+                cameraPIDController.setSp(0);
+                double distToColumn = columns.get(column) - CRYPTO_COLUMN_TARGET_POSITION;
+                double velocityCorrection = -cameraPIDController.calculatePID(distToColumn);
+                Log.d("Seek Status","Found, moving at " + velocityCorrection);
+                navigation.correctedDriveOnHeadingIMU((velocityCorrection < 0) ? primaryDirection : secondaryDirection, Math.abs(velocityCorrection), this);
+            } else {
+                navigation.brake();
+                Log.d("Seek Status", "Obtained, delta Pixels:" + Math.abs(columns.get(targetColumnIndex) - CRYPTO_COLUMN_TARGET_POSITION));
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -97,14 +97,7 @@ public class CenterOnCryptoboxPID extends LinearOpMode {
         long startTime = System.currentTimeMillis();
         curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
         coloredColumns = cryptoBoxFinder.findColumns(curImage, false);
-        while(!centerOnCryptoBoxClosestToCenter(0,coloredColumns,WEST,EAST) && opModeIsActive()){
-            curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
-            coloredColumns = cryptoBoxFinder.findColumns(curImage, false);
-        }
-        sleep(2000);
-        curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
-        coloredColumns = cryptoBoxFinder.findColumns(curImage, false);
-        while(!centerOnCryptoBoxClosestToCenter(0,coloredColumns,WEST,EAST) && opModeIsActive()){
+        while(!centerOnCryptoBoxClosestToCenter(0,coloredColumns,EAST,WEST) && opModeIsActive()){
             curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
             coloredColumns = cryptoBoxFinder.findColumns(curImage, false);
         }
@@ -163,7 +156,7 @@ public class CenterOnCryptoboxPID extends LinearOpMode {
                 Log.d("Column location", columns.get(column).toString());
                 cameraPIDController.setSp(0);
                 double distToColumn = columns.get(column) - CRYPTO_COLUMN_TARGET_POSITION;
-                double velocityCorrection = cameraPIDController.calculatePID(distToColumn);
+                double velocityCorrection = -cameraPIDController.calculatePID(distToColumn);
                 Log.d("Seek Status","Found, moving at " + velocityCorrection);
                 navigation.correctedDriveOnHeadingIMU((velocityCorrection < 0) ? primaryDirection : secondaryDirection, Math.abs(velocityCorrection), this);
             } else {
@@ -171,28 +164,6 @@ public class CenterOnCryptoboxPID extends LinearOpMode {
                 Log.d("Seek Status", "Obtained, delta Pixels:" + Math.abs(columns.get(targetColumnIndex) - CRYPTO_COLUMN_TARGET_POSITION));
                 return true;
             }
-        }
-        return false;
-    }
-
-    public boolean centerOnCryptoBox(int column, ArrayList<Integer> columns, int primaryDirection, int secondaryDirection){
-        Log.d("Seen columns", Integer.toString(columns.size()));
-        if(columns.size() == 0){
-            navigation.correctedDriveOnHeadingIMU(primaryDirection, SLOW_SPEED_IN_PER_SEC, 0, this);
-            return false;
-        }
-        else if(Math.abs(columns.get(column) -  DESIRED_WIDTH/2) < DESIRED_WIDTH/8){
-            //keep driving the hint
-            Log.d("Column location", columns.get(column).toString());
-            cameraPIDController.setSp(0);
-            double distToColumn = columns.get(column) - DESIRED_WIDTH/2;
-            double velocityCorrection = cameraPIDController.calculatePID(distToColumn);
-            navigation.correctedDriveOnHeadingIMU((velocityCorrection < 0)? primaryDirection:secondaryDirection,Math.abs(velocityCorrection),this);
-        }
-        else {
-            Log.d("Column location", columns.get(column).toString());
-            navigation.brake();
-            return true;
         }
         return false;
     }

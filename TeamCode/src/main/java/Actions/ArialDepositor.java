@@ -3,7 +3,6 @@ package Actions;
 import android.util.Log;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
@@ -20,20 +19,20 @@ import MotorControllers.MotorController;
     A class to set up two motors to use our extendotron and belt for our glyph system
  */
 public class ArialDepositor implements ActionHandler {
-    SpoolMotor leftLiftMotor;
+    SpoolMotor liftMotor;
     SpoolMotor belt;
     REVColorDistanceSensorController glyphSensor;
     TouchSensor extendLimit;
     HardwareMap hardwareMap;
     double currentPosition = 0;
-    long liftPositionOffset = 0;
+    long liftPositionOffsetTicks = 0;
     private final static double FAST_RETRACT_SPEED = 10.0;
     private final static double FAST_EXTEND_SPEED = 15.0;
     private final static double SLOW_RETRACT_SPEED = 1.0;
     private final static double SLOW_EXTEND_SPEED = 5.0;
 
     public final static int TICKS_PER_REV = 1120;
-    public final static double EXTENDOTRON_DIAMETER_INCHES = 1.18;
+    public final static double EXTENDOTRON_DIAMETER_INCHES = 2;
 
     public enum GLYPH_PLACEMENT_LEVEL{GROUND,ROW1,ROW2,ROW3,ROW4,ROW1_AND_2,ROW3_AND_4};
     public final static double GROUND_LEVEL_PLACEMENT_HEIGHT = 0;
@@ -41,57 +40,94 @@ public class ArialDepositor implements ActionHandler {
     public final static double ROW2_PLACEMENT_HEIGHT = 12;
     public final static double ROW3_PLACEMENT_HEIGHT = 18;
     public final static double ROW4_PLACEMENT_HEIGHT = 24;
-    public final static double ROW1_AND_2_PLACEMENT_HEIGHT = 13;
-    public final static double ROW3_AND_4_PLACEMENT_HEIGHT = 26;
+    public final static double ROW1_AND_2_PLACEMENT_HEIGHT = 14.5;
+    public final static double ROW3_AND_4_PLACEMENT_HEIGHT = 27;
 
     public ArialDepositor(HardwareMap hw) throws Exception{
         hardwareMap = hw;
-        leftLiftMotor = new SpoolMotor(new MotorController("liftMotor","MotorConfig/FunctionMotors/AerialLiftSpool.json", hardwareMap),FAST_EXTEND_SPEED,FAST_RETRACT_SPEED,100, hardwareMap);
+        liftMotor = new SpoolMotor(new MotorController("liftMotor","MotorConfig/FunctionMotors/AerialLiftSpool.json", hardwareMap),FAST_EXTEND_SPEED,FAST_RETRACT_SPEED,100, hardwareMap);
+        liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         belt = new SpoolMotor(new MotorController("belt", "MotorConfig/FunctionMotors/BeltMotor.json", hardwareMap), 10, 10, 100, hardwareMap);
         belt.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         glyphSensor = new REVColorDistanceSensorController(REVColorDistanceSensorController.type.GLYPH_STACK_O_TRON, "glyphSensor", hardwareMap);
         extendLimit = hardwareMap.touchSensor.get("extendLimit");
+//        zeroBedHeight();
     }
 
     public void extend(){
-        leftLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftLiftMotor.setExtendSpeed(FAST_EXTEND_SPEED);
-        leftLiftMotor.extend();
+        liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        liftMotor.setExtendSpeed(FAST_EXTEND_SPEED);
+        liftMotor.extend();
     }
 
     public void retract(){
-        leftLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftLiftMotor.setExtendSpeed(FAST_RETRACT_SPEED);
-        leftLiftMotor.retract();
+        liftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        liftMotor.setExtendPower(1);
+        liftMotor.retractWithPower();
     }
 
     public void slowRetract(){
-        leftLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftLiftMotor.setExtendSpeed(SLOW_RETRACT_SPEED);
-        leftLiftMotor.retract();
+        liftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        liftMotor.setExtendPower(0.25);
+        liftMotor.retractWithPower();
     }
     public void slowExtend(){
-        leftLiftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftLiftMotor.setExtendSpeed(SLOW_EXTEND_SPEED);
-        leftLiftMotor.extend();
+        liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        liftMotor.setExtendSpeed(SLOW_EXTEND_SPEED);
+        liftMotor.extend();
+    }
+
+
+    public boolean zeroBedHeight() {
+        if (extendLimit.isPressed()) {
+            liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            liftMotor.setPower(.1);
+            while (extendLimit.isPressed());
+            long tickLoc = liftMotor.getPosition();
+            liftMotor.holdPosition();
+            liftPositionOffsetTicks = tickLoc;
+            return true;
+        } else {
+            liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            liftMotor.setPower(-.1);
+            while (!extendLimit.isPressed()) ;
+            liftMotor.pause();
+            liftMotor.setPower(.1);
+            while (extendLimit.isPressed()) ;
+            long tickLoc = liftMotor.getPosition();
+            liftMotor.holdPosition();
+            liftPositionOffsetTicks = tickLoc;
+            return true;
+        }
     }
 
     public void stopLift(){
-        if(leftLiftMotor.getMotorControllerMode() == DcMotor.RunMode.RUN_USING_ENCODER || leftLiftMotor.getMotorControllerMode() == DcMotor.RunMode.RUN_WITHOUT_ENCODER) {
-            leftLiftMotor.setPower(0);
-            currentPosition = leftLiftMotor.getPosition();
-            currentPosition = currentPosition/TICKS_PER_REV*(Math.PI*EXTENDOTRON_DIAMETER_INCHES);
-            Log.d("Extendotron", "Update Position");
-            Log.d("Extendotron", "Tick " + Long.toString(leftLiftMotor.getPosition()));
-            Log.d("Extendotron", "Inch " + Double.toString(currentPosition));
+        if(liftMotor.getMotorControllerMode() == DcMotor.RunMode.RUN_USING_ENCODER || liftMotor.getMotorControllerMode() == DcMotor.RunMode.RUN_WITHOUT_ENCODER) {
+            liftMotor.holdPosition();
+//            liftMotor.setPower(0);
+//            currentPosition = liftMotor.getPosition();
+//            currentPosition = currentPosition/TICKS_PER_REV*(Math.PI*EXTENDOTRON_DIAMETER_INCHES);
+//            Log.d("Extendotron", "Update Position");
+//            Log.d("Extendotron", "Tick " + Long.toString(liftMotor.getPosition()));
+//            Log.d("Extendotron", "Inch " + Double.toString(currentPosition));
         }
-        goToLiftPosition(currentPosition - liftPositionOffset);
+        //goToLiftPosition(currentPosition - liftPositionOffsetTicks);
     }
 
     public void goToLiftPosition(double positionInInches){
-        leftLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        leftLiftMotor.setPosition(positionInInches + liftPositionOffset);
-        leftLiftMotor.setPower(1);
+        liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        double liftPositionOffsetInches = (double)liftPositionOffsetTicks/TICKS_PER_REV*Math.PI*EXTENDOTRON_DIAMETER_INCHES;
+        long tick = (long)(positionInInches/(Math.PI*EXTENDOTRON_DIAMETER_INCHES)*TICKS_PER_REV);
+        Log.d("Offset inch", Double.toString(liftPositionOffsetInches));
+        Log.d("Offset tick", Long.toString(liftPositionOffsetTicks));
+        Log.d("Desired inch", Double.toString(positionInInches));
+        Log.d("Desired tick", Long.toString(tick));
+        liftMotor.setPostitionInches(positionInInches + liftPositionOffsetInches);
+        liftMotor.setPower(1);
+    }
+
+    public double getGlyphInch(){
+        return (double) liftMotor.getPosition()/TICKS_PER_REV*Math.PI*EXTENDOTRON_DIAMETER_INCHES;
     }
 
     public void goToGlyphLevel(GLYPH_PLACEMENT_LEVEL level){
@@ -120,16 +156,16 @@ public class ArialDepositor implements ActionHandler {
         }
     }
 
-    public void setLiftPositionOffset(long offset){
-        liftPositionOffset = offset;
+    public void setLiftPositionOffsetTicks(long offset){
+        liftPositionOffsetTicks = offset;
     }
 
     public void setLiftPower(double power){
-        leftLiftMotor.setPower(power);
+        liftMotor.setPower(power);
     }
 
     public void setLiftDirection(DcMotor.Direction dir){
-        leftLiftMotor.setDirection(dir);
+        liftMotor.setDirection(dir);
     }
 
     public void setBeltDirection(DcMotor.Direction dir){
@@ -140,8 +176,12 @@ public class ArialDepositor implements ActionHandler {
         belt.setExtendPower(power);
     }
 
+    public long getLiftPositionOffsetTicks() {
+        return liftPositionOffsetTicks;
+    }
+
     public long getLiftMotorPosition(){
-        return leftLiftMotor.getPosition();
+        return liftMotor.getPosition();
     }
 
     public void startBelt(){
@@ -185,8 +225,8 @@ public class ArialDepositor implements ActionHandler {
 
     @Override
     public void stop() {
-        leftLiftMotor.pause();
-        leftLiftMotor.stop();
+        liftMotor.pause();
+        liftMotor.stop();
     }
 
 }

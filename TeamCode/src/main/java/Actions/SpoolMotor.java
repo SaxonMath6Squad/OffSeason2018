@@ -84,8 +84,12 @@ public class SpoolMotor implements ActionHandler{
         //todo implement
     }
 
-    public void setPosition(double positionInInches){
-        motor.setPosition(positionInInches);
+    public void setPostitionInches(double positionInInches){
+        motor.setPositionInches(positionInInches);
+    }
+
+    public void setPostitionTicks(int ticks){
+        motor.setPositionTicks(ticks);
     }
 
     public long getPosition(){
@@ -94,6 +98,12 @@ public class SpoolMotor implements ActionHandler{
 
     public void setMode(DcMotor.RunMode mode){
         motor.setMotorRunMode(mode);
+    }
+
+    public void holdPosition(){
+        motor.setMotorRunMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motor.setPositionTicks((int)motor.getCurrentTick());
+        motor.setMotorPower(1);
     }
 
     @Override
