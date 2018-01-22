@@ -42,6 +42,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import java.util.ArrayList;
 
 import Actions.ArialDepositor;
+import Actions.ArialDepositorTest;
 import Actions.JennyFlagController;
 import Actions.JennyO1BGlyphPicker;
 import Actions.JewelJouster;
@@ -82,7 +83,7 @@ public class JennyO1B extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
     JennyNavigation navigation;
     JoystickHandler leftJoystick, rightJoystick;
-    ArialDepositor glyphLift;
+    ArialDepositorTest glyphLift;
     JennyO1BGlyphPicker glyphPicker;
     JennyO1BRAD RAD;
     JewelJouster jouster;
@@ -91,7 +92,7 @@ public class JennyO1B extends LinearOpMode {
     boolean autoLiftPositionMode = false;
     boolean paralaxedControl = false;
     boolean flagOn = false;
-    ArialDepositor.GLYPH_PLACEMENT_LEVEL[] liftPosition = new ArialDepositor.GLYPH_PLACEMENT_LEVEL[]{ArialDepositor.GLYPH_PLACEMENT_LEVEL.GROUND, ArialDepositor.GLYPH_PLACEMENT_LEVEL.ROW1_AND_2, ArialDepositor.GLYPH_PLACEMENT_LEVEL.ROW3_AND_4};
+    ArialDepositorTest.GLYPH_PLACEMENT_LEVEL[] liftPosition = new ArialDepositorTest.GLYPH_PLACEMENT_LEVEL[]{ArialDepositorTest.GLYPH_PLACEMENT_LEVEL.GROUND, ArialDepositorTest.GLYPH_PLACEMENT_LEVEL.ROW1_AND_2, ArialDepositorTest.GLYPH_PLACEMENT_LEVEL.ROW3_AND_4};
 
     int position = 0;
     PIDController cameraPIDController;
@@ -113,7 +114,7 @@ public class JennyO1B extends LinearOpMode {
 
         }
         try{
-            glyphLift = new ArialDepositor(hardwareMap);
+            glyphLift = new ArialDepositorTest(hardwareMap);
 
         }
         catch(Exception e){

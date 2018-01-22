@@ -189,6 +189,11 @@ public class MotorController extends Thread {
         return (double) ticks / ticksPerRevolution * Math.PI  * wheelDiameterInInches;
     }
 
+    public void holdPosition(){
+        motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motor.setTargetPosition((int)motor.getCurrentPosition());
+        motor.setPower(1);
+    }
 
     public void setMotorPower(double power){
         motor.setPower(power);

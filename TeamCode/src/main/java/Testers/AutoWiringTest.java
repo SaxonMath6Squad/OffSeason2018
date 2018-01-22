@@ -38,6 +38,7 @@ import android.util.Log;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import java.util.ArrayList;
@@ -53,6 +54,8 @@ import SensorHandlers.JennySensorTelemetry;
 import Actions.JennyFlagController;
 import Actions.JennyO1BRAD;
 
+import static Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor.CLOSE_UP_MIN_COLUMN_WIDTH;
+import static Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor.CLOSE_UP_MIN_PERCENT_COLUMN_CHECK;
 import static Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor.DESIRED_HEIGHT;
 import static Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor.DESIRED_WIDTH;
 import static Autonomous.RelicRecoveryField.BLUE_ALLIANCE_2;
@@ -82,9 +85,6 @@ public class AutoWiringTest extends LinearOpMode {
     JennyO1BGlyphPicker glyphPicker;
     CryptoBoxColumnImageProcessor cryptoboxFinder;
     VuforiaHelper vuforia;
-    Bitmap bmp = null;
-    ArrayList<Integer> columns;
-    ArrayList<Integer> centers;
 
     @Override
     public void runOpMode() {
@@ -93,7 +93,10 @@ public class AutoWiringTest extends LinearOpMode {
         boolean miscMotorOk = false;
         int miscMotorCount = 0;
         boolean[] sensorOk = {false, false, false};
+        Bitmap bmp = null;
+        ArrayList<Integer> centers;
         boolean radOk;
+        boolean liftSwitch = false;
 
         try {
             navigation = new JennyNavigation(hardwareMap, startLocations[BLUE_ALLIANCE_2], 0, "RobotConfig/JennyV2.json");
@@ -103,9 +106,10 @@ public class AutoWiringTest extends LinearOpMode {
             flagController = new JennyFlagController(hardwareMap);
             jewelJouster = new JewelJouster("jewelJouster", hardwareMap);
             glyphPicker = new JennyO1BGlyphPicker(hardwareMap);
-        }
-        catch (Exception e){
-            Log.e("Error!" , e.toString());
+            vuforia = new VuforiaHelper();
+            cryptoboxFinder = new CryptoBoxColumnImageProcessor(DESIRED_HEIGHT, DESIRED_WIDTH, CLOSE_UP_MIN_PERCENT_COLUMN_CHECK, CLOSE_UP_MIN_COLUMN_WIDTH, CryptoBoxColumnImageProcessor.CRYPTOBOX_COLOR.BLUE);
+        } catch (Exception e) {
+            Log.e("Error!", e.toString());
             throw new RuntimeException("System Creation Error! " + e.toString());
 
         }
@@ -119,76 +123,76 @@ public class AutoWiringTest extends LinearOpMode {
         // DRIVE
         double[] motorPositions = navigation.getMotorPositionsInches();
         navigation.applyMotorPowers(new double[]{0.3, 0.3, 0.3, 0.3});
-        sleep(MED_SLEEP_DELAY_MILLIS);
+        sleep(LONG_SLEEP_DELAY_MILLIS);
         navigation.brake();
         double[] newMotorPositions = navigation.getMotorPositionsInches();
-        for(int i = 0; i < navigation.driveMotors.length; i++) {
+        for (int i = 0; i < navigation.driveMotors.length; i++) {
             if (newMotorPositions[i] > motorPositions[i]) driveMotorCount[i]++;
         }
         motorPositions = navigation.getMotorPositionsInches();
         navigation.applyMotorPowers(new double[]{-0.3, -0.3, -0.3, -0.3});
-        sleep(MED_SLEEP_DELAY_MILLIS);
+        sleep(LONG_SLEEP_DELAY_MILLIS);
         navigation.brake();
         newMotorPositions = navigation.getMotorPositionsInches();
-        for(int i = 0; i < navigation.driveMotors.length; i++) {
+        for (int i = 0; i < navigation.driveMotors.length; i++) {
             if (motorPositions[i] > newMotorPositions[i]) driveMotorCount[i]++;
             if (driveMotorCount[i] == 2) driveMotorOk[i] = true;
-            if (driveMotorOk[i]){
+            if (driveMotorOk[i]) {
                 telemetry.addData("Drive Motor " + Integer.toString(i), "OK!");
                 telemetry.update();
-                sleep(MED_SLEEP_DELAY_MILLIS);
+                sleep(LONG_SLEEP_DELAY_MILLIS);
             }
         }
         //DRIVE
 
         //TODO: USE EXTEND TO POSITION INSTEAD, BRINGING IT TO THE TOP
         //EXTEND
-        boolean liftSwitch = sensorTelemetry.isPressed(RAD_LIMIT);
+        liftSwitch = glyphPlacement.isPressed();
         double liftPosition = glyphPlacement.getLiftMotorPosition();
-        glyphPlacement.setLiftPower(0.3);
+        glyphPlacement.setLiftPower(0.7);
         sleep(LONG_SLEEP_DELAY_MILLIS);
         glyphPlacement.stopLift();
-        if(liftSwitch && !sensorTelemetry.isPressed(RAD_LIMIT)) liftSwitch = true;
+        if (liftSwitch && !glyphPlacement.isPressed()) liftSwitch = true;
         else liftSwitch = false;
         double newLiftPosition = glyphPlacement.getLiftMotorPosition();
-        if(newLiftPosition > liftPosition) miscMotorCount++;
+        if (newLiftPosition > liftPosition) miscMotorCount++;
         liftPosition = glyphPlacement.getLiftMotorPosition();
-        glyphPlacement.setLiftPower(-0.3);
-        sleep(MED_SLEEP_DELAY_MILLIS);
+        glyphPlacement.setLiftPower(-0.7);
+        sleep(LONG_SLEEP_DELAY_MILLIS);
         glyphPlacement.stopLift();
         newLiftPosition = glyphPlacement.getLiftMotorPosition();
-        if(liftPosition > newLiftPosition) miscMotorCount++;
-        if(miscMotorCount == 2) miscMotorOk = true;
-        if(miscMotorOk) {
+        if (liftPosition > newLiftPosition) miscMotorCount++;
+        if (miscMotorCount == 2) miscMotorOk = true;
+        if (miscMotorOk) {
             telemetry.addData("Misc Motor (Lift motor)", "OK!");
         } else {
             telemetry.addData("Misc Motor (Lift motor)", "BAD!");
         }
         telemetry.update();
-        sleep(MED_SLEEP_DELAY_MILLIS);
-        if(liftSwitch){
+        sleep(LONG_SLEEP_DELAY_MILLIS);
+        if (liftSwitch) {
             telemetry.addData("Extend Limit", "OK!");
             telemetry.update();
         } else {
             telemetry.addData("ExtendLimit", "BAD!");
         }
         telemetry.update();
-        sleep(MED_SLEEP_DELAY_MILLIS);
+        sleep(LONG_SLEEP_DELAY_MILLIS);
         //EXTEND
 
         //COLOR SENSORS
         jewelJouster.setPosition(JewelJouster.EXTENDION_MODE.HIT);
-        sleep(DEFAULT_SLEEP_DELAY_MILLIS);
+        sleep(LONG_SLEEP_DELAY_MILLIS);
         color[] detectedColors = new color[2];
         //detectedColors[0] = sensorTelemetry.getColor(COLOR_DISTANCE_SENSOR);
         detectedColors[0] = jewelJouster.getJewelColor();
         detectedColors[1] = glyphPlacement.getColor();
-        for(int i = 0; i < detectedColors.length; i++){
-            if(detectedColors[i] == color.UNKNOWN) sensorOk[i] = true;
-            if(sensorOk[i]){
+        for (int i = 0; i < detectedColors.length; i++) {
+            if (detectedColors[i] == color.UNKNOWN) sensorOk[i] = true;
+            if (sensorOk[i]) {
                 telemetry.addData("Color Sensor " + Integer.toString(i), "OK!");
                 telemetry.update();
-                sleep(MED_SLEEP_DELAY_MILLIS);
+                sleep(LONG_SLEEP_DELAY_MILLIS);
             }
         }
         jewelJouster.setPosition(JewelJouster.EXTENDION_MODE.STORE);
@@ -220,9 +224,9 @@ public class AutoWiringTest extends LinearOpMode {
 
         //GLYPH PICKER
         glyphPicker.grab();
-        sleep(MED_SLEEP_DELAY_MILLIS);
+        sleep(LONG_SLEEP_DELAY_MILLIS);
         glyphPicker.spit();
-        sleep(MED_SLEEP_DELAY_MILLIS);
+        sleep(LONG_SLEEP_DELAY_MILLIS);
         glyphPicker.pause();
         //GLYPH PICKER
 
@@ -234,39 +238,39 @@ public class AutoWiringTest extends LinearOpMode {
 
         //JEWEL JOUST
         jewelJouster.setPosition(JewelJouster.EXTENDION_MODE.HIT);
-        sleep(DEFAULT_SLEEP_DELAY_MILLIS);
+        sleep(LONG_SLEEP_DELAY_MILLIS);
         jewelJouster.setPosition(JewelJouster.EXTENDION_MODE.STORE);
         //JEWEL JOUST
 
         //SWITCHES DOUBLE CHECK
         telemetry.addData("Press", "Extend Limit");
         telemetry.update();
-        sleep(MED_SLEEP_DELAY_MILLIS);
-        if(glyphPlacement.isPressed()){
+        sleep(LONG_SLEEP_DELAY_MILLIS*3);
+        if (glyphPlacement.isPressed()) {
             telemetry.addData("Release", "Extend Limit");
         } else {
             telemetry.addData("Error", "Extend Limit not pressed!");
         }
         telemetry.update();
-        sleep(MED_SLEEP_DELAY_MILLIS);
-        if(!glyphPlacement.isPressed()){
+        sleep(LONG_SLEEP_DELAY_MILLIS*3);
+        if (!glyphPlacement.isPressed()) {
             telemetry.addData("Extend Limit", "OK!");
         } else {
             telemetry.addData("Error", "Extend Limit not released!");
         }
         telemetry.update();
-        sleep(MED_SLEEP_DELAY_MILLIS);
+        sleep(LONG_SLEEP_DELAY_MILLIS*3);
         telemetry.addData("Press", "RAD Limit");
         telemetry.update();
-        sleep(MED_SLEEP_DELAY_MILLIS);
-        if(sensorTelemetry.isPressed(RAD_LIMIT)){
+        sleep(LONG_SLEEP_DELAY_MILLIS*3);
+        if (sensorTelemetry.isPressed(RAD_LIMIT)) {
             telemetry.addData("Release", "RAD Limit");
         } else {
             telemetry.addData("Error", "RAD Limit not pressed!");
         }
         telemetry.update();
-        sleep(MED_SLEEP_DELAY_MILLIS);
-        if(!sensorTelemetry.isPressed(RAD_LIMIT)){
+        sleep(LONG_SLEEP_DELAY_MILLIS*3);
+        if (!sensorTelemetry.isPressed(RAD_LIMIT)) {
             telemetry.addData("RAD Limit", "OK!");
         } else {
             telemetry.addData("Error", "RAD Limit not released!");
@@ -276,20 +280,49 @@ public class AutoWiringTest extends LinearOpMode {
 
         //CAMERA
         bmp = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
-        if(bmp == null){
+        if (bmp == null) {
             telemetry.addData("Error", "Unable to take image");
             telemetry.update();
-            sleep(MED_SLEEP_DELAY_MILLIS);
+            sleep(LONG_SLEEP_DELAY_MILLIS);
         } else {
-            columns = cryptoboxFinder.findColumns(bmp, true);
-            vuforia.saveBMP(bmp);
             centers = cryptoboxFinder.findColumnCenters(bmp, true);
             vuforia.saveBMP(bmp);
             telemetry.addData("Images created", "Please check");
             telemetry.update();
-            sleep(MED_SLEEP_DELAY_MILLIS);
+            sleep(LONG_SLEEP_DELAY_MILLIS);
         }
         //CAMERA
+
+        //TELEMETRY
+        for (int x = 0; x < driveMotorOk.length; x++) {
+            if (driveMotorOk[x]) {
+                telemetry.addData("Drive Motor " + x, "OK!");
+            }
+            else{
+                telemetry.addData("Drive Motor " + x, " = FAILURE!!!");
+            }
+        }
+//        if (radOk){
+//            telemetry.addData("RAD =", ":)");
+//        }
+//        else{
+//            telemetry.addData("RAD =", "FAILURE!!!");
+//        }
+        for(int x = 0; x < sensorOk.length; x++) {
+            if (sensorOk[x]) {
+                telemetry.addData("Sensor " + x, ":)");
+            }
+
+            else{
+                telemetry.addData("Sensor " + x, " = FAILURE");
+            }
+        }
+        if (miscMotorOk){
+            telemetry.addData("Other Motors =", ":)");
+        }
+        else{
+            telemetry.addData("Other Motors =", "FAILURE");
+        }
 
         navigation.stopNavigation();
         rad.stop();
