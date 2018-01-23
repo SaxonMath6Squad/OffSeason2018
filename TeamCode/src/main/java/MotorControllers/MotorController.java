@@ -97,8 +97,8 @@ public class MotorController extends Thread {
     }
 
     public void killMotorController(){
-        shouldRun = false;
         brake();
+        shouldRun = false;
     }
 
     private void updateData(){

@@ -59,9 +59,12 @@ public class MotorStopperTest extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
     JennyNavigation navigation;
     ArialDepositorTest glyphPlacement;
+    private long start;
+    private long expectedDelta;
+    private long delta = 0;
+    private long newPosition = 0;
     @Override
     public void runOpMode() {
-        double minRPS = 0.2;
         boolean shouldKill = false;
         try {
             navigation = new JennyNavigation(hardwareMap, startLocations[BLUE_ALLIANCE_2], 0, "RobotConfig/JennyV2.json");
@@ -74,7 +77,8 @@ public class MotorStopperTest extends LinearOpMode {
         }
         telemetry.addData("Status", "Initialized");
         telemetry.update();
-
+        expectedDelta = 2;
+        start = glyphPlacement.getLiftMotorPosition();
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
@@ -82,17 +86,23 @@ public class MotorStopperTest extends LinearOpMode {
         sleep(MED_SLEEP_DELAY_MILLIS + LONG_SLEEP_DELAY_MILLIS);
         while (opModeIsActive() && !shouldKill) {
             glyphPlacement.setLiftPower(0.5);
-            telemetry.addData("Cur RPS", glyphPlacement.getRPS());
-            telemetry.update();
-            Log.d("Cur RPS", Double.toString(glyphPlacement.getRPS()));
-            if (glyphPlacement.getRPS() < minRPS) {
-                glyphPlacement.retract();
-                while (!glyphPlacement.isPressed()) ;
-                glyphPlacement.setLiftPower(0);
+            newPosition = glyphPlacement.getLiftMotorPosition();
+            delta = newPosition - start;
+            Log.d("Start Value", "" + start);
+            Log.d("New Value", "" + newPosition);
+            Log.d("Delta", Long.toString(delta));
+            if(delta < expectedDelta){
                 shouldKill = true;
             }
+            else{
+               start = glyphPlacement.getLiftMotorPosition();
+            }
         }
-
+        glyphPlacement.stopLift();
+        while (!glyphPlacement.isPressed() && opModeIsActive()){
+            glyphPlacement.retract();
+        }
         glyphPlacement.stop();
+        navigation.stopNavigation();
     }
 }
