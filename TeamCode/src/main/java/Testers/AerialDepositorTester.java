@@ -38,30 +38,29 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import Actions.ArialDepositor;
+import Actions.NewArialDepositor;
 
 /*
     An opmode to test if all our drive wheels are working correctly
  */
-@TeleOp(name="Lift Encoder Test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
+@TeleOp(name="Aerial Depositor Tester", group="Linear Opmode")  // @Autonomous(...) is the other common choice
 //@Disabled
-public class MiscWiringTest extends LinearOpMode {
+public class AerialDepositorTester extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
-    ArialDepositor glyphPlacer;
+    NewArialDepositor glyphLift;
     @Override
     public void runOpMode() {
         try {
-            glyphPlacer = new ArialDepositor(hardwareMap);
+            glyphLift = new NewArialDepositor(hardwareMap);
         }
         catch (Exception e){
-            Log.e("Error!" , "Jenny Navigation: " + e.toString());
-            throw new RuntimeException("Navigation Creation Error! " + e.toString());
+            Log.e("Error!" , "Glyph Lift: " + e.toString());
+            throw new RuntimeException("Glyph Lift Creation Error! " + e.toString());
 
         }
-        //leftJoystick = new JoystickHandler(gamepad1,JoystickHandler.LEFT_JOYSTICK);
-        //rightJoystick = new JoystickHandler(gamepad1,JoystickHandler.RIGHT_JOYSTICK);
+
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
@@ -69,11 +68,28 @@ public class MiscWiringTest extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
-        // run until the end of the match (driver presses STOP)
-        while (opModeIsActive()) {
-            telemetry.addData("Encoder value", glyphPlacer.getLiftMotorPosition());
+        while (opModeIsActive()){
+            if(gamepad1.right_trigger > .1){
+                glyphLift.extend();
+            }
+            else if(gamepad1.right_bumper){
+                glyphLift.retract();
+            }
+            else glyphLift.stopLift();
+
+            if(gamepad1.left_trigger > .1){
+                glyphLift.startBelt();
+            }
+            else if(gamepad1.right_bumper){
+                glyphLift.retractBelt();
+            }
+            else glyphLift.stopBelt();
+            telemetry.addData("Tick", glyphLift.getLiftMotorPosition());
+            telemetry.addData("Inch",glyphLift.getExtendotronHeight());
+            telemetry.addData("Offset", glyphLift.getLiftPositionOffsetTicks());
             telemetry.update();
         }
-        glyphPlacer.kill();
+
+        glyphLift.kill();
     }
 }

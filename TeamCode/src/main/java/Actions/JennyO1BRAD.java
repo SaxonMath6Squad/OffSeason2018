@@ -77,7 +77,7 @@ public class JennyO1BRAD {
     }
 
     public int stop(){
-        RADExtender.stop();
+        RADExtender.kill();
         RADGrabber.setPosition(RADGrabber.getPosition());
         return 0;
     }

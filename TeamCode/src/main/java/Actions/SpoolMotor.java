@@ -122,7 +122,7 @@ public class SpoolMotor implements ActionHandler{
     }
 
     @Override
-    public void stop() {
+    public void kill() {
         motor.setInchesPerSecondVelocity(0);
         motor.killMotorController();
     }

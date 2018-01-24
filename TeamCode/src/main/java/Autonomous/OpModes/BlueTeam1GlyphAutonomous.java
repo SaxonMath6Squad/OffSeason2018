@@ -213,7 +213,7 @@ public class BlueTeam1GlyphAutonomous extends LinearOpMode {
 //        navigation.driveDistance(2, NORTH, SLOW_SPEED_IN_PER_SEC, this);
         while(opModeIsActive());
         navigation.stopNavigation();
-        glyphSystem.stop();
+        glyphSystem.kill();
 //        glyphSystem.stopNavigation();
     }
 

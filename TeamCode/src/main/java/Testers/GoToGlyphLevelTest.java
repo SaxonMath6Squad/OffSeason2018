@@ -91,6 +91,6 @@ public class GoToGlyphLevelTest extends LinearOpMode {
             telemetry.update();
         }
 
-        glyphLift.stop();
+        glyphLift.kill();
     }
 }

@@ -55,7 +55,6 @@ import static Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor.CLOSE_UP_
 import static Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor.CLOSE_UP_MIN_PERCENT_COLUMN_CHECK;
 import static Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor.DESIRED_HEIGHT;
 import static Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor.DESIRED_WIDTH;
-import static Autonomous.REVColorDistanceSensorController.color.BLUE;
 import static Autonomous.REVColorDistanceSensorController.color.RED;
 import static Autonomous.REVColorDistanceSensorController.color.UNKNOWN;
 import static Autonomous.RelicRecoveryField.BLUE_ALLIANCE_2;
@@ -209,7 +208,7 @@ public class RedTeam1GlyphAutonomous extends LinearOpMode {
         glyphSystem.goToGlyphLevel(ArialDepositor.GLYPH_PLACEMENT_LEVEL.GROUND);
         while(opModeIsActive());
         navigation.stopNavigation();
-        glyphSystem.stop();
+        glyphSystem.kill();
 //        glyphSystem.stopNavigation();
     }
 

@@ -56,7 +56,7 @@ public class JennyO1BGlyphPicker implements ActionHandler {
     }
 
     @Override
-    public void stop() {
+    public void kill() {
         wheelMotor.killMotorController();
     }
 }

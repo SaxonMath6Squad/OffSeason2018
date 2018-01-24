@@ -35,10 +35,8 @@ package Testers;
 import android.graphics.Bitmap;
 import android.util.Log;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import java.util.ArrayList;
@@ -60,10 +58,7 @@ import static Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor.DESIRED_H
 import static Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor.DESIRED_WIDTH;
 import static Autonomous.RelicRecoveryField.BLUE_ALLIANCE_2;
 import static Autonomous.RelicRecoveryField.startLocations;
-import static DriveEngine.JennyNavigation.DEFAULT_SLEEP_DELAY_MILLIS;
 import static DriveEngine.JennyNavigation.LONG_SLEEP_DELAY_MILLIS;
-import static DriveEngine.JennyNavigation.MED_SLEEP_DELAY_MILLIS;
-import static SensorHandlers.JennySensorTelemetry.COLOR_DISTANCE_SENSOR;
 
 import static SensorHandlers.JennySensorTelemetry.RAD_LIMIT;
 
@@ -326,9 +321,9 @@ public class AutoWiringTest extends LinearOpMode {
 
         navigation.stopNavigation();
         rad.stop();
-        glyphPicker.stop();
-        glyphPlacement.stop();
-        jewelJouster.stop();
+        glyphPicker.kill();
+        glyphPlacement.kill();
+        jewelJouster.kill();
         sensorTelemetry.stopSensorTelemetry();
         flagController.stopFlag();
     }

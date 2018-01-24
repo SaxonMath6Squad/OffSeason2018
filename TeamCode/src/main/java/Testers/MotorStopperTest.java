@@ -38,7 +38,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import Actions.ArialDepositor;
 import Actions.ArialDepositorTest;
 import DriveEngine.JennyNavigation;
 
@@ -46,7 +45,6 @@ import static Autonomous.RelicRecoveryField.BLUE_ALLIANCE_2;
 import static Autonomous.RelicRecoveryField.startLocations;
 import static DriveEngine.JennyNavigation.LONG_SLEEP_DELAY_MILLIS;
 import static DriveEngine.JennyNavigation.MED_SLEEP_DELAY_MILLIS;
-import static DriveEngine.JennyNavigation.MED_SPEED_IN_PER_SEC;
 
 /*
     An opmode to test if all our drive wheels are working correctly
@@ -102,7 +100,7 @@ public class MotorStopperTest extends LinearOpMode {
         while (!glyphPlacement.isPressed() && opModeIsActive()){
             glyphPlacement.retract();
         }
-        glyphPlacement.stop();
+        glyphPlacement.kill();
         navigation.stopNavigation();
     }
 }

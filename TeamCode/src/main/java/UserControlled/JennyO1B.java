@@ -41,7 +41,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import java.util.ArrayList;
 
-import Actions.ArialDepositor;
 import Actions.ArialDepositorTest;
 import Actions.JennyFlagController;
 import Actions.JennyO1BGlyphPicker;
@@ -58,7 +57,6 @@ import static Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor.CLOSE_UP_
 import static Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor.DESIRED_HEIGHT;
 import static Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor.DESIRED_WIDTH;
 import static Autonomous.RelicRecoveryField.BLUE_ALLIANCE_2;
-import static Autonomous.RelicRecoveryField.CRYPTOBOX_COLORED_COLUMN_WIDTHS_INCHES;
 import static Autonomous.RelicRecoveryField.CRYPTOBOX_SCORING_COLUMN_WIDTHS_INCHES;
 import static Autonomous.RelicRecoveryField.startLocations;
 import static DriveEngine.JennyNavigation.DEFAULT_SLEEP_DELAY_MILLIS;
@@ -348,12 +346,12 @@ public class JennyO1B extends LinearOpMode {
             telemetry.update();
         }
         navigation.stopNavigation();
-        glyphLift.stop();
+        glyphLift.kill();
         RAD.stop();
         sensorTelemetry.stopTelemetryLogging();
-        glyphPicker.stop();
+        glyphPicker.kill();
         flagController.stopFlag();
-        jouster.stop();
+        jouster.kill();
     }
 
     public int findCryptoColumnClosestToDesired(ArrayList<Integer> columns, int desiredLocationOnScreen){

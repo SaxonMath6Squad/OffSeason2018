@@ -208,7 +208,7 @@ public class BlueTeam2GlyphAutonomous extends LinearOpMode {
         glyphSystem.goToGlyphLevel(ArialDepositor.GLYPH_PLACEMENT_LEVEL.GROUND);
         while(opModeIsActive());
         navigation.stopNavigation();
-        glyphSystem.stop();
+        glyphSystem.kill();
 //        glyphSystem.stopNavigation();
     }
 

@@ -192,7 +192,7 @@ public class ArialDepositor implements ActionHandler {
         belt.pause();
     }
 
-    public void reverseBelt(){
+    public void reverseGlyphs(){
         belt.retractWithPower();
     }
 
@@ -224,9 +224,9 @@ public class ArialDepositor implements ActionHandler {
     }
 
     @Override
-    public void stop() {
+    public void kill() {
         liftMotor.pause();
-        liftMotor.stop();
+        liftMotor.kill();
     }
 
 }

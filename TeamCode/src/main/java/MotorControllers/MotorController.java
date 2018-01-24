@@ -190,10 +190,17 @@ public class MotorController extends Thread {
     }
 
     public void holdPosition(){
+        motor.setPower(0);
         motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        motor.setTargetPosition((int)motor.getCurrentPosition());
+        motor.setTargetPosition(motor.getCurrentPosition());
         motor.setPower(1);
     }
+
+    public double getWheelDiameterInInches(){
+        return wheelDiameterInInches;
+    }
+
+    public int getTicksPerRevolution(){return (int)(motor.getMotorType().getTicksPerRev() + .5);}
 
     public void setMotorPower(double power){
         motor.setPower(power);
@@ -204,6 +211,9 @@ public class MotorController extends Thread {
     }
 
     public void setPositionInches(double positionInInches){
+        //go ahead and set mode
+        motor.setPower(0);
+        motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         int positionInTicks = (int)(positionInInches/(wheelDiameterInInches*Math.PI)*ticksPerRevolution);
         logDebug("Desired tick", Double.toString(positionInTicks));
         motor.setTargetPosition(positionInTicks);

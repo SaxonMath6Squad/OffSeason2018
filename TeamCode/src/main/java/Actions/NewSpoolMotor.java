@@ -52,15 +52,6 @@ public class NewSpoolMotor extends MotorController implements ActionHandler{
         zeroPoint = getCurrentTick();
     }
 
-    public void extend(){
-        if(getMotorRunMode() != DcMotor.RunMode.RUN_USING_ENCODER) setMotorRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        setInchesPerSecondVelocity(extendSpeedInPerSecond);
-    }
-
-    public void pause(){
-        setInchesPerSecondVelocity(0);
-    }
-
     public void determineZeroPoint(){
         if (spoolLimit.isPressed()) {
             setMotorRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -81,14 +72,33 @@ public class NewSpoolMotor extends MotorController implements ActionHandler{
         //TODO set back down on the hard stops, no reason to keep it powered here.
     }
 
-    public void retract(){
-        if(getMotorRunMode() != DcMotor.RunMode.RUN_WITHOUT_ENCODER) setMotorRunMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    public void extend(double percentOfMaxSpeed){
+        //setMotorRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        setInchesPerSecondVelocity(extendSpeedInPerSecond*percentOfMaxSpeed);
+    }
+
+    public void extend(){
+        extend(1);
+    }
+
+    public void pause(){
+        setInchesPerSecondVelocity(0);
+    }
+
+
+
+    public void retract(double percentOfMaxSpeed){
+        //setMotorRunMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         if(shouldLimitRetraction) {
             if (!spoolLimit.isPressed())
-                setInchesPerSecondVelocity(-retractSpeedInPerSecond);
+                setInchesPerSecondVelocity(-(retractSpeedInPerSecond * percentOfMaxSpeed));
             else pause();
         }
-        else setInchesPerSecondVelocity(-retractSpeedInPerSecond);
+        else setInchesPerSecondVelocity(-(retractSpeedInPerSecond * percentOfMaxSpeed));
+    }
+
+    public void retract(){
+        retract(1);
     }
 
     @Override
