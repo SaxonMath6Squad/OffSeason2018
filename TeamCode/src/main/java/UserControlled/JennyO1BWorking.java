@@ -35,6 +35,7 @@ package UserControlled;
 import android.graphics.Bitmap;
 import android.util.Log;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -42,18 +43,15 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import java.util.ArrayList;
 
 import Actions.ArialDepositor;
-import Actions.ArialDepositorTest;
-import Actions.HardwareWrappers.NewArialDepositor;
-import Actions.HardwareWrappers.NewSpoolMotor;
 import Actions.JennyFlagController;
 import Actions.JennyO1BGlyphPicker;
+import Actions.JennyO1BRAD;
 import Actions.JewelJouster;
 import Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor;
 import Autonomous.VuforiaHelper;
 import DriveEngine.JennyNavigation;
 import MotorControllers.PIDController;
 import SensorHandlers.JennySensorTelemetry;
-import Actions.JennyO1BRAD;
 
 import static Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor.CLOSE_UP_MIN_COLUMN_WIDTH;
 import static Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor.CLOSE_UP_MIN_PERCENT_COLUMN_CHECK;
@@ -76,15 +74,15 @@ import static SensorHandlers.JennySensorTelemetry.RAD_LIMIT;
     Limited autonomous, no ciphers on red team, glyphs close but not always scored.
     We won 1st place
  */
-@TeleOp(name="Jenny O1B User Controlled", group="Linear Opmode")  // @Autonomous(...) is the other common choice
-//@Disabled
-public class JennyO1B extends LinearOpMode {
+@TeleOp(name="Jenny O1B User Controlled Working", group="Linear Opmode")  // @Autonomous(...) is the other common choice
+@Disabled
+public class JennyO1BWorking extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
     JennyNavigation navigation;
     JoystickHandler leftJoystick, rightJoystick;
-    NewArialDepositor glyphLift;
+    ArialDepositor glyphLift;
     JennyO1BGlyphPicker glyphPicker;
     JennyO1BRAD RAD;
     JewelJouster jouster;
@@ -93,7 +91,7 @@ public class JennyO1B extends LinearOpMode {
     boolean autoLiftPositionMode = false;
     boolean paralaxedControl = false;
     boolean flagOn = false;
-    NewArialDepositor.GLYPH_PLACEMENT_LEVEL[] liftPosition = new NewArialDepositor.GLYPH_PLACEMENT_LEVEL[]{NewArialDepositor.GLYPH_PLACEMENT_LEVEL.GROUND, NewArialDepositor.GLYPH_PLACEMENT_LEVEL.ROW1_AND_2, NewArialDepositor.GLYPH_PLACEMENT_LEVEL.ROW3_AND_4};
+    ArialDepositor.GLYPH_PLACEMENT_LEVEL[] liftPosition = new ArialDepositor.GLYPH_PLACEMENT_LEVEL[]{ArialDepositor.GLYPH_PLACEMENT_LEVEL.GROUND, ArialDepositor.GLYPH_PLACEMENT_LEVEL.ROW1_AND_2, ArialDepositor.GLYPH_PLACEMENT_LEVEL.ROW3_AND_4};
 
     int position = 0;
     PIDController cameraPIDController;
@@ -115,7 +113,7 @@ public class JennyO1B extends LinearOpMode {
 
         }
         try{
-            glyphLift = new NewArialDepositor(hardwareMap);
+            glyphLift = new ArialDepositor(hardwareMap);
 
         }
         catch(Exception e){
@@ -252,20 +250,20 @@ public class JennyO1B extends LinearOpMode {
             //GLYPH ROLLER
             if(!glyphLift.isPressed()) {
                 if (gamepad1.left_trigger > 0.1) glyphLift.startBelt();
-                else if (gamepad1.left_bumper && !gamepad1.right_bumper) glyphLift.retractBelt();
+                else if (gamepad1.left_bumper && !gamepad1.right_bumper) glyphLift.reverseGlyphs();
                 else if (gamepad2.left_trigger > 0.1 && gamepad1.right_trigger < 0.1 && gamepad1.left_trigger < 0.1 && !gamepad1.right_bumper && !gamepad1.left_bumper)
                     glyphLift.startBelt();
                 else if (gamepad2.left_bumper && gamepad1.right_trigger < 0.1 && gamepad1.left_trigger < 0.1 && !gamepad1.right_bumper && !gamepad1.left_bumper)
-                    glyphLift.retractBelt();
+                    glyphLift.reverseGlyphs();
                 else
                     glyphLift.stopBelt();
             } else {
                 if (gamepad1.left_trigger > 0.1) glyphLift.startBelt();
-                else if (gamepad1.left_bumper && !gamepad1.right_bumper) glyphLift.retractBelt();
+                else if (gamepad1.left_bumper && !gamepad1.right_bumper) glyphLift.reverseGlyphs();
                 else if (gamepad2.left_trigger > 0.1 && gamepad1.right_trigger < 0.1 && gamepad1.left_trigger < 0.1 && !gamepad1.right_bumper && !gamepad1.left_bumper)
                     glyphLift.startBelt();
                 else if (gamepad2.left_bumper && gamepad1.right_trigger < 0.1 && gamepad1.left_trigger < 0.1 && !gamepad1.right_bumper && !gamepad1.left_bumper)
-                    glyphLift.retractBelt();
+                    glyphLift.reverseGlyphs();
                 else
                     glyphLift.stopBelt();
             }

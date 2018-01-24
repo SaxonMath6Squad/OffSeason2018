@@ -176,7 +176,7 @@ public class MotorController extends Thread {
             shouldRun = false;
             throw new RuntimeException(e);
         }
-        //Log.d("MotorPow", "" + getMotorPower() + " %");
+        Log.d("MotorPow", "" + getMotorPower() + " %");
 
     }
 
@@ -200,7 +200,7 @@ public class MotorController extends Thread {
         return wheelDiameterInInches;
     }
 
-    public int getTicksPerRevolution(){return (int)(motor.getMotorType().getTicksPerRev() + .5);}
+    public int getTicksPerRevolution(){return (int)ticksPerRevolution;}
 
     public void setMotorPower(double power){
         motor.setPower(power);

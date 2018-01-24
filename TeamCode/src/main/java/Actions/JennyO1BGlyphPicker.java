@@ -16,13 +16,13 @@ import MotorControllers.MotorController;
 public class JennyO1BGlyphPicker implements ActionHandler {
     MotorController wheelMotor;
     HardwareMap hardwareMap;
-    private double WHEEL_POWERS = 0.4;
+    private double WHEEL_POWERS = 0.8;
 
     public JennyO1BGlyphPicker(HardwareMap hw) throws Exception{
         hardwareMap = hw;
         wheelMotor = new MotorController("glyphMotor", "MotorConfig/DriveMotors/NewHolonomicDriveMotorConfig.json", hardwareMap);
         wheelMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        wheelMotor.setMotorDirection(DcMotorSimple.Direction.FORWARD);
+        wheelMotor.setMotorDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     public int grab(){

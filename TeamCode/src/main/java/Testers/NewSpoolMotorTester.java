@@ -36,65 +36,49 @@ import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import Actions.HardwareWrappers.NewArialDepositor;
+import Actions.ArialDepositorTest;
+import Actions.HardwareWrappers.NewSpoolMotor;
+import DriveEngine.JennyNavigation;
+
+import static Autonomous.RelicRecoveryField.BLUE_ALLIANCE_2;
+import static Autonomous.RelicRecoveryField.startLocations;
+import static DriveEngine.JennyNavigation.LONG_SLEEP_DELAY_MILLIS;
+import static DriveEngine.JennyNavigation.MED_SLEEP_DELAY_MILLIS;
 
 /*
     An opmode to test if all our drive wheels are working correctly
  */
-@TeleOp(name="Aerial Depositor Tester", group="Linear Opmode")  // @Autonomous(...) is the other common choice
+@TeleOp(name="New Spool Motor Test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
 //@Disabled
-public class AerialDepositorTester extends LinearOpMode {
+public class NewSpoolMotorTester extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
-    NewArialDepositor glyphLift;
+    NewSpoolMotor spoolMotor;
     @Override
     public void runOpMode() {
+
         try {
-            glyphLift = new NewArialDepositor(hardwareMap);
-        }
-        catch (Exception e){
-            Log.e("Error!" , "Glyph Lift: " + e.toString());
-            throw new RuntimeException("Glyph Lift Creation Error! " + e.toString());
+            spoolMotor = new NewSpoolMotor("liftMotor", "MotorConfig/FunctionMotors/AerialLiftSpool.json", 10, 10, hardwareMap);
+        } catch (Exception e){
 
         }
-
+        spoolMotor.setMotorRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
         telemetry.addData("Status", "Initialized");
         telemetry.update();
-
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
-
-        while (opModeIsActive()){
-            if(gamepad1.right_trigger > .1){
-                Log.d("Extending", "");
-                glyphLift.extend();
-            }
-            else if(gamepad1.right_bumper){
-                Log.d("Retracting", "");
-                glyphLift.retract();
-            }
-            else glyphLift.stopLift();
-
-            if(gamepad1.left_trigger > .1){
-                glyphLift.startBelt();
-            }
-            else if(gamepad1.left_bumper){
-                glyphLift.retractBelt();
-            }
-            else glyphLift.stopBelt();
-
-            telemetry.addData("Tick", glyphLift.getLiftMotorPosition());
-            telemetry.addData("Inch",glyphLift.getExtendotronHeight());
-            telemetry.addData("Right Trigger", Double.toString(gamepad1.right_trigger));
-            telemetry.addData("Right Bumber", Boolean.toString(gamepad1.right_bumper));
-
+        while (opModeIsActive()) {
+            if(gamepad1.a) {
+                spoolMotor.extend();
+            } else spoolMotor.pause();
+            telemetry.addData("Motor power", spoolMotor.getMotorPower());
+            telemetry.addData("Motor tick", spoolMotor.getCurrentTick());
             telemetry.update();
         }
-
-        glyphLift.kill();
     }
 }

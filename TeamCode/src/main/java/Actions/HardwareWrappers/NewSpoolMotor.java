@@ -33,7 +33,8 @@ public class NewSpoolMotor extends MotorController implements ActionHandler{
         super(motorName,configFileLoc,hw);
         extendSpeedInPerSecond = extendInPerSecond;
         retractSpeedInPerSecond = retractInPerSecond;
-        zeroPoint = getCurrentTick();
+//        zeroPoint = getCurrentTick();
+
     }
 
     public NewSpoolMotor(String motorName, String configFileLoc, double extendInPerSecond, double retractInPerSecond, TouchSensor limit, HardwareMap hw) throws IOException {
@@ -73,7 +74,7 @@ public class NewSpoolMotor extends MotorController implements ActionHandler{
     }
 
     public void extend(double percentOfMaxSpeed){
-        //setMotorRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        setMotorRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
         setInchesPerSecondVelocity(extendSpeedInPerSecond*percentOfMaxSpeed);
     }
 
@@ -88,7 +89,7 @@ public class NewSpoolMotor extends MotorController implements ActionHandler{
 
 
     public void retract(double percentOfMaxSpeed){
-        //setMotorRunMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        setMotorRunMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         if(shouldLimitRetraction) {
             if (!spoolLimit.isPressed())
                 setInchesPerSecondVelocity(-(retractSpeedInPerSecond * percentOfMaxSpeed));

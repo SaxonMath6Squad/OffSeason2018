@@ -37,8 +37,8 @@ public class JennySensorTelemetry implements RobotSensorTelemetry {
     private int tickLocationY = 0;
     private double startPositionX = 0;
     private double startPositionY = 0;
-    private double wheelDiameter;
-    private double ticksPerRev;
+//    private double wheelDiameter;
+//    private double ticksPerRev;
     private double ftToTicksFactor = 12;
     public static final int RAD_LIMIT = 0;
     public static final int COLOR_DISTANCE_SENSOR = 0;
@@ -56,28 +56,28 @@ public class JennySensorTelemetry implements RobotSensorTelemetry {
         startPositionY = positionY;
         colorSensors[COLOR_DISTANCE_SENSOR] = new REVColorDistanceSensorController(REVColorDistanceSensorController.type.JEWEL_SNATCH_O_MATIC, "jewelSensor", hardwareMap);
         limitSwitches[RAD_LIMIT] = hardwareMap.touchSensor.get("radLimit");
-        try {
-            reader = new JsonConfigReader(h.appContext.getAssets().open("MotorConfig/DriveMotors/NewHolonomicDriveMotorConfig.json"));
-        } catch (Exception e){
-            Log.d("Error: ", e.toString());
-        }
-        try {
-            wheelDiameter = reader.getDouble("WHEEL_DIAMETER");
-        } catch (Exception e){
-            Log.d("Error: ", e.toString());
-        }
-        try {
-            ticksPerRev = reader.getDouble("TICKS_PER_REV");
-        } catch (Exception e){
-            Log.d("Error: ", e.toString());
-        }
+//        try {
+//            reader = new JsonConfigReader(h.appContext.getAssets().open("MotorConfig/DriveMotors/NewHolonomicDriveMotorConfig.json"));
+//        } catch (Exception e){
+//            Log.d("Error: ", e.toString());
+//        }
+//        try {
+//            wheelDiameter = reader.getDouble("WHEEL_DIAMETER");
+//        } catch (Exception e){
+//            Log.d("Error: ", e.toString());
+//        }
+//        try {
+//            ticksPerRev = reader.getDouble("TICKS_PER_REV");
+//        } catch (Exception e){
+//            Log.d("Error: ", e.toString());
+//        }
     }
     @Override
     public Location getLocation() {
         Location location = new Location(0, 0);
 //        tickLocationX = robot.driveMotors[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR].getCurrentPositionInTicks();
 //        tickLocationY = robot.driveMotors[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR].getCurrentPositionInTicks();
-        location.updateXY(tickLocationX + startPositionX*ticksPerRev, tickLocationY + startPositionY*ticksPerRev);
+        //location.updateXY(tickLocationX + startPositionX*ticksPerRev, tickLocationY + startPositionY*ticksPerRev);
         return location;
     }
 

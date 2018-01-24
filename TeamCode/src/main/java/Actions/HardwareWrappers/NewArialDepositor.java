@@ -44,8 +44,10 @@ public class NewArialDepositor implements ActionHandler {
         hardwareMap = hw;
         liftMotor = new NewSpoolMotor("liftMotor","MotorConfig/FunctionMotors/AerialLiftSpool.json", FAST_EXTEND_SPEED, FAST_RETRACT_SPEED, hardwareMap);
         liftMotor.setMotorRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         belt = new NewSpoolMotor("belt", "MotorConfig/FunctionMotors/BeltMotor.json", 10, 10, hardwareMap);
         belt.setMotorRunMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        belt.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         glyphSensor = new REVColorDistanceSensorController(REVColorDistanceSensorController.type.GLYPH_STACK_O_TRON, "glyphSensor", hardwareMap);
         extendLimit = hardwareMap.touchSensor.get("extendLimit");
         TICKS_PER_REV = liftMotor.getTicksPerRevolution();
@@ -64,6 +66,7 @@ public class NewArialDepositor implements ActionHandler {
     public void slowRetract(){
         liftMotor.retract(.5);
     }
+
     public void slowExtend(){
         liftMotor.extend(.5);
     }
@@ -85,7 +88,7 @@ public class NewArialDepositor implements ActionHandler {
     }
 
     public double getExtendotronHeight(){
-        return (double) liftMotor.getInchesFromStart();
+        return liftMotor.getInchesFromStart();
     }
 
     public void goToGlyphLevel(GLYPH_PLACEMENT_LEVEL level){
