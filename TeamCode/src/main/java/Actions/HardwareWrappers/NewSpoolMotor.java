@@ -1,4 +1,4 @@
-package Actions;
+package Actions.HardwareWrappers;
 
 import android.text.method.Touch;
 
@@ -114,5 +114,10 @@ public class NewSpoolMotor extends MotorController implements ActionHandler{
     @Override
     public boolean startDoingAction(String action) {
         return false;
+    }
+
+    @Override
+    public void kill() {
+        super.killMotorController();
     }
 }

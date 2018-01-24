@@ -8,6 +8,8 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
+import Actions.HardwareWrappers.NewSpoolMotor;
+import Actions.HardwareWrappers.SpoolMotor;
 import Autonomous.REVColorDistanceSensorController;
 import MotorControllers.MotorController;
 

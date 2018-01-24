@@ -5,6 +5,8 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import Actions.HardwareWrappers.ServoHandler;
+import Actions.HardwareWrappers.SpoolMotor;
 import MotorControllers.MotorController;
 
 

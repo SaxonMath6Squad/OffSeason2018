@@ -1,6 +1,4 @@
-package Actions;
-
-import android.util.Log;
+package Actions.HardwareWrappers;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -8,8 +6,8 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
+import Actions.ActionHandler;
 import Autonomous.REVColorDistanceSensorController;
-import MotorControllers.MotorController;
 
 /**
  * Created by robotics on 12/2/17.

@@ -4,7 +4,7 @@ import android.util.Log;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import Actions.ServoHandler;
+import Actions.HardwareWrappers.ServoHandler;
 
 /**
  * Created by robotics on 1/5/18.

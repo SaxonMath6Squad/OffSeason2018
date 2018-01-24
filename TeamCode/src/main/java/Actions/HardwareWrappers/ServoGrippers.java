@@ -1,4 +1,4 @@
-package Actions;
+package Actions.HardwareWrappers;
 
 import com.qualcomm.robotcore.hardware.Servo;
 

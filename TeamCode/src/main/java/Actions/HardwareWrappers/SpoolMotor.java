@@ -1,8 +1,9 @@
-package Actions;
+package Actions.HardwareWrappers;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import Actions.ActionHandler;
 import MotorControllers.MotorController;
 
 /**
@@ -13,7 +14,7 @@ import MotorControllers.MotorController;
     A class to set up a motor that has a spool of string attached to it
     ex: our extendotron lift motor
  */
-public class SpoolMotor implements ActionHandler{
+public class SpoolMotor implements ActionHandler {
     MotorController motor;
     HardwareMap hardwareMap;
     private double extendSpeedInPerSecond = 0;
