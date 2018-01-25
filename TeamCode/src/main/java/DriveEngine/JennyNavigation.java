@@ -407,13 +407,41 @@ public class JennyNavigation extends Thread{
         applyMotorVelocities(determineMotorVelocitiesToDriveOnHeading(heading, desiredVelocity));
     }
 
-    public void turn(double rps) {
+    public void driveOnHeadingWithTurning(double heading, double driveVelocity, double turnRPS){
+        //Log.d("driveVelocity","" + driveVelocity);
+        //Log.d("heading","" + heading);
+        double [] turnVelocities =  calculateTurnVelocities(turnRPS);
+        double [] headingVelocities = determineMotorVelocitiesToDriveOnHeading(heading,driveVelocity);
+        double [] finalVelocities = new double[4];
+        for(int i = 0; i < finalVelocities.length; i ++){
+            //Log.d("headingVelocities" +i,"" + headingVelocities[i]);
+            //Log.d("TurnVelocities" + i,"" + turnVelocities[i]);
+            finalVelocities[i] = turnVelocities[i] + headingVelocities[i];
+            //Log.d("finalVelocities" + i, "" + finalVelocities[i]);
+        }
+        applyMotorVelocities(finalVelocities);
+
+    }
+    public double [] calculateTurnVelocities(double rps){
         double[] velocities = new double[4];
+        if(Double.isNaN(rps)) rps = 0;
         double velocity = rps*WHEEL_BASE_RADIUS*2.0*Math.PI;
-        velocities[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR] = velocity;
-        velocities[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR] = -velocity;
-        velocities[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR] = velocity;
-        velocities[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR] = -velocity;
+        if(Double.isNaN(velocity)){
+            velocities[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR] = 0;
+            velocities[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR] = 0;
+            velocities[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR] = 0;
+            velocities[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR] = 0;
+        }
+        else {
+            velocities[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR] = velocity;
+            velocities[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR] = -velocity;
+            velocities[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR] = velocity;
+            velocities[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR] = -velocity;
+        }
+        return velocities;
+    }
+    public void turn(double rps) {
+        double[] velocities = calculateTurnVelocities(rps);
         applyMotorVelocities(velocities);
     }
 

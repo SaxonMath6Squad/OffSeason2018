@@ -155,11 +155,13 @@ public class JennyO1B extends LinearOpMode {
         jouster.setPosition(JewelJouster.EXTENDION_MODE.NEUTRAL);
         runtime.reset();
         boolean isSlowMode = false;
-
+        double driveVelocity = 0;
+        double turnRps = 0;
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
             //DRIVE
+            /*
             if(rightJoystick.magnitude() < .1){
                 if(!isSlowMode)
                 navigation.driveOnHeading((paralaxedControl)? (leftJoystick.angle() + 90)%360:leftJoystick.angle(), leftJoystick.magnitude() * HIGH_SPEED_IN_PER_SEC);
@@ -169,6 +171,12 @@ public class JennyO1B extends LinearOpMode {
                 if(!isSlowMode) navigation.turn(rightJoystick.magnitude() * rightJoystick.x()/Math.abs(rightJoystick.x()));
                 else navigation.turn(.1 * rightJoystick.magnitude() * rightJoystick.x()/Math.abs(rightJoystick.x()));
             }
+            */
+            driveVelocity = (isSlowMode)? (SLOW_SPEED_IN_PER_SEC):HIGH_SPEED_IN_PER_SEC;
+            driveVelocity *= leftJoystick.magnitude();
+            //Log.d("DriveVelocity","" + driveVelocity);
+            turnRps = (isSlowMode)? (.1 * rightJoystick.magnitude() * rightJoystick.x()/Math.abs(rightJoystick.x())):.5 *rightJoystick.magnitude() * rightJoystick.x()/Math.abs(rightJoystick.x());
+            navigation.driveOnHeadingWithTurning((paralaxedControl)? (leftJoystick.angle() + 90)%360:leftJoystick.angle(), driveVelocity, turnRps);
             if(gamepad1.left_bumper && gamepad1.right_bumper){
                 isSlowMode = !isSlowMode;
                 while(gamepad1.left_bumper && gamepad1.right_bumper);
