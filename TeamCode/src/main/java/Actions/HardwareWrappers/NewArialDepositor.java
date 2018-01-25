@@ -33,12 +33,12 @@ public class NewArialDepositor implements ActionHandler {
 
     public enum GLYPH_PLACEMENT_LEVEL{GROUND,ROW1,ROW2,ROW3,ROW4,ROW1_AND_2,ROW3_AND_4};
     public final static double GROUND_LEVEL_PLACEMENT_HEIGHT = 0;
-    public final static double ROW1_PLACEMENT_HEIGHT = 6;
-    public final static double ROW2_PLACEMENT_HEIGHT = 12;
-    public final static double ROW3_PLACEMENT_HEIGHT = 18;
-    public final static double ROW4_PLACEMENT_HEIGHT = 24;
+    public final static double ROW1_PLACEMENT_HEIGHT = 6.7;
+    public final static double ROW2_PLACEMENT_HEIGHT = 14.8;
+    public final static double ROW3_PLACEMENT_HEIGHT = 23.3;
+    public final static double ROW4_PLACEMENT_HEIGHT = 30.7;
     public final static double ROW1_AND_2_PLACEMENT_HEIGHT = 14.5;
-    public final static double ROW3_AND_4_PLACEMENT_HEIGHT = 27;
+    public final static double ROW3_AND_4_PLACEMENT_HEIGHT = 30.5;
 
     public NewArialDepositor(HardwareMap hw) throws Exception{
         hardwareMap = hw;
@@ -155,6 +155,14 @@ public class NewArialDepositor implements ActionHandler {
 
     public void retractBelt(){
         belt.retract();
+    }
+
+    public void retractBeltSlow() {
+        belt.retract(0.2);
+    }
+
+    public void startBeltSlow() {
+        belt.extend(0.2);
     }
 
     public REVColorDistanceSensorController.color getColor() {

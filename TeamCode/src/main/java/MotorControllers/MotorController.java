@@ -229,6 +229,10 @@ public class MotorController extends Thread {
         }
     }
 
+    public double getMaxSpeed(){
+        return convertTicksToInches(maxTicksPerSecond);
+    }
+
     private void logError(String main, String sub){
         Log.d(motor.getDeviceName(), logTag + ":" + main + ":" + sub);
     }

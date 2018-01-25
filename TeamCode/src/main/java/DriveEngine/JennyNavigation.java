@@ -324,14 +324,10 @@ public class JennyNavigation extends Thread{
         double distanceTraveled = 0;
         double [] motorPositionsInches = getMotorPositionsInches();
         double [] startPositionsInches = motorPositionsInches;
-        //applyMotorVelocities(velocities);
-        //long deltaTime = 0;
-        long startTime = 0;
         double [] deltaInches;
         double averagePosition = 0;
         while(distanceTraveled < distanceInInches && mode.opModeIsActive()){
-            startTime = System.currentTimeMillis();
-            //from our motor posisition, determine location
+            //from our motor position, determine location
             correctedDriveOnHeadingIMU((int)(heading + .5),desiredVelocity,0,mode);
             motorPositionsInches = getMotorPositionsInches();
             deltaInches = new double[4];
@@ -358,20 +354,8 @@ public class JennyNavigation extends Thread{
                 averagePosition /= (double) deltaInches.length;
                 distanceTraveled = averagePosition / Math.sin(Math.toRadians(45));
             }
-
-            //mode.telemetry.addData("Distance Travelled", distanceTraveled);
-            //mode.telemetry.addData("Avg Position", averagePosition);
-            //mode.telemetry.update();
-            //long loopTime = System.currentTimeMillis() - startTime;
-            //Log.d("Loop time", Long.toString(loopTime) );
-            //deltaTime = loopTime - deltaTime;
-            //Log.d("Delta loop time", Long.toString(System.currentTimeMillis() - startTime));
-//            mode.sleep(10);
         }
         brake();
-//        for (int i = 0; i < driveMotors.length; i++) {
-//            Log.d("Inch from start", Integer.toString(i) + ": " + driveMotors[i].getInchesFromStart());
-//        }
     }
 
     long [] getMotorPositionsTicks(){
@@ -419,9 +403,55 @@ public class JennyNavigation extends Thread{
             finalVelocities[i] = turnVelocities[i] + headingVelocities[i];
             //Log.d("finalVelocities" + i, "" + finalVelocities[i]);
         }
-        applyMotorVelocities(finalVelocities);
+        //look for max and min values
+        double maxValue = finalVelocities[0];
+        double minValue = finalVelocities[0];
+        for(int i = 1; i < finalVelocities.length; i ++){
+            if(finalVelocities[i] > maxValue){
+                maxValue = finalVelocities[i];
+            }
+            else if(finalVelocities[i] < minValue){
+                minValue = finalVelocities[i];
+            }
+        }
+        //scale all motor powers to correspond with maxVelocities
+        Log.d("MotorMaxSpeed","" + driveMotors[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR].getMaxSpeed());
+        double scaleValue = 1;
+        if(Math.abs(maxValue) >= Math.abs(minValue)){
+            if(maxValue > driveMotors[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR].getMaxSpeed()){
+                scaleValue = driveMotors[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR].getMaxSpeed()/maxValue;
+            }
+        }
+        else if(Math.abs(maxValue) < Math.abs(minValue)){
+            if(Math.abs(minValue) > driveMotors[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR].getMaxSpeed()){
+                scaleValue = Math.abs(driveMotors[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR].getMaxSpeed()/maxValue);
+            }
+        }
 
+        if(scaleValue != 1){
+            for(int i = 0; i < finalVelocities.length; i ++){
+                finalVelocities[i] *= scaleValue;
+            }
+        }
+
+        applyMotorVelocities(finalVelocities);
     }
+    /*
+    public void driveOnHeadingWithTurning(double heading, double driveVelocity, double turnRPS){
+        //Log.d("driveVelocity","" + driveVelocity);
+        //Log.d("heading","" + heading);
+        double [] turnVelocities =  calculateTurnVelocities(turnRPS);
+        double [] headingVelocities = determineMotorVelocitiesToDriveOnHeading(heading,driveVelocity);
+        double [] finalVelocities = new double[4];
+        for(int i = 0; i < finalVelocities.length; i ++){
+            //Log.d("headingVelocities" +i,"" + headingVelocities[i]);
+            //Log.d("TurnVelocities" + i,"" + turnVelocities[i]);
+            finalVelocities[i] = turnVelocities[i] + headingVelocities[i];
+            //Log.d("finalVelocities" + i, "" + finalVelocities[i]);
+        }
+        applyMotorVelocities(finalVelocities);
+    }
+    */
     public double [] calculateTurnVelocities(double rps){
         double[] velocities = new double[4];
         if(Double.isNaN(rps)) rps = 0;

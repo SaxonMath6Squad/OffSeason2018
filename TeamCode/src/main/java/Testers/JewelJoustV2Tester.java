@@ -39,24 +39,23 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import Actions.HardwareWrappers.NewArialDepositor;
+import Actions.JewelJousterV2;
 
 /*
     An opmode to test if all our drive wheels are working correctly
  */
-@TeleOp(name="Aerial Depositor Tester", group="Linear Opmode")  // @Autonomous(...) is the other common choice
+@TeleOp(name="Jewel Joust V2 Tester", group="Linear Opmode")  // @Autonomous(...) is the other common choice
 //@Disabled
-public class AerialDepositorTester extends LinearOpMode {
+public class JewelJoustV2Tester extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
-    NewArialDepositor glyphLift;
-    int position = 0;
-    NewArialDepositor.GLYPH_PLACEMENT_LEVEL[] heights = new NewArialDepositor.GLYPH_PLACEMENT_LEVEL[] {NewArialDepositor.GLYPH_PLACEMENT_LEVEL.GROUND, NewArialDepositor.GLYPH_PLACEMENT_LEVEL.ROW1, NewArialDepositor.GLYPH_PLACEMENT_LEVEL.ROW2};
+    JewelJousterV2 jewelJoust;
 
     @Override
     public void runOpMode() {
         try {
-            glyphLift = new NewArialDepositor(hardwareMap);
+            jewelJoust = new JewelJousterV2("jewelJoust", "jewelJoustTurn", hardwareMap);
         }
         catch (Exception e){
             Log.e("Error!" , "Glyph Lift: " + e.toString());
@@ -72,32 +71,21 @@ public class AerialDepositorTester extends LinearOpMode {
         runtime.reset();
 
         while (opModeIsActive()){
-            if(gamepad1.right_trigger > .1){
-                position++;
-                while (gamepad1.right_trigger > .1);
+            if(gamepad1.b){
+                jewelJoust.setJoustMode(JewelJousterV2.JEWEL_JOUSTER_POSITIONS.STORE);
             }
-            else if(gamepad1.right_bumper){
-                position--;
-                while (gamepad1.right_bumper);
+            else if(gamepad1.a){
+                jewelJoust.setJoustMode(JewelJousterV2.JEWEL_JOUSTER_POSITIONS.READ);
+            }
+            else if(gamepad1.dpad_left){
+                jewelJoust.setJoustMode(JewelJousterV2.JEWEL_JOUSTER_POSITIONS.HIT_LEFT);
+            }
+            else if(gamepad1.dpad_right){
+                jewelJoust.setJoustMode(JewelJousterV2.JEWEL_JOUSTER_POSITIONS.HIT_RIGHT);
             }
 
-            if(gamepad1.left_trigger > .1){
-                glyphLift.startBelt();
-            }
-            else if(gamepad1.left_bumper){
-                glyphLift.retractBelt();
-            }
-            else glyphLift.stopBelt();
-
-            if(position > heights.length-1) position = heights.length-1;
-            else if(position <= 0) position = 0;
-            glyphLift.goToGlyphLevel(heights[position]);
-            telemetry.addData("Tick", glyphLift.getLiftMotorPosition());
-            telemetry.addData("Inch",glyphLift.getExtendotronHeight());
-            telemetry.addData("Position", position);
+            telemetry.addData("Color", jewelJoust.getJewelColor());
             telemetry.update();
         }
-
-        glyphLift.kill();
     }
 }

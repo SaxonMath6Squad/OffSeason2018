@@ -48,6 +48,7 @@ import Actions.HardwareWrappers.NewSpoolMotor;
 import Actions.JennyFlagController;
 import Actions.JennyO1BGlyphPicker;
 import Actions.JewelJouster;
+import Actions.JewelJousterV2;
 import Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor;
 import Autonomous.VuforiaHelper;
 import DriveEngine.JennyNavigation;
@@ -87,7 +88,7 @@ public class JennyO1B extends LinearOpMode {
     NewArialDepositor glyphLift;
     JennyO1BGlyphPicker glyphPicker;
     JennyO1BRAD RAD;
-    JewelJouster jouster;
+    JewelJousterV2 jouster;
     JennySensorTelemetry sensorTelemetry;
     JennyFlagController flagController;
     boolean autoLiftPositionMode = false;
@@ -129,7 +130,7 @@ public class JennyO1B extends LinearOpMode {
             throw new RuntimeException("RAD Creation Error! " + e.toString());
         }
         try{
-            jouster = new JewelJouster("jewelJouster",hardwareMap);
+            jouster = new JewelJousterV2("jewelJoust", "jewelJoustTurn", hardwareMap);
         } catch (Exception e){
             Log.e("Error!", "Jenny JewelJouster: " + e.toString());
             throw new RuntimeException("Jenny JewelJouster! " + e.toString());
@@ -147,12 +148,11 @@ public class JennyO1B extends LinearOpMode {
         cameraPIDController = new PIDController(10.0/DESIRED_WIDTH,0,0);
         vuforia = new VuforiaHelper();
         cryptoBoxFinder = new CryptoBoxColumnImageProcessor(DESIRED_HEIGHT, DESIRED_WIDTH, CLOSE_UP_MIN_PERCENT_COLUMN_CHECK, CLOSE_UP_MIN_COLUMN_WIDTH, CryptoBoxColumnImageProcessor.CRYPTOBOX_COLOR.BLUE);
+        jouster.setJoustMode(JewelJousterV2.JEWEL_JOUSTER_POSITIONS.STORE);
         telemetry.addData("Status", "Initialized");
         telemetry.update();
-        jouster.setPosition(JewelJouster.EXTENDION_MODE.STORE);
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
-        jouster.setPosition(JewelJouster.EXTENDION_MODE.NEUTRAL);
         runtime.reset();
         boolean isSlowMode = false;
         double driveVelocity = 0;
@@ -175,7 +175,7 @@ public class JennyO1B extends LinearOpMode {
             driveVelocity = (isSlowMode)? (SLOW_SPEED_IN_PER_SEC):HIGH_SPEED_IN_PER_SEC;
             driveVelocity *= leftJoystick.magnitude();
             //Log.d("DriveVelocity","" + driveVelocity);
-            turnRps = (isSlowMode)? (.1 * rightJoystick.magnitude() * rightJoystick.x()/Math.abs(rightJoystick.x())):.5 *rightJoystick.magnitude() * rightJoystick.x()/Math.abs(rightJoystick.x());
+            turnRps = (isSlowMode)? (.05 * rightJoystick.magnitude() * rightJoystick.x()/Math.abs(rightJoystick.x())):.25 *rightJoystick.magnitude() * rightJoystick.x()/Math.abs(rightJoystick.x());
             navigation.driveOnHeadingWithTurning((paralaxedControl)? (leftJoystick.angle() + 90)%360:leftJoystick.angle(), driveVelocity, turnRps);
             if(gamepad1.left_bumper && gamepad1.right_bumper){
                 isSlowMode = !isSlowMode;
@@ -259,12 +259,12 @@ public class JennyO1B extends LinearOpMode {
 
             //GLYPH ROLLER
             if(!glyphLift.isPressed()) {
-                if (gamepad1.left_trigger > 0.1) glyphLift.startBelt();
-                else if (gamepad1.left_bumper && !gamepad1.right_bumper) glyphLift.retractBelt();
+                if (gamepad1.left_trigger > 0.1) glyphLift.startBeltSlow();
+                else if (gamepad1.left_bumper && !gamepad1.right_bumper) glyphLift.retractBeltSlow();
                 else if (gamepad2.left_trigger > 0.1 && gamepad1.right_trigger < 0.1 && gamepad1.left_trigger < 0.1 && !gamepad1.right_bumper && !gamepad1.left_bumper)
-                    glyphLift.startBelt();
+                    glyphLift.startBeltSlow();
                 else if (gamepad2.left_bumper && gamepad1.right_trigger < 0.1 && gamepad1.left_trigger < 0.1 && !gamepad1.right_bumper && !gamepad1.left_bumper)
-                    glyphLift.retractBelt();
+                    glyphLift.retractBeltSlow();
                 else
                     glyphLift.stopBelt();
             } else {
@@ -346,7 +346,7 @@ public class JennyO1B extends LinearOpMode {
                 while (gamepad2.start);
             }
 
-            jouster.setPosition(JewelJouster.EXTENDION_MODE.NEUTRAL);
+            jouster.setJoustMode(JewelJousterV2.JEWEL_JOUSTER_POSITIONS.STORE);
             telemetry.addData("lift tick", glyphLift.getLiftMotorPosition());
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.update();
