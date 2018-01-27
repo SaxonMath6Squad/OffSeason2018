@@ -55,7 +55,7 @@ public class JewelJoustV2Tester extends LinearOpMode {
     @Override
     public void runOpMode() {
         try {
-            jewelJoust = new JewelJousterV2("jewelJoust", "jewelJoustTurn", hardwareMap);
+            jewelJoust = new JewelJousterV2("jewelJoust", "jewelJoustTurn", this, hardwareMap);
         }
         catch (Exception e){
             Log.e("Error!" , "Glyph Lift: " + e.toString());

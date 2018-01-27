@@ -49,10 +49,20 @@ public class VuforiaHelper {
         }
     }
 
+    public  void kill(){
+        //Vuforia.deinit();
+        //vuLoc.
+    }
+
     public void loadCipherAssets(){
         relicTrackables = vuLoc.loadTrackablesFromAsset("RelicVuMark");
         relicTemplate = relicTrackables.get(0);
         relicTrackables.activate();
+    }
+
+
+    public void threadVuMarkFinder(){
+
     }
 
     public RelicRecoveryVuMark getMark(){

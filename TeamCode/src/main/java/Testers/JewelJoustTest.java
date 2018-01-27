@@ -41,6 +41,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import Actions.JewelJousterV2;
 import Autonomous.REVColorDistanceSensorController;
 
+import static DriveEngine.JennyNavigation.LONG_SLEEP_DELAY_MILLIS;
+import static DriveEngine.JennyNavigation.MED_SLEEP_DELAY_MILLIS;
+
 /*
     An opmode to test if all our drive wheels are working correctly
  */
@@ -55,7 +58,7 @@ public class JewelJoustTest extends LinearOpMode {
     @Override
     public void runOpMode() {
         try {
-            jewelJoust = new JewelJousterV2("jewelJoust", "jewelJoustTurn", hardwareMap);
+            jewelJoust = new JewelJousterV2("jewelJoust", "jewelJoustTurn", this, hardwareMap);
         }
         catch (Exception e){
             Log.e("Error!" , "Glyph Lift: " + e.toString());
@@ -70,12 +73,26 @@ public class JewelJoustTest extends LinearOpMode {
         waitForStart();
         runtime.reset();
         jewelJoust.setJoustMode(JewelJousterV2.JEWEL_JOUSTER_POSITIONS.READ);
-        if(jewelJoust.getJewelColor() == REVColorDistanceSensorController.color.BLUE){
-            jewelJoust.setJoustMode(JewelJousterV2.JEWEL_JOUSTER_POSITIONS.HIT_RIGHT);
+        sleep(2*LONG_SLEEP_DELAY_MILLIS);
+        REVColorDistanceSensorController.color readColor = jewelJoust.getJewelColor();
+        while(readColor == REVColorDistanceSensorController.color.UNKNOWN || readColor == REVColorDistanceSensorController.color.NOT_IN_RANGE && opModeIsActive()){
+            sleep(100);
+            readColor = jewelJoust.getJewelColor();
+            telemetry.addData("Color", readColor);
+            telemetry.update();
         }
-        else if(jewelJoust.getJewelColor() == REVColorDistanceSensorController.color.RED){
-            jewelJoust.setJoustMode(JewelJousterV2.JEWEL_JOUSTER_POSITIONS.HIT_LEFT);
+        if(opModeIsActive()) {
+            if (readColor == REVColorDistanceSensorController.color.BLUE) {
+                jewelJoust.setJoustMode(JewelJousterV2.JEWEL_JOUSTER_POSITIONS.HIT_RIGHT);
+                telemetry.addData("HIT RIGHT", "");
+            } else if (readColor == REVColorDistanceSensorController.color.RED) {
+                jewelJoust.setJoustMode(JewelJousterV2.JEWEL_JOUSTER_POSITIONS.HIT_LEFT);
+                telemetry.addData("HIT LEFT", "");
+            }
+            telemetry.addData("Color", readColor);
+            telemetry.update();
         }
-
+        while (opModeIsActive());
+        jewelJoust.kill();
     }
 }

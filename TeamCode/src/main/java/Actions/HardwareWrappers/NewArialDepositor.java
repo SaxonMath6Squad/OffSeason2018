@@ -19,11 +19,13 @@ import Autonomous.REVColorDistanceSensorController;
 public class NewArialDepositor implements ActionHandler {
     NewSpoolMotor liftMotor;
     NewSpoolMotor belt;
-    REVColorDistanceSensorController glyphSensor;
+    REVColorDistanceSensorController glyphSensor[] = new REVColorDistanceSensorController[2];
     TouchSensor extendLimit;
     HardwareMap hardwareMap;
     long liftPositionOffsetTicks = 0;
-    private final static double FAST_RETRACT_SPEED = 10.0;
+    public final static int FRONT_GLYPH_SENSOR = 0;
+    public final static int REAR_GLYPH_SENSOR = 1;
+    private final static double FAST_RETRACT_SPEED = 20.0;
     private final static double FAST_EXTEND_SPEED = 15.0;
     private final static double SLOW_RETRACT_SPEED = 1.0;
     private final static double SLOW_EXTEND_SPEED = 5.0;
@@ -33,7 +35,7 @@ public class NewArialDepositor implements ActionHandler {
 
     public enum GLYPH_PLACEMENT_LEVEL{GROUND,ROW1,ROW2,ROW3,ROW4,ROW1_AND_2,ROW3_AND_4};
     public final static double GROUND_LEVEL_PLACEMENT_HEIGHT = 0;
-    public final static double ROW1_PLACEMENT_HEIGHT = 6.7;
+    public final static double ROW1_PLACEMENT_HEIGHT = 10.0;
     public final static double ROW2_PLACEMENT_HEIGHT = 14.8;
     public final static double ROW3_PLACEMENT_HEIGHT = 23.3;
     public final static double ROW4_PLACEMENT_HEIGHT = 30.7;
@@ -48,7 +50,8 @@ public class NewArialDepositor implements ActionHandler {
         belt = new NewSpoolMotor("belt", "MotorConfig/FunctionMotors/BeltMotor.json", 10, 10, hardwareMap);
         belt.setMotorRunMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         belt.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        glyphSensor = new REVColorDistanceSensorController(REVColorDistanceSensorController.type.GLYPH_STACK_O_TRON, "glyphSensor", hardwareMap);
+        glyphSensor[FRONT_GLYPH_SENSOR] = new REVColorDistanceSensorController(REVColorDistanceSensorController.type.GLYPH_STACK_O_TRON, "frontGlyphSensor", hardwareMap);
+        glyphSensor[REAR_GLYPH_SENSOR] = new REVColorDistanceSensorController(REVColorDistanceSensorController.type.GLYPH_STACK_O_TRON, "rearGlyphSensor", hardwareMap);
         extendLimit = hardwareMap.touchSensor.get("extendLimit");
         TICKS_PER_REV = liftMotor.getTicksPerRevolution();
         EXTENDOTRON_SPOOL_DIAMETER_INCHES = liftMotor.getWheelDiameterInInches();
@@ -172,19 +175,19 @@ public class NewArialDepositor implements ActionHandler {
     }
 
     public void retractBeltSlow() {
-        belt.retract(0.2);
+        belt.retract(0.4);
     }
 
     public void startBeltSlow() {
-        belt.extend(0.2);
+        belt.extend(0.4);
     }
 
-    public REVColorDistanceSensorController.color getColor() {
-        return glyphSensor.getColor();
+    public REVColorDistanceSensorController.color getColor(int sensor) {
+        return glyphSensor[sensor].getColor();
     }
 
-    public double getDistance(DistanceUnit unit){
-        return glyphSensor.getDistance(unit);
+    public double getDistance(int sensor, DistanceUnit unit){
+        return glyphSensor[sensor].getDistance(unit);
     }
 
     public boolean isPressed(){

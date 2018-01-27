@@ -415,7 +415,7 @@ public class JennyNavigation extends Thread{
             }
         }
         //scale all motor powers to correspond with maxVelocities
-        Log.d("MotorMaxSpeed","" + driveMotors[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR].getMaxSpeed());
+        //Log.d("MotorMaxSpeed","" + driveMotors[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR].getMaxSpeed());
         double scaleValue = 1;
         if(Math.abs(maxValue) >= Math.abs(minValue)){
             if(maxValue > driveMotors[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR].getMaxSpeed()){

@@ -41,6 +41,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import java.sql.SQLSyntaxErrorException;
 import java.util.ArrayList;
 
 import Actions.ArialDepositor;
@@ -135,7 +136,7 @@ public class JennyO1B extends LinearOpMode {
             throw new RuntimeException("RAD Creation Error! " + e.toString());
         }
         try{
-            jouster = new JewelJousterV2("jewelJoust", "jewelJoustTurn", hardwareMap);
+            jouster = new JewelJousterV2("jewelJoust", "jewelJoustTurn", this, hardwareMap);
         } catch (Exception e){
             Log.e("Error!", "Jenny JewelJouster: " + e.toString());
             throw new RuntimeException("Jenny JewelJouster! " + e.toString());
@@ -172,20 +173,14 @@ public class JennyO1B extends LinearOpMode {
         double driveVelocity = 0;
         double turnRps = 0;
         // run until the end of the match (driver presses STOP)
-        while (opModeIsActive()) {
+        long loopStartTime = 0;
 
-            //DRIVE
-            /*
-            if(rightJoystick.magnitude() < .1){
-                if(!isSlowMode)
-                navigation.driveOnHeading((paralaxedControl)? (leftJoystick.angle() + 90)%360:leftJoystick.angle(), leftJoystick.magnitude() * HIGH_SPEED_IN_PER_SEC);
-                else navigation.driveOnHeading((paralaxedControl)? (leftJoystick.angle() + 90)%360:leftJoystick.angle(), leftJoystick.magnitude() * SLOW_SPEED_IN_PER_SEC);
-            }
-            else {
-                if(!isSlowMode) navigation.turn(rightJoystick.magnitude() * rightJoystick.x()/Math.abs(rightJoystick.x()));
-                else navigation.turn(.1 * rightJoystick.magnitude() * rightJoystick.x()/Math.abs(rightJoystick.x()));
-            }
-            */
+
+
+        while (opModeIsActive()) {
+            loopStartTime = System.currentTimeMillis();
+
+
             driveVelocity = (isSlowMode)? (SLOW_SPEED_IN_PER_SEC):HIGH_SPEED_IN_PER_SEC;
             driveVelocity *= leftJoystick.magnitude();
             //Log.d("DriveVelocity","" + driveVelocity);
@@ -204,6 +199,7 @@ public class JennyO1B extends LinearOpMode {
             else glyphPicker.pause();
 
             //GLYPH LIFT
+            long glyphLiftStart = System.currentTimeMillis();
             if (!autoLiftPositionMode) {
                 if (gamepad1.right_trigger > 0.1) {
                     if(!isSlowMode){
@@ -276,7 +272,7 @@ public class JennyO1B extends LinearOpMode {
                 autoLiftPositionMode = !autoLiftPositionMode;
                 while (gamepad2.x && gamepad2.y);
             }
-
+            telemetry.addData("Glyph Lift Time", "" + (System.currentTimeMillis() - glyphLiftStart));
             //GLYPH ROLLER
 
 
@@ -335,6 +331,7 @@ public class JennyO1B extends LinearOpMode {
             if(gamepad1.left_stick_button){
                 navigation.setOrientationOffset(360 - navigation.getOrientation());
             }
+
             if(gamepad1.x){
                 curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
                 coloredColumns = cryptoBoxFinder.findColumns(curImage, false);
@@ -370,10 +367,14 @@ public class JennyO1B extends LinearOpMode {
                 while (gamepad2.start);
             }
 
-            jouster.setJoustMode(JewelJousterV2.JEWEL_JOUSTER_POSITIONS.STORE);
+            //jouster.setJoustMode(JewelJousterV2.JEWEL_JOUSTER_POSITIONS.STORE);
             telemetry.addData("lift tick", glyphLift.getLiftMotorPosition());
             telemetry.addData("Belt power", glyphLift.getBeltPower());
             telemetry.addData("Status", "Run Time: " + runtime.toString());
+
+
+
+            telemetry.addData("Time for Loop","" + (System.currentTimeMillis() - loopStartTime));
             telemetry.update();
         }
         navigation.stopNavigation();

@@ -81,12 +81,12 @@ public class REVColorDistanceSensorController {
     }
     public boolean grey(){
         boolean grey = false;
-        if(hsvValues[1] < 0.23) grey = true;
+        if(hsvValues[0] > 60) grey = true;
         return grey;
     }
     public boolean brown(){
         boolean brown = false;
-        if(hsvValues[1] > 0.27) brown = true;
+        if(hsvValues[0] > 20 && hsvValues[0] < 60) brown = true;
         return brown;
     }
     public double getDistance(DistanceUnit unit){
