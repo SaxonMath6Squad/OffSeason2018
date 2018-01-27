@@ -74,7 +74,6 @@ public class NewSpoolMotor extends MotorController implements ActionHandler{
     }
 
     public void extend(double percentOfMaxSpeed){
-        setMotorRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
         setInchesPerSecondVelocity(extendSpeedInPerSecond*percentOfMaxSpeed);
     }
 

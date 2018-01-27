@@ -51,7 +51,7 @@ public class AerialDepositorTester extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
     NewArialDepositor glyphLift;
     int position = 0;
-    NewArialDepositor.GLYPH_PLACEMENT_LEVEL[] heights = new NewArialDepositor.GLYPH_PLACEMENT_LEVEL[] {NewArialDepositor.GLYPH_PLACEMENT_LEVEL.GROUND, NewArialDepositor.GLYPH_PLACEMENT_LEVEL.ROW1, NewArialDepositor.GLYPH_PLACEMENT_LEVEL.ROW2};
+    NewArialDepositor.GLYPH_PLACEMENT_LEVEL[] heights = new NewArialDepositor.GLYPH_PLACEMENT_LEVEL[] {NewArialDepositor.GLYPH_PLACEMENT_LEVEL.GROUND, NewArialDepositor.GLYPH_PLACEMENT_LEVEL.ROW1, NewArialDepositor.GLYPH_PLACEMENT_LEVEL.ROW2, NewArialDepositor.GLYPH_PLACEMENT_LEVEL.ROW3, NewArialDepositor.GLYPH_PLACEMENT_LEVEL.ROW4};
 
     @Override
     public void runOpMode() {

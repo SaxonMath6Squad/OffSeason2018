@@ -289,21 +289,21 @@ public class JennyNavigation extends Thread{
             velocities[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR] += deltaVelocity;
         }
 
-        else if(distanceFromHeading >45 && distanceFromHeading <= 135){
+        else if(distanceFromHeading > 45 && distanceFromHeading <= 135){
             velocities[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR] -= deltaVelocity;
             velocities[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR] += deltaVelocity;
             velocities[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR] -= deltaVelocity;
             velocities[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR] += deltaVelocity;
         }
 
-        else if(distanceFromHeading >135 && distanceFromHeading <= 225){
+        else if(distanceFromHeading > 135 && distanceFromHeading <= 225){
             velocities[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR] -= deltaVelocity;
             velocities[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR] += deltaVelocity;
             velocities[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR] -= deltaVelocity;
             velocities[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR] += deltaVelocity;
         }
 
-        else if(distanceFromHeading >225 && distanceFromHeading <= 315){
+        else if(distanceFromHeading > 225 && distanceFromHeading <= 315){
             velocities[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR] -= deltaVelocity;
             velocities[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR] += deltaVelocity;
             velocities[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR] -= deltaVelocity;

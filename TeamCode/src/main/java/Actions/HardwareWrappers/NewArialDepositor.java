@@ -52,10 +52,15 @@ public class NewArialDepositor implements ActionHandler {
         extendLimit = hardwareMap.touchSensor.get("extendLimit");
         TICKS_PER_REV = liftMotor.getTicksPerRevolution();
         EXTENDOTRON_SPOOL_DIAMETER_INCHES = liftMotor.getWheelDiameterInInches();
-//        zeroBedHeight();
+        zeroBedHeight();
+    }
+
+    public void setLiftRunMode(DcMotor.RunMode mode){
+        liftMotor.setMotorRunMode(mode);
     }
 
     public void extend(){
+        liftMotor.setMotorRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
         liftMotor.extend();
     }
 
@@ -68,11 +73,12 @@ public class NewArialDepositor implements ActionHandler {
     }
 
     public void slowExtend(){
+        liftMotor.setMotorRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
         liftMotor.extend(.5);
     }
 
     public void stopLift(){
-        liftMotor.holdPosition();
+        liftMotor.brake();
     }
 
     public void goToLiftPosition(double positionInInches){
@@ -117,9 +123,13 @@ public class NewArialDepositor implements ActionHandler {
         }
     }
 
-//    public void setLiftPositionOffsetTicks(long offset){
-//        liftPositionOffsetTicks = offset;
-//    }
+    private void zeroBedHeight(){
+        while (!isPressed()){
+            liftMotor.retract(0.1);
+        }
+        liftMotor.brake();
+        liftMotor.setMotorRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    }
 
     public void setLiftPower(double power){
         liftMotor.setMotorPower(power);
@@ -131,6 +141,10 @@ public class NewArialDepositor implements ActionHandler {
 
     public void setBeltDirection(DcMotor.Direction dir){
         belt.setMotorDirection(dir);
+    }
+
+    public double getBeltPower(){
+        return belt.getMotorPower();
     }
 
 //    public void setBeltPower(double power){

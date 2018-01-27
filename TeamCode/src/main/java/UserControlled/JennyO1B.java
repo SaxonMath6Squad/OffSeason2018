@@ -36,7 +36,9 @@ import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import java.util.ArrayList;
@@ -55,6 +57,7 @@ import DriveEngine.JennyNavigation;
 import MotorControllers.PIDController;
 import SensorHandlers.JennySensorTelemetry;
 import Actions.JennyO1BRAD;
+import Testers.MotorStopperTest;
 
 import static Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor.CLOSE_UP_MIN_COLUMN_WIDTH;
 import static Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor.CLOSE_UP_MIN_PERCENT_COLUMN_CHECK;
@@ -94,6 +97,8 @@ public class JennyO1B extends LinearOpMode {
     boolean autoLiftPositionMode = false;
     boolean paralaxedControl = false;
     boolean flagOn = false;
+    boolean ready = false;
+    CryptoBoxColumnImageProcessor.CRYPTOBOX_COLOR color = CryptoBoxColumnImageProcessor.CRYPTOBOX_COLOR.BLUE;
     NewArialDepositor.GLYPH_PLACEMENT_LEVEL[] liftPosition = new NewArialDepositor.GLYPH_PLACEMENT_LEVEL[]{NewArialDepositor.GLYPH_PLACEMENT_LEVEL.GROUND, NewArialDepositor.GLYPH_PLACEMENT_LEVEL.ROW1_AND_2, NewArialDepositor.GLYPH_PLACEMENT_LEVEL.ROW3_AND_4};
 
     int position = 0;
@@ -101,7 +106,7 @@ public class JennyO1B extends LinearOpMode {
     VuforiaHelper vuforia;
     CryptoBoxColumnImageProcessor cryptoBoxFinder;
 
-    int CRYPTO_COLUMN_TARGET_POSITION = 67;
+    int CRYPTO_COLUMN_TARGET_POSITION = 70;
     Bitmap curImage = null;
     ArrayList<Integer> coloredColumns;
 
@@ -145,10 +150,19 @@ public class JennyO1B extends LinearOpMode {
         flagController = new JennyFlagController(hardwareMap);
         leftJoystick = new JoystickHandler(gamepad1,JoystickHandler.LEFT_JOYSTICK);
         rightJoystick = new JoystickHandler(gamepad1,JoystickHandler.RIGHT_JOYSTICK);
-        cameraPIDController = new PIDController(10.0/DESIRED_WIDTH,0,0);
+        cameraPIDController = new PIDController(5.0/DESIRED_WIDTH,0,0);
         vuforia = new VuforiaHelper();
-        cryptoBoxFinder = new CryptoBoxColumnImageProcessor(DESIRED_HEIGHT, DESIRED_WIDTH, CLOSE_UP_MIN_PERCENT_COLUMN_CHECK, CLOSE_UP_MIN_COLUMN_WIDTH, CryptoBoxColumnImageProcessor.CRYPTOBOX_COLOR.BLUE);
         jouster.setJoustMode(JewelJousterV2.JEWEL_JOUSTER_POSITIONS.STORE);
+        while (!opModeIsActive()) {
+            if (gamepad1.start) {
+                if(color == CryptoBoxColumnImageProcessor.CRYPTOBOX_COLOR.BLUE) color = CryptoBoxColumnImageProcessor.CRYPTOBOX_COLOR.RED;
+                else color = CryptoBoxColumnImageProcessor.CRYPTOBOX_COLOR.BLUE;
+                while (gamepad1.start) ;
+            }
+            telemetry.addData("Color", color);
+            telemetry.update();
+        }
+        cryptoBoxFinder = new CryptoBoxColumnImageProcessor(DESIRED_HEIGHT, DESIRED_WIDTH, CLOSE_UP_MIN_PERCENT_COLUMN_CHECK, CLOSE_UP_MIN_COLUMN_WIDTH, color);
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         // Wait for the game to start (driver presses PLAY)
@@ -250,15 +264,26 @@ public class JennyO1B extends LinearOpMode {
 
                 if (position <= 0) position = 0;
                 if (position >= liftPosition.length - 1) position = liftPosition.length - 1;
-                glyphLift.goToGlyphLevel(liftPosition[position]);
+                if(position == 0) {
+                    while (opModeIsActive() && !glyphLift.isPressed() && !gamepad1.dpad_up && !gamepad1.a && !gamepad1.b) {
+                        glyphLift.slowRetract();
+                    }
+                    glyphLift.stopLift();
+                    glyphLift.setLiftRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                } else glyphLift.goToGlyphLevel(liftPosition[position]);
             }
-            if(gamepad2.back) {
+            if(gamepad2.x && gamepad2.y) {
                 autoLiftPositionMode = !autoLiftPositionMode;
-                while (gamepad1.back || gamepad2.back);
+                while (gamepad2.x && gamepad2.y);
             }
 
             //GLYPH ROLLER
+
+
             if(!glyphLift.isPressed()) {
+
+                //if(gamepad1.left_bumper)
+
                 if (gamepad1.left_trigger > 0.1) glyphLift.startBeltSlow();
                 else if (gamepad1.left_bumper && !gamepad1.right_bumper) glyphLift.retractBeltSlow();
                 else if (gamepad2.left_trigger > 0.1 && gamepad1.right_trigger < 0.1 && gamepad1.left_trigger < 0.1 && !gamepad1.right_bumper && !gamepad1.left_bumper)
@@ -299,7 +324,6 @@ public class JennyO1B extends LinearOpMode {
             else {
                 RAD.stopRelic();
             }
-
             //MISC
             if(gamepad1.back){
                 paralaxedControl = !paralaxedControl;
@@ -320,7 +344,7 @@ public class JennyO1B extends LinearOpMode {
                 }
             }
             if(gamepad1.dpad_left){
-                navigation.driveDistance(CRYPTOBOX_SCORING_COLUMN_WIDTHS_INCHES, WEST, SLOW_SPEED_IN_PER_SEC, this);
+                navigation.driveDistance(CRYPTOBOX_SCORING_COLUMN_WIDTHS_INCHES/1.5, WEST, SLOW_SPEED_IN_PER_SEC, this);
                 sleep(DEFAULT_SLEEP_DELAY_MILLIS);
                 curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
                 coloredColumns = cryptoBoxFinder.findColumns(curImage, false);
@@ -330,7 +354,7 @@ public class JennyO1B extends LinearOpMode {
                 }
             }
             else if(gamepad1.dpad_right){
-                navigation.driveDistance(CRYPTOBOX_SCORING_COLUMN_WIDTHS_INCHES, EAST, SLOW_SPEED_IN_PER_SEC, this);
+                navigation.driveDistance(CRYPTOBOX_SCORING_COLUMN_WIDTHS_INCHES/1.5, EAST, SLOW_SPEED_IN_PER_SEC, this);
                 sleep(DEFAULT_SLEEP_DELAY_MILLIS);
                 curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
                 coloredColumns = cryptoBoxFinder.findColumns(curImage, false);
@@ -348,6 +372,7 @@ public class JennyO1B extends LinearOpMode {
 
             jouster.setJoustMode(JewelJousterV2.JEWEL_JOUSTER_POSITIONS.STORE);
             telemetry.addData("lift tick", glyphLift.getLiftMotorPosition());
+            telemetry.addData("Belt power", glyphLift.getBeltPower());
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.update();
         }
