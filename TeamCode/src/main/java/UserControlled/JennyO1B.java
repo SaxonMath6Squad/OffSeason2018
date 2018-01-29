@@ -199,6 +199,39 @@ public class JennyO1B extends LinearOpMode {
             else glyphPicker.pause();
 
             //GLYPH LIFT
+
+            //GLYPH LIFT
+            long glyphLiftStart = System.currentTimeMillis();
+            if (!autoLiftPositionMode) {
+                if (gamepad1.right_trigger > 0.1 || (gamepad2.right_trigger > .1 && gamepad1.right_trigger < .1 && !gamepad1.right_bumper)) {
+                    glyphLift.extend();
+                }
+                else if (gamepad1.right_bumper || (gamepad2.right_bumper && !gamepad1.right_bumper) && !glyphLift.isPressed()){
+                    glyphLift.retract();
+                }
+                else
+                    glyphLift.setLiftPower(0);
+            } else {
+                if (gamepad1.right_trigger > 0.1 || (gamepad2.right_trigger > .1 && gamepad1.right_trigger < .1)) {
+                    position++;
+                    while (gamepad1.right_trigger > 0.1 || (gamepad2.right_trigger > .1 && gamepad1.right_trigger < .1)) ;
+                }
+                else if (gamepad1.right_bumper || (gamepad2.right_bumper && !gamepad1.right_bumper) && !glyphLift.isPressed()) {
+                    position--;
+                    while (gamepad1.right_bumper || (gamepad2.right_bumper && !gamepad1.right_bumper) && !glyphLift.isPressed()) ;
+                }
+
+                if (position <= 0) position = 0;
+                if (position >= liftPosition.length - 1) position = liftPosition.length - 1;
+                if(position == 0) {
+                    while (opModeIsActive() && !glyphLift.isPressed() && !gamepad1.dpad_up && !gamepad1.a && !gamepad1.b) {
+                        glyphLift.slowRetract();
+                    }
+                    glyphLift.stopLift();
+                    glyphLift.setLiftRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                } else glyphLift.goToGlyphLevel(liftPosition[position]);
+            }
+            /*
             long glyphLiftStart = System.currentTimeMillis();
             if (!autoLiftPositionMode) {
                 if (gamepad1.right_trigger > 0.1) {
@@ -268,6 +301,7 @@ public class JennyO1B extends LinearOpMode {
                     glyphLift.setLiftRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 } else glyphLift.goToGlyphLevel(liftPosition[position]);
             }
+            */
             if(gamepad2.x && gamepad2.y) {
                 autoLiftPositionMode = !autoLiftPositionMode;
                 while (gamepad2.x && gamepad2.y);

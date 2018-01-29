@@ -424,7 +424,7 @@ public class JennyNavigation extends Thread{
         }
         else if(Math.abs(maxValue) < Math.abs(minValue)){
             if(Math.abs(minValue) > driveMotors[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR].getMaxSpeed()){
-                scaleValue = Math.abs(driveMotors[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR].getMaxSpeed()/maxValue);
+                scaleValue = Math.abs(driveMotors[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR].getMaxSpeed()/Math.abs(minValue));
             }
         }
 
@@ -452,6 +452,8 @@ public class JennyNavigation extends Thread{
         applyMotorVelocities(finalVelocities);
     }
     */
+    //public doube
+
     public double [] calculateTurnVelocities(double rps){
         double[] velocities = new double[4];
         if(Double.isNaN(rps)) rps = 0;
