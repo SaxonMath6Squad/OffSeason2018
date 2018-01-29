@@ -47,21 +47,25 @@ import Actions.HardwareWrappers.NewArialDepositor;
 import Actions.JewelJousterV2;
 import Autonomous.ImageAlignmentHelper;
 import Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor;
+import Autonomous.REVColorDistanceSensorController;
 import Autonomous.VuforiaHelper;
 import DriveEngine.JennyNavigation;
-import MotorControllers.PIDController;
 import SensorHandlers.JennySensorTelemetry;
 
 import static Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor.CLOSE_UP_MIN_COLUMN_WIDTH;
 import static Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor.CLOSE_UP_MIN_PERCENT_COLUMN_CHECK;
 import static Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor.DESIRED_HEIGHT;
 import static Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor.DESIRED_WIDTH;
+import static Autonomous.REVColorDistanceSensorController.color.BLUE;
+import static Autonomous.REVColorDistanceSensorController.color.RED;
 import static Autonomous.RelicRecoveryField.BLUE_ALLIANCE_2;
 import static Autonomous.RelicRecoveryField.RED_ALLIANCE_2;
 import static Autonomous.RelicRecoveryField.startLocations;
 import static DriveEngine.JennyNavigation.ADJUSTING_SPEED_IN_PER_SEC;
+import static DriveEngine.JennyNavigation.DEFAULT_DELAY_MILLIS;
 import static DriveEngine.JennyNavigation.DEFAULT_SLEEP_DELAY_MILLIS;
 import static DriveEngine.JennyNavigation.EAST;
+import static DriveEngine.JennyNavigation.MED_SLEEP_DELAY_MILLIS;
 import static DriveEngine.JennyNavigation.MED_SPEED_IN_PER_SEC;
 import static DriveEngine.JennyNavigation.NORTH;
 import static DriveEngine.JennyNavigation.SLOW_SPEED_IN_PER_SEC;
@@ -71,7 +75,7 @@ import static DriveEngine.JennyNavigation.WEST;
 /*
     An opmode to test knocking off the correct jewel
  */
-@Autonomous(name="Red Team 2 Glyph Test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
+@Autonomous(name="Blue Team 2 Glyph Test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
 //@Disabled
 public class BlueTeam2GlyphAutonomousNewCenterTest extends LinearOpMode {
 
@@ -85,13 +89,13 @@ public class BlueTeam2GlyphAutonomousNewCenterTest extends LinearOpMode {
     RelicRecoveryVuMark mark;
     CryptoBoxColumnImageProcessor cryptoBoxFinder;
     ImageAlignmentHelper cryptoBoxAligner;
-    PIDController cameraPIDController;
-
-    int CRYPTO_COLUMN_TARGET_POSITION = 67;
     //ImuHandler imuHandler;
     @Override
     public void runOpMode() {
         //imuHandler = new ImuHandler("imu", hardwareMap);
+        REVColorDistanceSensorController.color jewelColor;
+        int blueCount = 0;
+        int redCount = 0;
         try {
             navigation = new JennyNavigation(hardwareMap, startLocations[BLUE_ALLIANCE_2], WEST, "RobotConfig/JennyV2.json");
             glyphSystem = new NewArialDepositor(hardwareMap);
@@ -114,34 +118,37 @@ public class BlueTeam2GlyphAutonomousNewCenterTest extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
-//        jewelJouster.setJoustMode(JewelJousterV2.JEWEL_JOUSTER_POSITIONS.READ);
-//        sleep(LONG_SLEEP_DELAY_MILLIS);
-//        REVColorDistanceSensorController.color jewelColor = jewelJouster.getJewelColor();
-//        if(jewelColor != UNKNOWN && jewelColor != NOT_IN_RANGE){
-//            if(jewelColor == RED){
-//                jewelJouster.setJoustMode(JewelJousterV2.JEWEL_JOUSTER_POSITIONS.HIT_LEFT);
-//                telemetry.addData("Jewel Color","RED");
-//            }
-//            else {
-//                //navigation.driveDistance(2, NORTH, ADJUSTING_SPEED_IN_PER_SEC, this);
-//                jewelJouster.setJoustMode(JewelJousterV2.JEWEL_JOUSTER_POSITIONS.HIT_RIGHT);
-//                telemetry.addData("Jewel Color","BLUE");
-//                //sleep(DEFAULT_SLEEP_DELAY_MILLIS);
-//            }
-//        }
-//        else{
-//            telemetry.addData("Jewel Color","UNKNOWN");
-//        }
+        jewelJouster.setJoustMode(JewelJousterV2.JEWEL_JOUSTER_POSITIONS.READ);
+        sleep(DEFAULT_SLEEP_DELAY_MILLIS);
+        for(int i = 0; i < 10; i++){
+            if(jewelJouster.getJewelColor() == BLUE) blueCount++;
+            else if(jewelJouster.getJewelColor() == RED) redCount++;
+            sleep(DEFAULT_DELAY_MILLIS/2);
+        }
+        jewelColor = (blueCount > redCount) ? BLUE:RED;
+        if(jewelColor == RED){
+            jewelJouster.setJoustMode(JewelJousterV2.JEWEL_JOUSTER_POSITIONS.HIT_LEFT);
+            telemetry.addData("Jewel Color","RED");
+        }
+        else {
+            //navigation.driveDistance(2, NORTH, ADJUSTING_SPEED_IN_PER_SEC, this);
+            jewelJouster.setJoustMode(JewelJousterV2.JEWEL_JOUSTER_POSITIONS.HIT_RIGHT);
+            telemetry.addData("Jewel Color","BLUE");
+            //sleep(DEFAULT_SLEEP_DELAY_MILLIS);
+        }
+        telemetry.update();
+        sleep(MED_SLEEP_DELAY_MILLIS);
         jewelJouster.setJoustMode(JewelJousterV2.JEWEL_JOUSTER_POSITIONS.STORE);
         sleep(DEFAULT_SLEEP_DELAY_MILLIS);
         telemetry.update();
-        navigation.driveDistance(7, SOUTH, MED_SPEED_IN_PER_SEC, this);
+        navigation.driveDistance(22, SOUTH, MED_SPEED_IN_PER_SEC, this);
         navigation.brake();
+        navigation.turnToHeading(215, this);
         sleep(DEFAULT_SLEEP_DELAY_MILLIS);
         long startTime = System.currentTimeMillis();
         mark = vuforia.getMark();
-
         while(mark == RelicRecoveryVuMark.UNKNOWN && opModeIsActive() && System.currentTimeMillis() - startTime < 2000){
+            navigation.turnToHeading(215 - 20 * Math.sin((System.currentTimeMillis() - startTime)/1000.0), this);
             mark = vuforia.getMark();
         }
 
@@ -164,19 +171,20 @@ public class BlueTeam2GlyphAutonomousNewCenterTest extends LinearOpMode {
         }
         if(mark == RelicRecoveryVuMark.UNKNOWN) mark = RelicRecoveryVuMark.CENTER;
         telemetry.update();
+        navigation.turnToHeading(WEST, this);
         sleep(DEFAULT_SLEEP_DELAY_MILLIS);
         switch (mark) {
             case CENTER:
-                navigation.driveDistance(25, SOUTH, SLOW_SPEED_IN_PER_SEC, this);
+                navigation.driveDistance(10, SOUTH, SLOW_SPEED_IN_PER_SEC, this);
                 break;
             case LEFT:
-                navigation.driveDistance(20, SOUTH, SLOW_SPEED_IN_PER_SEC, this);
+                navigation.driveDistance(3, SOUTH, SLOW_SPEED_IN_PER_SEC, this);
                 break;
             case RIGHT:
-                navigation.driveDistance(32, SOUTH, SLOW_SPEED_IN_PER_SEC, this);
+                navigation.driveDistance(17, SOUTH, SLOW_SPEED_IN_PER_SEC, this);
                 break;
         }
-        navigation.driveDistance(9, EAST, ADJUSTING_SPEED_IN_PER_SEC, this);
+        navigation.driveDistance(10, EAST, ADJUSTING_SPEED_IN_PER_SEC, this);
         curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
         columns = cryptoBoxFinder.findColumns(curImage, false);
         while (!cryptoBoxAligner.centerOnCryptoBoxClosestToCenter(0, columns, SOUTH, NORTH) && opModeIsActive()) {
@@ -189,10 +197,10 @@ public class BlueTeam2GlyphAutonomousNewCenterTest extends LinearOpMode {
         sleep(DEFAULT_SLEEP_DELAY_MILLIS);
         glyphSystem.startBelt();
         sleep(2000);
-        navigation.driveDistance(5, WEST, ADJUSTING_SPEED_IN_PER_SEC, this);
+        navigation.driveDistance(5, WEST, SLOW_SPEED_IN_PER_SEC, this);
         glyphSystem.stopBelt();
         glyphSystem.goToGlyphLevel(NewArialDepositor.GLYPH_PLACEMENT_LEVEL.GROUND);
-        navigation.driveDistance(20, WEST, SLOW_SPEED_IN_PER_SEC, this);
+        navigation.driveDistance(20, WEST, MED_SPEED_IN_PER_SEC, this);
         while(opModeIsActive());
         navigation.stopNavigation();
         glyphSystem.kill();

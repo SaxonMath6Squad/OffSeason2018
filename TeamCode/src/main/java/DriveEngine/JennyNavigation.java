@@ -391,10 +391,10 @@ public class JennyNavigation extends Thread{
         applyMotorVelocities(determineMotorVelocitiesToDriveOnHeading(heading, desiredVelocity));
     }
 
-    public void driveOnHeadingWithTurning(double heading, double driveVelocity, double turnRPS){
+    public void driveOnHeadingWithTurning(double heading, double driveVelocity, double magnitudeOfTurn){
         //Log.d("driveVelocity","" + driveVelocity);
         //Log.d("heading","" + heading);
-        double [] turnVelocities =  calculateTurnVelocities(turnRPS);
+        double [] turnVelocities =  calculateTurnVelocitiesRelativeToMax(magnitudeOfTurn);
         double [] headingVelocities = determineMotorVelocitiesToDriveOnHeading(heading,driveVelocity);
         double [] finalVelocities = new double[4];
         for(int i = 0; i < finalVelocities.length; i ++){
@@ -431,6 +431,7 @@ public class JennyNavigation extends Thread{
         if(scaleValue != 1){
             for(int i = 0; i < finalVelocities.length; i ++){
                 finalVelocities[i] *= scaleValue;
+                Log.d("final velocity" + i,"" + finalVelocities[i]);
             }
         }
 
@@ -453,6 +454,27 @@ public class JennyNavigation extends Thread{
     }
     */
     //public doube
+
+    public double [] calculateTurnVelocitiesRelativeToMax(double percentOfMax){
+        double[] velocities = new double[4];
+        double maxWheelVelocity = driveMotors[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR].getMaxSpeed();
+        if(Double.isNaN(percentOfMax)) percentOfMax = 0;
+        double velocity = maxWheelVelocity * percentOfMax;
+        //double velocity = rps*WHEEL_BASE_RADIUS*2.0*Math.PI;
+        if(Double.isNaN(velocity)){
+            velocities[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR] = 0;
+            velocities[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR] = 0;
+            velocities[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR] = 0;
+            velocities[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR] = 0;
+        }
+        else {
+            velocities[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR] = velocity;
+            velocities[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR] = -velocity;
+            velocities[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR] = velocity;
+            velocities[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR] = -velocity;
+        }
+        return velocities;
+    }
 
     public double [] calculateTurnVelocities(double rps){
         double[] velocities = new double[4];

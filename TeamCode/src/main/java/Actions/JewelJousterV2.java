@@ -29,8 +29,8 @@ public class JewelJousterV2 implements ActionHandler {
     private static final double TURN_RIGHT_POSITION = 93.0;
 
 
-    private static final double ARM_STORE_POSITION = 69.0;
-    private static final double ARM_NEUTRAL_POSITION = 69.0;
+    private static final double ARM_STORE_POSITION = 77.0;
+    private static final double ARM_NEUTRAL_POSITION = 77.0;
     private static final double ARM_READ_POSITION = 167.0;
     private static final double ARM_HIT_LEFT_POSITION = 167.0;
     private static final double ARM_HIT_RIGHT_POSITION = 153.0;
@@ -59,6 +59,7 @@ public class JewelJousterV2 implements ActionHandler {
                 setTurnPosition(TURN_TO_HIT_MODE.READ);
                 mode.sleep(200);
                 setArmPosition(EXTENSION_MODE.READ);
+                mode.sleep(200);
                 break;
             case HIT_LEFT:
                 setArmPosition(EXTENSION_MODE.HIT_LEFT);

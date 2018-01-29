@@ -184,7 +184,7 @@ public class JennyO1B extends LinearOpMode {
             driveVelocity = (isSlowMode)? (SLOW_SPEED_IN_PER_SEC):HIGH_SPEED_IN_PER_SEC;
             driveVelocity *= leftJoystick.magnitude();
             //Log.d("DriveVelocity","" + driveVelocity);
-            turnRps = (isSlowMode)? (.05 * rightJoystick.magnitude() * rightJoystick.x()/Math.abs(rightJoystick.x())):.25 *rightJoystick.magnitude() * rightJoystick.x()/Math.abs(rightJoystick.x());
+            turnRps = (isSlowMode)? (.25 * rightJoystick.magnitude() * rightJoystick.x()/Math.abs(rightJoystick.x())):.7 *rightJoystick.magnitude() * rightJoystick.x()/Math.abs(rightJoystick.x());
             navigation.driveOnHeadingWithTurning((paralaxedControl)? (leftJoystick.angle() + 90)%360:leftJoystick.angle(), driveVelocity, turnRps);
             if(gamepad1.left_bumper && gamepad1.right_bumper){
                 isSlowMode = !isSlowMode;
@@ -210,8 +210,10 @@ public class JennyO1B extends LinearOpMode {
                     glyphLift.retract();
                 }
                 else
-                    glyphLift.setLiftPower(0);
-            } else {
+                    glyphLift.stopLift();
+            }
+            /*
+            else {
                 if (gamepad1.right_trigger > 0.1 || (gamepad2.right_trigger > .1 && gamepad1.right_trigger < .1)) {
                     position++;
                     while (gamepad1.right_trigger > 0.1 || (gamepad2.right_trigger > .1 && gamepad1.right_trigger < .1)) ;
@@ -405,9 +407,7 @@ public class JennyO1B extends LinearOpMode {
             telemetry.addData("lift tick", glyphLift.getLiftMotorPosition());
             telemetry.addData("Belt power", glyphLift.getBeltPower());
             telemetry.addData("Status", "Run Time: " + runtime.toString());
-
-
-
+            telemetry.addData("Min Button","" + glyphLift.isPressed());
             telemetry.addData("Time for Loop","" + (System.currentTimeMillis() - loopStartTime));
             telemetry.update();
         }

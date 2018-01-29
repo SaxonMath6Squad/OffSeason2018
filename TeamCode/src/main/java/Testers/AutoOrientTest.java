@@ -91,6 +91,9 @@ public class AutoOrientTest extends LinearOpMode {
             else {
                 navigation.brake();
             }
+
+            telemetry.addData("Orientation", navigation.getOrientation());
+            telemetry.update();
         }
 
         navigation.stopNavigation();
