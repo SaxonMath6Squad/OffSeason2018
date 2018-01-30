@@ -178,38 +178,16 @@ public class JennyO1B extends LinearOpMode {
         while (opModeIsActive()) {
             loopStartTime = System.currentTimeMillis();
 
-
-            driveVelocity = (isSlowMode)? (SLOW_SPEED_IN_PER_SEC):HIGH_SPEED_IN_PER_SEC;
-            driveVelocity *= leftJoystick.magnitude();
-            //Log.d("DriveVelocity","" + driveVelocity);
-            turnRps = (isSlowMode)? (.25 * rightJoystick.magnitude() * rightJoystick.x()/Math.abs(rightJoystick.x())):.7 *rightJoystick.magnitude() * rightJoystick.x()/Math.abs(rightJoystick.x());
-            navigation.driveOnHeadingWithTurning((paralaxedControl)? (leftJoystick.angle() + 90)%360:leftJoystick.angle(), driveVelocity, turnRps);
-            if(gamepad1.left_bumper && gamepad1.right_bumper){
-                isSlowMode = !isSlowMode;
-                while(gamepad1.left_bumper && gamepad1.right_bumper);
-            }
-
-            //GLYPH GRABBER
-            if(gamepad1.a) glyphPicker.grab();
-            else if(gamepad1.b) glyphPicker.spit();
-            else if(!gamepad1.a && !gamepad1.b && gamepad2.a) glyphPicker.grab();
-            else if(!gamepad1.a && !gamepad1.b && gamepad2.b) glyphPicker.spit();
-            else glyphPicker.pause();
+            handleDriveControl(); 
+            handlePickSystem();
+            handleAerialLift(); 
+            
 
             //GLYPH LIFT
 
             //GLYPH LIFT
             long glyphLiftStart = System.currentTimeMillis();
-            if (!autoLiftPositionMode) {
-                if (gamepad1.right_trigger > 0.1 || (gamepad2.right_trigger > .1 && gamepad1.right_trigger < .1 && !gamepad1.right_bumper)) {
-                    glyphLift.extend();
-                }
-                else if ((gamepad1.right_bumper || (gamepad2.right_bumper && !gamepad1.right_bumper)) && !glyphLift.isPressed()){
-                    glyphLift.retract();
-                }
-                else
-                    glyphLift.stopLift();
-            }
+            
             /*
             else {
                 if (gamepad1.right_trigger > 0.1 || (gamepad2.right_trigger > .1 && gamepad1.right_trigger < .1)) {
@@ -310,29 +288,6 @@ public class JennyO1B extends LinearOpMode {
             //GLYPH ROLLER
 
 
-            if(!glyphLift.isPressed()) {
-
-                //if(gamepad1.left_bumper)
-
-                if (gamepad1.left_trigger > 0.1) glyphLift.startBeltSlow();
-                else if (gamepad1.left_bumper && !gamepad1.right_bumper) glyphLift.retractBeltSlow();
-                else if (gamepad2.left_trigger > 0.1 && gamepad1.right_trigger < 0.1 && gamepad1.left_trigger < 0.1 && !gamepad1.right_bumper && !gamepad1.left_bumper)
-                    glyphLift.startBeltSlow();
-                else if (gamepad2.left_bumper && gamepad1.right_trigger < 0.1 && gamepad1.left_trigger < 0.1 && !gamepad1.right_bumper && !gamepad1.left_bumper)
-                    glyphLift.retractBeltSlow();
-                else
-                    glyphLift.stopBelt();
-            } else {
-                if (gamepad1.left_trigger > 0.1) glyphLift.startBelt();
-                else if (gamepad1.left_bumper && !gamepad1.right_bumper) glyphLift.retractBelt();
-                else if (gamepad2.left_trigger > 0.1 && gamepad1.right_trigger < 0.1 && gamepad1.left_trigger < 0.1 && !gamepad1.right_bumper && !gamepad1.left_bumper)
-                    glyphLift.startBelt();
-                else if (gamepad2.left_bumper && gamepad1.right_trigger < 0.1 && gamepad1.left_trigger < 0.1 && !gamepad1.right_bumper && !gamepad1.left_bumper)
-                    glyphLift.retractBelt();
-                else
-                    glyphLift.stopBelt();
-            }
-
             //RAD Extender
             if(gamepad2.dpad_right){
                 RAD.extendRAD();
@@ -372,6 +327,7 @@ public class JennyO1B extends LinearOpMode {
                 while(!alignmentHelper.centerOnCryptoBoxClosestToCenter(0,coloredColumns,EAST,WEST) && opModeIsActive() && !(gamepad1.dpad_up && gamepad1.a && gamepad1.b)){
                     curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
                     coloredColumns = cryptoBoxFinder.findColumns(curImage, false);
+                    handleAerialLift(); 
                 }
             }
             else if(gamepad1.dpad_left){
@@ -382,6 +338,7 @@ public class JennyO1B extends LinearOpMode {
                 while(!alignmentHelper.centerOnCryptoBoxClosestToCenter(0,coloredColumns,WEST,EAST) && opModeIsActive() && !(gamepad1.dpad_up && gamepad1.a && gamepad1.b)){
                     curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
                     coloredColumns = cryptoBoxFinder.findColumns(curImage, false);
+                    handleAerialLift();
                 }
             }
             else if(gamepad1.dpad_right){
@@ -392,6 +349,7 @@ public class JennyO1B extends LinearOpMode {
                 while(!alignmentHelper.centerOnCryptoBoxClosestToCenter(0,coloredColumns,EAST,WEST) && opModeIsActive() && !(gamepad1.dpad_up && gamepad1.a && gamepad1.b)){
                     curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
                     coloredColumns = cryptoBoxFinder.findColumns(curImage, false);
+                    handleAerialLift(); 
                 }
             }
             if(gamepad2.left_stick_button){
@@ -418,4 +376,69 @@ public class JennyO1B extends LinearOpMode {
         jouster.kill();
         vuforia.kill();
     }
+    
+    public void handleDriveControl(){
+        driveVelocity = (isSlowMode)? (SLOW_SPEED_IN_PER_SEC):HIGH_SPEED_IN_PER_SEC;
+        driveVelocity *= leftJoystick.magnitude();
+        //Log.d("DriveVelocity","" + driveVelocity);
+        turnRps = (isSlowMode)? (.25 * rightJoystick.magnitude() * rightJoystick.x()/Math.abs(rightJoystick.x())):.7 *rightJoystick.magnitude() * rightJoystick.x()/Math.abs(rightJoystick.x());
+        navigation.driveOnHeadingWithTurning((paralaxedControl)? (leftJoystick.angle() + 90)%360:leftJoystick.angle(), driveVelocity, turnRps);
+        if(gamepad1.left_bumper && gamepad1.right_bumper){
+            isSlowMode = !isSlowMode;
+            while(gamepad1.left_bumper && gamepad1.right_bumper);
+        }
+
+    }
+    
+    public void handleAerialLift(){
+        if (!autoLiftPositionMode) {
+            if (gamepad1.right_trigger > 0.1 || (gamepad2.right_trigger > .1 && gamepad1.right_trigger < .1 && !gamepad1.right_bumper)) {
+                glyphLift.extend();
+            }
+            else if ((gamepad1.right_bumper || (gamepad2.right_bumper && !gamepad1.right_bumper)) && !glyphLift.isPressed()){
+                glyphLift.retract();
+            }
+            else
+                glyphLift.stopLift();
+        }
+        
+
+        if(!glyphLift.isPressed()) {
+
+            //if(gamepad1.left_bumper)
+
+            if (gamepad1.left_trigger > 0.1) glyphLift.startBeltSlow();
+            else if (gamepad1.left_bumper && !gamepad1.right_bumper) glyphLift.retractBeltSlow();
+            else if (gamepad2.left_trigger > 0.1 && gamepad1.right_trigger < 0.1 && gamepad1.left_trigger < 0.1 && !gamepad1.right_bumper && !gamepad1.left_bumper)
+                glyphLift.startBeltSlow();
+            else if (gamepad2.left_bumper && gamepad1.right_trigger < 0.1 && gamepad1.left_trigger < 0.1 && !gamepad1.right_bumper && !gamepad1.left_bumper)
+                glyphLift.retractBeltSlow();
+            else
+                glyphLift.stopBelt();
+        } else {
+            if (gamepad1.left_trigger > 0.1) glyphLift.startBelt();
+            else if (gamepad1.left_bumper && !gamepad1.right_bumper) glyphLift.retractBelt();
+            else if (gamepad2.left_trigger > 0.1 && gamepad1.right_trigger < 0.1 && gamepad1.left_trigger < 0.1 && !gamepad1.right_bumper && !gamepad1.left_bumper)
+                glyphLift.startBelt();
+            else if (gamepad2.left_bumper && gamepad1.right_trigger < 0.1 && gamepad1.left_trigger < 0.1 && !gamepad1.right_bumper && !gamepad1.left_bumper)
+                glyphLift.retractBelt();
+            else
+                glyphLift.stopBelt();
+        }
+    }
+    
+    public void handleRAD(){
+        
+    }
+    
+    public void handlePickSystem(){
+        //GLYPH GRABBER
+        if(gamepad1.a) glyphPicker.grab();
+        else if(gamepad1.b) glyphPicker.spit();
+        else if(!gamepad1.a && !gamepad1.b && gamepad2.a) glyphPicker.grab();
+        else if(!gamepad1.a && !gamepad1.b && gamepad2.b) glyphPicker.spit();
+        else glyphPicker.pause();
+    }
+
 }
+
