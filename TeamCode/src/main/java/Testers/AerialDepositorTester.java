@@ -38,7 +38,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import Actions.HardwareWrappers.NewArialDepositor;
+import Actions.NewArialDepositor;
 
 /*
     An opmode to test if all our drive wheels are working correctly

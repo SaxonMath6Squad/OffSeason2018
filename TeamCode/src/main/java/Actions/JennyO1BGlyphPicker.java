@@ -36,7 +36,7 @@ public class JennyO1BGlyphPicker implements ActionHandler {
     }
 
     public int spit() {
-        wheelMotor.setMotorPower(-WHEEL_POWERS/3.0);
+        wheelMotor.setMotorPower(-WHEEL_POWERS/1.5);
         return 0;
     }
 

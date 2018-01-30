@@ -17,15 +17,18 @@ import static DriveEngine.JennyNavigation.SLOW_SPEED_IN_PER_SEC;
  */
 
 public class ImageAlignmentHelper {
-    private int CRYPTO_COLUMN_TARGET_POSITION = 70;
+    private int CRYPTO_COLUMN_TARGET_POSITION = 66;
     private double MOVEMENT_KP_UNSCALED = 5;
+    private double MOVEMENT_KI = 0;
+    private double MOVEMENT_KI_MAX = 0;
     private int DESIRED_PIXEL_ACCURACY = 3;
     private PIDController imagePid;
     private LinearOpMode mode;
     private JennyNavigation navigation;
 
     public ImageAlignmentHelper(int image_width, JennyNavigation nav, LinearOpMode m){
-        imagePid = new PIDController(MOVEMENT_KP_UNSCALED/image_width,0,0);
+        imagePid = new PIDController(MOVEMENT_KP_UNSCALED/image_width,MOVEMENT_KI,0);
+        imagePid.setIMax(MOVEMENT_KI_MAX);
         mode = m;
         navigation = nav;
     }

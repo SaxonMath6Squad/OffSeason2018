@@ -3,7 +3,6 @@ package Autonomous.OpModes;
 import android.graphics.Bitmap;
 import android.util.Log;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import Autonomous.VuforiaHelper;
@@ -27,12 +26,20 @@ public class VuforiaImageCaptureTest extends LinearOpMode{
     final int IMAGE_PROCESS_HEIGHT = 224;
     @Override
     public void runOpMode() throws InterruptedException {
-
+        CryptoBoxColumnImageProcessor.CRYPTOBOX_COLOR color = CryptoBoxColumnImageProcessor.CRYPTOBOX_COLOR.BLUE;
         /*To access the image: you need to iterate through the images of the frame object:*/
-        VuforiaHelper vuforia = new VuforiaHelper();
-        cryptoFinder = new CryptoBoxColumnImageProcessor(CryptoBoxColumnImageProcessor.DESIRED_HEIGHT,CryptoBoxColumnImageProcessor.DESIRED_WIDTH,.1,1, CryptoBoxColumnImageProcessor.CRYPTOBOX_COLOR.BLUE);
+        VuforiaHelper vuforia = new VuforiaHelper();telemetry.update();while (!opModeIsActive()) {
+            if (gamepad1.start) {
+                if(color == CryptoBoxColumnImageProcessor.CRYPTOBOX_COLOR.BLUE) color = CryptoBoxColumnImageProcessor.CRYPTOBOX_COLOR.RED;
+                else color = CryptoBoxColumnImageProcessor.CRYPTOBOX_COLOR.BLUE;
+                while (gamepad1.start) ;
+            }
+            telemetry.addData("Color", color);
+            telemetry.update();
+        }
+        cryptoFinder = new CryptoBoxColumnImageProcessor(CryptoBoxColumnImageProcessor.DESIRED_HEIGHT,CryptoBoxColumnImageProcessor.DESIRED_WIDTH,.1,1, color);
         telemetry.addData("Status","Initialized");
-        telemetry.update();
+
         waitForStart();
         Bitmap bmp;
         ArrayList<Integer> columnLocations = new ArrayList<Integer>();
@@ -40,7 +47,6 @@ public class VuforiaImageCaptureTest extends LinearOpMode{
             long timeStart = System.currentTimeMillis();
             bmp = vuforia.getImage(CryptoBoxColumnImageProcessor.DESIRED_WIDTH,CryptoBoxColumnImageProcessor.DESIRED_HEIGHT);
             if(bmp != null){
-//                vuforia.saveBMP(bmp);
                 long algorithmStart = System.currentTimeMillis();
                 columnLocations = cryptoFinder.findColumns(bmp,true);
                 telemetry.addData("Algorithm Time", "" + (System.currentTimeMillis() - algorithmStart));
@@ -49,6 +55,7 @@ public class VuforiaImageCaptureTest extends LinearOpMode{
                         telemetry.addData("Column " + i, " " + columnLocations.get(i).intValue());
                     }
                 }
+                vuforia.saveBMP(bmp);
                 telemetry.addData("Loop Time", "" + (System.currentTimeMillis() - timeStart));
                 telemetry.update();
             }

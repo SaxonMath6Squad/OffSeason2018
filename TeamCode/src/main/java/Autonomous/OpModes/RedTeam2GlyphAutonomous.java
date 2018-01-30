@@ -44,7 +44,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 import java.util.ArrayList;
 
 import Actions.ArialDepositor;
-import Actions.HardwareWrappers.NewArialDepositor;
+import Actions.NewArialDepositor;
 import Actions.JewelJouster;
 import Actions.JewelJousterV2;
 import Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor;
@@ -129,7 +129,6 @@ public class RedTeam2GlyphAutonomous extends LinearOpMode {
         for(int i = 0; i < 10; i++){
             if(jewelJouster.getJewelColor() == BLUE) blueCount++;
             else if(jewelJouster.getJewelColor() == RED) redCount++;
-            sleep(DEFAULT_DELAY_MILLIS/2);
         }
         jewelColor = (blueCount > redCount) ? BLUE:RED;
         if(jewelColor == BLUE){

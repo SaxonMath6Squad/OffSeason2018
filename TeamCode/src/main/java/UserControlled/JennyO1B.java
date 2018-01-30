@@ -41,25 +41,21 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import java.sql.SQLSyntaxErrorException;
+
 import java.util.ArrayList;
 
-import Actions.ArialDepositor;
-import Actions.ArialDepositorTest;
-import Actions.HardwareWrappers.NewArialDepositor;
-import Actions.HardwareWrappers.NewSpoolMotor;
 import Actions.JennyFlagController;
 import Actions.JennyO1BGlyphPicker;
-import Actions.JewelJouster;
+
 import Actions.JewelJousterV2;
 import Autonomous.ImageAlignmentHelper;
 import Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor;
 import Autonomous.VuforiaHelper;
 import DriveEngine.JennyNavigation;
-import MotorControllers.PIDController;
+import Actions.NewArialDepositor;
 import SensorHandlers.JennySensorTelemetry;
 import Actions.JennyO1BRAD;
-import Testers.MotorStopperTest;
+
 
 import static Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor.CLOSE_UP_MIN_COLUMN_WIDTH;
 import static Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor.CLOSE_UP_MIN_PERCENT_COLUMN_CHECK;
@@ -108,6 +104,10 @@ public class JennyO1B extends LinearOpMode {
     CryptoBoxColumnImageProcessor cryptoBoxFinder;
     Bitmap curImage = null;
     ArrayList<Integer> coloredColumns;
+
+    boolean isSlowMode = false;
+    double driveVelocity = 0;
+    double turnRps = 0;
 
     @Override
     public void runOpMode() {
@@ -167,9 +167,7 @@ public class JennyO1B extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
-        boolean isSlowMode = false;
-        double driveVelocity = 0;
-        double turnRps = 0;
+
         // run until the end of the match (driver presses STOP)
         long loopStartTime = 0;
 
@@ -177,17 +175,17 @@ public class JennyO1B extends LinearOpMode {
 
         while (opModeIsActive()) {
             loopStartTime = System.currentTimeMillis();
-
-            handleDriveControl(); 
+            jouster.setJoustMode(JewelJousterV2.JEWEL_JOUSTER_POSITIONS.STORE_WITHOUT_PAUSE);
+            handleDriveControl();
             handlePickSystem();
-            handleAerialLift(); 
-            
+            handleAerialLift();
+            handleRAD();
 
             //GLYPH LIFT
 
             //GLYPH LIFT
             long glyphLiftStart = System.currentTimeMillis();
-            
+
             /*
             else {
                 if (gamepad1.right_trigger > 0.1 || (gamepad2.right_trigger > .1 && gamepad1.right_trigger < .1)) {
@@ -288,27 +286,7 @@ public class JennyO1B extends LinearOpMode {
             //GLYPH ROLLER
 
 
-            //RAD Extender
-            if(gamepad2.dpad_right){
-                RAD.extendRAD();
-            }
-            else if(gamepad2.dpad_left && !sensorTelemetry.isPressed(RAD_LIMIT)){
-                RAD.retractRAD();
-            }
-            else {
-                RAD.pauseRADExtender();
-            }
 
-            //RAD Grabber
-            if(gamepad2.dpad_up){
-                RAD.grabRelic();
-            }
-            else if(gamepad2.dpad_down){
-                RAD.releaseRelic();
-            }
-            else {
-                RAD.stopRelic();
-            }
             //MISC
             if(gamepad1.back){
                 paralaxedControl = !paralaxedControl;
@@ -324,10 +302,14 @@ public class JennyO1B extends LinearOpMode {
             if(gamepad1.x){
                 curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
                 coloredColumns = cryptoBoxFinder.findColumns(curImage, false);
+                long startTimeImage = System.currentTimeMillis();
                 while(!alignmentHelper.centerOnCryptoBoxClosestToCenter(0,coloredColumns,EAST,WEST) && opModeIsActive() && !(gamepad1.dpad_up && gamepad1.a && gamepad1.b)){
                     curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
                     coloredColumns = cryptoBoxFinder.findColumns(curImage, false);
-                    handleAerialLift(); 
+                    Log.d("Time Taken","" + (System.currentTimeMillis() - startTimeImage));
+                    handleAerialLift();
+                    startTimeImage = System.currentTimeMillis();
+
                 }
             }
             else if(gamepad1.dpad_left){
@@ -349,7 +331,7 @@ public class JennyO1B extends LinearOpMode {
                 while(!alignmentHelper.centerOnCryptoBoxClosestToCenter(0,coloredColumns,EAST,WEST) && opModeIsActive() && !(gamepad1.dpad_up && gamepad1.a && gamepad1.b)){
                     curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
                     coloredColumns = cryptoBoxFinder.findColumns(curImage, false);
-                    handleAerialLift(); 
+                    handleAerialLift();
                 }
             }
             if(gamepad2.left_stick_button){
@@ -376,7 +358,7 @@ public class JennyO1B extends LinearOpMode {
         jouster.kill();
         vuforia.kill();
     }
-    
+
     public void handleDriveControl(){
         driveVelocity = (isSlowMode)? (SLOW_SPEED_IN_PER_SEC):HIGH_SPEED_IN_PER_SEC;
         driveVelocity *= leftJoystick.magnitude();
@@ -389,7 +371,7 @@ public class JennyO1B extends LinearOpMode {
         }
 
     }
-    
+
     public void handleAerialLift(){
         if (!autoLiftPositionMode) {
             if (gamepad1.right_trigger > 0.1 || (gamepad2.right_trigger > .1 && gamepad1.right_trigger < .1 && !gamepad1.right_bumper)) {
@@ -401,7 +383,7 @@ public class JennyO1B extends LinearOpMode {
             else
                 glyphLift.stopLift();
         }
-        
+
 
         if(!glyphLift.isPressed()) {
 
@@ -426,11 +408,31 @@ public class JennyO1B extends LinearOpMode {
                 glyphLift.stopBelt();
         }
     }
-    
+
     public void handleRAD(){
-        
+        //RAD Extender
+        if(gamepad2.dpad_right){
+            RAD.extendRAD();
+        }
+        else if(gamepad2.dpad_left && !sensorTelemetry.isPressed(RAD_LIMIT)){
+            RAD.retractRAD();
+        }
+        else {
+            RAD.pauseRADExtender();
+        }
+
+        //RAD Grabber
+        if(gamepad2.dpad_up){
+            RAD.grabRelic();
+        }
+        else if(gamepad2.dpad_down){
+            RAD.releaseRelic();
+        }
+        else {
+            RAD.stopRelic();
+        }
     }
-    
+
     public void handlePickSystem(){
         //GLYPH GRABBER
         if(gamepad1.a) glyphPicker.grab();

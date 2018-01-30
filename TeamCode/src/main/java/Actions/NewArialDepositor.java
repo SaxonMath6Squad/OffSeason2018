@@ -1,4 +1,4 @@
-package Actions.HardwareWrappers;
+package Actions;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import Actions.ActionHandler;
+import Actions.HardwareWrappers.NewSpoolMotor;
 import Autonomous.REVColorDistanceSensorController;
 
 /**
@@ -55,7 +56,7 @@ public class NewArialDepositor implements ActionHandler {
         extendLimit = hardwareMap.touchSensor.get("extendLimit");
         TICKS_PER_REV = liftMotor.getTicksPerRevolution();
         EXTENDOTRON_SPOOL_DIAMETER_INCHES = liftMotor.getWheelDiameterInInches();
-        zeroBedHeight();
+        //zeroBedHeight();
     }
 
     public void setLiftRunMode(DcMotor.RunMode mode){

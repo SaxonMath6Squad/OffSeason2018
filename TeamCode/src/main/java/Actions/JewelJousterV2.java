@@ -17,7 +17,7 @@ public class JewelJousterV2 implements ActionHandler {
     private REVColorDistanceSensorController colorSensor;
     private HardwareMap hardwareMap;
 
-    public enum JEWEL_JOUSTER_POSITIONS {STORE,READ,HIT_LEFT,HIT_RIGHT};
+    public enum JEWEL_JOUSTER_POSITIONS {STORE,READ,HIT_LEFT,HIT_RIGHT,STORE_WITHOUT_PAUSE};
 
     public enum EXTENSION_MODE {STORE, READ, HIT_LEFT, HIT_RIGHT, NEUTRAL};
     public enum TURN_TO_HIT_MODE{STORE,READ,LEFT,RIGHT};
@@ -55,6 +55,12 @@ public class JewelJousterV2 implements ActionHandler {
                 mode.sleep(200);
                 setTurnPosition(TURN_TO_HIT_MODE.STORE);
                 break;
+
+            case STORE_WITHOUT_PAUSE:
+                setArmPosition(EXTENSION_MODE.STORE);
+                setTurnPosition(TURN_TO_HIT_MODE.STORE);
+                break;
+
             case READ:
                 setTurnPosition(TURN_TO_HIT_MODE.READ);
                 mode.sleep(200);

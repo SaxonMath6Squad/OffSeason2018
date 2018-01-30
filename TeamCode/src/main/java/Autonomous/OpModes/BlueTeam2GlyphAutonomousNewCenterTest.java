@@ -43,7 +43,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 
 import java.util.ArrayList;
 
-import Actions.HardwareWrappers.NewArialDepositor;
+import Actions.NewArialDepositor;
 import Actions.JewelJousterV2;
 import Autonomous.ImageAlignmentHelper;
 import Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor;
@@ -59,7 +59,6 @@ import static Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor.DESIRED_W
 import static Autonomous.REVColorDistanceSensorController.color.BLUE;
 import static Autonomous.REVColorDistanceSensorController.color.RED;
 import static Autonomous.RelicRecoveryField.BLUE_ALLIANCE_2;
-import static Autonomous.RelicRecoveryField.RED_ALLIANCE_2;
 import static Autonomous.RelicRecoveryField.startLocations;
 import static DriveEngine.JennyNavigation.ADJUSTING_SPEED_IN_PER_SEC;
 import static DriveEngine.JennyNavigation.DEFAULT_DELAY_MILLIS;
@@ -123,7 +122,6 @@ public class BlueTeam2GlyphAutonomousNewCenterTest extends LinearOpMode {
         for(int i = 0; i < 10; i++){
             if(jewelJouster.getJewelColor() == BLUE) blueCount++;
             else if(jewelJouster.getJewelColor() == RED) redCount++;
-            sleep(DEFAULT_DELAY_MILLIS/2);
         }
         jewelColor = (blueCount > redCount) ? BLUE:RED;
         if(jewelColor == RED){
@@ -141,14 +139,12 @@ public class BlueTeam2GlyphAutonomousNewCenterTest extends LinearOpMode {
         jewelJouster.setJoustMode(JewelJousterV2.JEWEL_JOUSTER_POSITIONS.STORE);
         sleep(DEFAULT_SLEEP_DELAY_MILLIS);
         telemetry.update();
-        navigation.driveDistance(22, SOUTH, MED_SPEED_IN_PER_SEC, this);
+        navigation.turnToHeading(250, this);
         navigation.brake();
-        navigation.turnToHeading(215, this);
         sleep(DEFAULT_SLEEP_DELAY_MILLIS);
         long startTime = System.currentTimeMillis();
         mark = vuforia.getMark();
         while(mark == RelicRecoveryVuMark.UNKNOWN && opModeIsActive() && System.currentTimeMillis() - startTime < 2000){
-            navigation.turnToHeading(215 - 20 * Math.sin((System.currentTimeMillis() - startTime)/1000.0), this);
             mark = vuforia.getMark();
         }
 
@@ -173,6 +169,7 @@ public class BlueTeam2GlyphAutonomousNewCenterTest extends LinearOpMode {
         telemetry.update();
         navigation.turnToHeading(WEST, this);
         sleep(DEFAULT_SLEEP_DELAY_MILLIS);
+        navigation.driveDistance(22, SOUTH, MED_SPEED_IN_PER_SEC, this);
         switch (mark) {
             case CENTER:
                 navigation.driveDistance(10, SOUTH, SLOW_SPEED_IN_PER_SEC, this);
@@ -184,7 +181,8 @@ public class BlueTeam2GlyphAutonomousNewCenterTest extends LinearOpMode {
                 navigation.driveDistance(17, SOUTH, SLOW_SPEED_IN_PER_SEC, this);
                 break;
         }
-        navigation.driveDistance(10, EAST, ADJUSTING_SPEED_IN_PER_SEC, this);
+        sleep(DEFAULT_SLEEP_DELAY_MILLIS);
+        navigation.driveDistance(10, EAST, SLOW_SPEED_IN_PER_SEC, this);
         curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
         columns = cryptoBoxFinder.findColumns(curImage, false);
         while (!cryptoBoxAligner.centerOnCryptoBoxClosestToCenter(0, columns, SOUTH, NORTH) && opModeIsActive()) {
