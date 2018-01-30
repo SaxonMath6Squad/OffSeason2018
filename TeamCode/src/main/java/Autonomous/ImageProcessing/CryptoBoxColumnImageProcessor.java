@@ -26,6 +26,7 @@ public class CryptoBoxColumnImageProcessor {
     public static final int FAR_AWAY_MIN_COLUMN_WIDTH = 1;
     public enum CRYPTOBOX_COLOR {BLUE,RED};
     CRYPTOBOX_COLOR colorToFind = CRYPTOBOX_COLOR.BLUE;
+
     public CryptoBoxColumnImageProcessor(int desiredHeight, int desiredWidth, double percentColumnCheck, int minColumnWidth){
         imageHeight = desiredHeight;
         imageWidth = desiredWidth;

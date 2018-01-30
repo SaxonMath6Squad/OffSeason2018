@@ -58,6 +58,7 @@ import static Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor.DESIRED_H
 import static Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor.DESIRED_WIDTH;
 import static Autonomous.REVColorDistanceSensorController.color.BLUE;
 import static Autonomous.REVColorDistanceSensorController.color.RED;
+import static Autonomous.RelicRecoveryField.BLUE_ALLIANCE_1;
 import static Autonomous.RelicRecoveryField.RED_ALLIANCE_1;
 import static Autonomous.RelicRecoveryField.startLocations;
 import static DriveEngine.JennyNavigation.DEFAULT_DELAY_MILLIS;
@@ -95,12 +96,12 @@ public class BlueTeam1GlyphAutonomousNewCenterTest extends LinearOpMode {
         int blueCount = 0;
         REVColorDistanceSensorController.color jewelColor;
         try {
-            navigation = new JennyNavigation(hardwareMap, startLocations[RED_ALLIANCE_1], EAST, "RobotConfig/JennyV2.json");
+            navigation = new JennyNavigation(hardwareMap, startLocations[BLUE_ALLIANCE_1], WEST, "RobotConfig/JennyV2.json");
             glyphSystem = new NewArialDepositor(hardwareMap);
             sensorTelemetry = new JennySensorTelemetry(hardwareMap, 0, 0);
             jewelJouster = new JewelJousterV2("jewelJoust", "jewelJoustTurn", this, hardwareMap);
             vuforia = new VuforiaHelper();
-            cryptoBoxFinder = new CryptoBoxColumnImageProcessor(DESIRED_HEIGHT, DESIRED_WIDTH, CLOSE_UP_MIN_PERCENT_COLUMN_CHECK, CLOSE_UP_MIN_COLUMN_WIDTH, CryptoBoxColumnImageProcessor.CRYPTOBOX_COLOR.RED);
+            cryptoBoxFinder = new CryptoBoxColumnImageProcessor(DESIRED_HEIGHT, DESIRED_WIDTH, CLOSE_UP_MIN_PERCENT_COLUMN_CHECK, CLOSE_UP_MIN_COLUMN_WIDTH, CryptoBoxColumnImageProcessor.CRYPTOBOX_COLOR.BLUE);
             cryptoBoxAligner = new ImageAlignmentHelper(DESIRED_WIDTH, navigation, this);
         }
         catch (Exception e){
@@ -141,12 +142,12 @@ public class BlueTeam1GlyphAutonomousNewCenterTest extends LinearOpMode {
         telemetry.update();
         navigation.driveDistance(22, SOUTH, MED_SPEED_IN_PER_SEC, this);
         navigation.brake();
-        navigation.turnToHeading(227, this);
+        navigation.turnToHeading(215, this);
         sleep(DEFAULT_SLEEP_DELAY_MILLIS);
         long startTime = System.currentTimeMillis();
         mark = vuforia.getMark();
-
         while(mark == RelicRecoveryVuMark.UNKNOWN && opModeIsActive() && System.currentTimeMillis() - startTime < 2000){
+            navigation.turnToHeading(215 - 20 * Math.sin((System.currentTimeMillis() - startTime)/1000.0), this);
             mark = vuforia.getMark();
         }
 
@@ -185,7 +186,7 @@ public class BlueTeam1GlyphAutonomousNewCenterTest extends LinearOpMode {
         }
         curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
         columns = cryptoBoxFinder.findColumns(curImage, false);
-        while (!cryptoBoxAligner.centerOnCryptoBoxClosestToCenter(0, columns, EAST, WEST) && opModeIsActive()) {
+        while (!cryptoBoxAligner.centerOnCryptoBoxClosestToCenter(0, columns, WEST, EAST) && opModeIsActive()) {
             curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
             columns = cryptoBoxFinder.findColumns(curImage, false);
         }
