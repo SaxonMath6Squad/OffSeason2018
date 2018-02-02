@@ -17,8 +17,8 @@ import static DriveEngine.JennyNavigation.SLOW_SPEED_IN_PER_SEC;
  */
 
 public class ImageAlignmentHelper {
-    private int CRYPTO_COLUMN_TARGET_POSITION = 66;
-    private double MOVEMENT_KP_UNSCALED = 5;
+    private int CRYPTO_COLUMN_TARGET_POSITION = 40;
+    private double MOVEMENT_KP_UNSCALED = 10;
     private double MOVEMENT_KI = 0;
     private double MOVEMENT_KI_MAX = 0;
     private int DESIRED_PIXEL_ACCURACY = 3;

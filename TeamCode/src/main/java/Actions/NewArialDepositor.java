@@ -27,7 +27,7 @@ public class NewArialDepositor implements ActionHandler {
     public final static int FRONT_GLYPH_SENSOR = 0;
     public final static int REAR_GLYPH_SENSOR = 1;
     private final static double FAST_RETRACT_SPEED = 20.0;
-    private final static double FAST_EXTEND_SPEED = 15.0;
+    private final static double FAST_EXTEND_SPEED = 50.0;
     private final static double SLOW_RETRACT_SPEED = 1.0;
     private final static double SLOW_EXTEND_SPEED = 5.0;
 

@@ -26,6 +26,7 @@ public class VuforiaImageCaptureTest extends LinearOpMode{
     final int IMAGE_PROCESS_HEIGHT = 224;
     @Override
     public void runOpMode() throws InterruptedException {
+        int imageTaken = 0;
         CryptoBoxColumnImageProcessor.CRYPTOBOX_COLOR color = CryptoBoxColumnImageProcessor.CRYPTOBOX_COLOR.BLUE;
         /*To access the image: you need to iterate through the images of the frame object:*/
         VuforiaHelper vuforia = new VuforiaHelper();telemetry.update();while (!opModeIsActive()) {
@@ -55,7 +56,10 @@ public class VuforiaImageCaptureTest extends LinearOpMode{
                         telemetry.addData("Column " + i, " " + columnLocations.get(i).intValue());
                     }
                 }
-                vuforia.saveBMP(bmp);
+                if(imageTaken == 0) {
+                    vuforia.saveBMP(bmp); // save edited image
+                    imageTaken++;
+                }
                 telemetry.addData("Loop Time", "" + (System.currentTimeMillis() - timeStart));
                 telemetry.update();
             }

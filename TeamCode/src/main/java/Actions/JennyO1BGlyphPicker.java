@@ -16,7 +16,7 @@ import MotorControllers.MotorController;
 public class JennyO1BGlyphPicker implements ActionHandler {
     MotorController wheelMotor;
     HardwareMap hardwareMap;
-    private double WHEEL_POWERS = 0.8;
+    private double WHEEL_POWERS = 0.5;
 
     public JennyO1BGlyphPicker(HardwareMap hw) throws Exception{
         hardwareMap = hw;
@@ -36,7 +36,7 @@ public class JennyO1BGlyphPicker implements ActionHandler {
     }
 
     public int spit() {
-        wheelMotor.setMotorPower(-WHEEL_POWERS/1.5);
+        wheelMotor.setMotorPower(-WHEEL_POWERS);
         return 0;
     }
 

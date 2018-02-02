@@ -139,7 +139,7 @@ public class BlueTeam1GlyphAutonomousNewCenterTest extends LinearOpMode {
         jewelJouster.setJoustMode(JewelJousterV2.JEWEL_JOUSTER_POSITIONS.STORE);
         sleep(DEFAULT_SLEEP_DELAY_MILLIS);
         telemetry.update();
-        navigation.turnToHeading(245, this);
+        navigation.turnToHeading(250, this);
         navigation.brake();
         sleep(DEFAULT_SLEEP_DELAY_MILLIS);
         long startTime = System.currentTimeMillis();
@@ -173,7 +173,7 @@ public class BlueTeam1GlyphAutonomousNewCenterTest extends LinearOpMode {
         sleep(DEFAULT_SLEEP_DELAY_MILLIS);
         switch (mark) {
             case CENTER:
-                navigation.driveDistance(8, WEST, SLOW_SPEED_IN_PER_SEC, this);
+                navigation.driveDistance(11, WEST, SLOW_SPEED_IN_PER_SEC, this);
                 break;
             case LEFT:
                 navigation.driveDistance(2, WEST, SLOW_SPEED_IN_PER_SEC, this);
@@ -186,7 +186,7 @@ public class BlueTeam1GlyphAutonomousNewCenterTest extends LinearOpMode {
         sleep(DEFAULT_DELAY_MILLIS);
         curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
         columns = cryptoBoxFinder.findColumns(curImage, false);
-        while (!cryptoBoxAligner.centerOnCryptoBoxClosestToCenter(0, columns, WEST, EAST) && opModeIsActive()) {
+        while (!cryptoBoxAligner.centerOnCryptoBoxClosestToCenter(0, columns, EAST, WEST) && opModeIsActive()) {
             curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
             columns = cryptoBoxFinder.findColumns(curImage, false);
         }
