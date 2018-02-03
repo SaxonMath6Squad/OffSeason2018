@@ -23,14 +23,15 @@ public class JennyO1CRAD {
     ServoHandler RADStopper;
     SpoolMotor RADExtender;
     HardwareMap hardwareMap;
-    final double RELEASE_FRONT = 160;
-    final double NEUTRAL = 90;
-    final double GRAB_FRONT = 20;
-    final double RELEASE_BACK = 160;
-    final double GRAB_BACK = 20;
-    final double ROTATION_INCREMENT = 5;
-    final double STOP_RAD = 93;
+    final double RELEASE_FRONT = 180;
+    final double GRAB_FRONT = 100;
+    final double RELEASE_BACK = 0;
+    final double GRAB_BACK = 101;
+    final double STOP_RAD = 87;
     final double RELEASE_RAD = 8;
+    final double ZERO_ROTATION = 0;
+    final double FLIP_ROTATION = 170;
+    final double PERPENDICULAR_ROTATION = 80;
 
     public JennyO1CRAD(HardwareMap hw) throws InterruptedException {
         hardwareMap = hw;
@@ -47,11 +48,13 @@ public class JennyO1CRAD {
         RADExtender.setDirection(DcMotorSimple.Direction.REVERSE);
         RADExtender.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         RADStopper.setServoRanges(RELEASE_RAD-1, STOP_RAD+1);
-        RADStopper.setDegree(STOP_RAD);
-        frontRelicGrabber.setServoRanges(0, 180);
-        frontRelicGrabber.setDegree(0);
-        backRelicGrabber.setServoRanges(0, 180);
-        backRelicGrabber.setDegree(0);
+        RADStopper.setDegree(RELEASE_RAD);
+        frontRelicGrabber.setServoRanges(GRAB_FRONT-1, RELEASE_FRONT+1);
+        frontRelicGrabber.setDegree(GRAB_FRONT);
+        backRelicGrabber.setServoRanges(RELEASE_BACK-1, GRAB_BACK+1);
+        backRelicGrabber.setDegree(RELEASE_BACK);
+        relicRotator.setServoRanges(ZERO_ROTATION-1, FLIP_ROTATION+1);
+        relicRotator.setDegree(ZERO_ROTATION);
     }
 
     public int extendRAD(){
@@ -79,11 +82,6 @@ public class JennyO1CRAD {
         return 0;
     }
 
-    public int stopFrontRelic(){
-        frontRelicGrabber.setDegree(NEUTRAL);
-        return 0;
-    }
-
     public int setFrontGrabberPosition(double positionInDeg){
         frontRelicGrabber.setDegree(positionInDeg);
         return 0;
@@ -99,23 +97,23 @@ public class JennyO1CRAD {
         return 0;
     }
 
-    public int stopBackRelic(){
-        backRelicGrabber.setDegree(NEUTRAL);
-        return 0;
-    }
-
     public int setBackGrabberPosition(double positionInDeg){
         backRelicGrabber.setDegree(positionInDeg);
         return 0;
     }
 
-    public int rotateRelicClockwise(){
-        relicRotator.incrementDegree(ROTATION_INCREMENT);
+    public int zeroRotation(){
+        relicRotator.setDegree(ZERO_ROTATION);
         return 0;
     }
 
-    public int rotateRelicCounterclockwise(){
-        relicRotator.incrementDegree(-ROTATION_INCREMENT);
+    public int flipRotation(){
+        relicRotator.setDegree(FLIP_ROTATION);
+        return 0;
+    }
+
+    public int perpendicularRotation(){
+        relicRotator.setDegree(PERPENDICULAR_ROTATION);
         return 0;
     }
 

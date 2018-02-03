@@ -156,7 +156,7 @@ public class RedTeam2GlyphAutonomous extends LinearOpMode {
             mark = vuforia.getMark();
         }
 
-        switch (mark){
+        switch (mark) {
             case LEFT:
                 telemetry.addData("Mark", "LEFT");
                 break;
@@ -172,6 +172,7 @@ public class RedTeam2GlyphAutonomous extends LinearOpMode {
             default:
                 telemetry.addData("Mark", "HUH");
                 break;
+
         }
         if(mark == RelicRecoveryVuMark.UNKNOWN) mark = RelicRecoveryVuMark.CENTER;
         navigation.turnToHeading(EAST, this);
