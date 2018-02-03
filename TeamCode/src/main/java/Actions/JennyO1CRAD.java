@@ -23,10 +23,10 @@ public class JennyO1CRAD {
     ServoHandler RADStopper;
     SpoolMotor RADExtender;
     HardwareMap hardwareMap;
-    final double RELEASE_FRONT = 180;
-    final double GRAB_FRONT = 100;
-    final double RELEASE_BACK = 0;
-    final double GRAB_BACK = 101;
+    final double RELEASE_FRONT = 179;
+    final double GRAB_FRONT = 111;
+    final double RELEASE_BACK = 40;
+    final double GRAB_BACK = 100;
     final double STOP_RAD = 87;
     final double RELEASE_RAD = 8;
     final double ZERO_ROTATION = 0;

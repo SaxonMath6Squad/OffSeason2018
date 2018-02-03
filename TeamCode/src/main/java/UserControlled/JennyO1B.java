@@ -173,20 +173,31 @@ public class JennyO1B extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         long loopStartTime = 0;
         RAD.activateStopper();
-
+        long driveStart = 0;
+        long pickStart = 0;
+        long aerialStart = 0;
+        long radStart = 0;
 
         while (opModeIsActive()) {
             loopStartTime = System.currentTimeMillis();
             jouster.setJoustMode(JewelJousterV2.JEWEL_JOUSTER_POSITIONS.STORE_WITHOUT_PAUSE);
+            driveStart = System.currentTimeMillis();
             handleDriveControl();
+            telemetry.addData("Drive time","" + (System.currentTimeMillis() - driveStart));
+            pickStart = System.currentTimeMillis();
             handlePickSystem();
+            telemetry.addData("Pick time","" + (System.currentTimeMillis() - pickStart));
+            aerialStart = System.currentTimeMillis();
             handleAerialLift();
+            telemetry.addData("aerial time","" + (System.currentTimeMillis() - aerialStart));
+            radStart = System.currentTimeMillis();
             if(radMode) handleRAD();
+            telemetry.addData("rad time","" + (System.currentTimeMillis() - radStart));
 
             //GLYPH LIFT
 
             //GLYPH LIFT
-            long glyphLiftStart = System.currentTimeMillis();
+            //long glyphLiftStart = System.currentTimeMillis();
 
             /*
             else {
@@ -284,7 +295,7 @@ public class JennyO1B extends LinearOpMode {
                 autoLiftPositionMode = !autoLiftPositionMode;
                 while (gamepad2.x && gamepad2.y);
             }
-            telemetry.addData("Glyph Lift Time", "" + (System.currentTimeMillis() - glyphLiftStart));
+            //telemetry.addData("Glyph Lift Time", "" + (System.currentTimeMillis() - glyphLiftStart));
             //GLYPH ROLLER
 
 
@@ -337,22 +348,25 @@ public class JennyO1B extends LinearOpMode {
                     handleAerialLift();
                 }
             }
+            /*
             if(gamepad2.left_stick_button && !gamepad2.right_stick_button){
                 if(flagOn) flagController.pauseFlag();
                 else flagController.startFlag();
                 flagOn = !flagOn;
                 while (gamepad2.left_stick_button);
             }
+            */
             if(gamepad2.left_stick_button && gamepad2.right_stick_button) {
                 radMode = !radMode;
                 while (gamepad2.left_stick_button && gamepad2.right_stick_button);
             }
 
+
             //jouster.setJoustMode(JewelJousterV2.JEWEL_JOUSTER_POSITIONS.STORE);
-            telemetry.addData("lift tick", glyphLift.getLiftMotorPosition());
-            telemetry.addData("Belt power", glyphLift.getBeltPower());
+            //telemetry.addData("lift tick", glyphLift.getLiftMotorPosition());
+            //telemetry.addData("Belt power", glyphLift.getBeltPower());
             telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Min Button","" + glyphLift.isPressed());
+            //telemetry.addData("Min Button","" + glyphLift.isPressed());
             telemetry.addData("Time for Loop","" + (System.currentTimeMillis() - loopStartTime));
             telemetry.update();
         }
