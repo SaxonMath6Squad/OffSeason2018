@@ -60,13 +60,17 @@ public class GlyphStackingEngine {
             {Glyph.GRAY, Glyph.BROWN, Glyph.GRAY, Glyph.BROWN}
     };
 
-    public GlyphStackingEngine(ArrayList<Glyph> glyphColors, ArrayList<Location> glyphPositions) {
+    public GlyphStackingEngine(ArrayList<REVColorDistanceSensorController.color> glyphColors, ArrayList<Location> glyphPositions) {
+        ArrayList<Glyph> colors = new ArrayList<>();
+        for (int i = 0; i < glyphColors.size(); i++){
+            colors.set(i, convertSensorColorToGlyphColor(glyphColors.get(i)));
+        }
         boolean shouldContinue = true;
         for(int x = 0; x < 3; x++) {
             for(int y = 0; y < 4; y++) {
                 for(int i = 0; i < glyphPositions.size(); i++){
                     if(glyphPositions.get(i).getX() == x && glyphPositions.get(i).getY() == y){
-                        cryptobox[x][y] = glyphColors.get(i);
+                        cryptobox[x][y] = colors.get(i);
                         shouldContinue = false;
                     }
                     if(shouldContinue) cryptobox[x][y] = Glyph.NONE;
@@ -94,10 +98,11 @@ public class GlyphStackingEngine {
         }
     }
 
-    public boolean placeGlyph(Glyph color, Location location) {
+    public boolean placeGlyph(REVColorDistanceSensorController.color color, Location location) {
+        Glyph glyphColor = convertSensorColorToGlyphColor(color);
         if(location.getX() != -1 && location.getY() != -1) {
             if(cryptobox[(int)location.getX()][(int)location.getY()] == Glyph.NONE) {
-                cryptobox[(int)location.getX()][(int)location.getY()] = color;
+                cryptobox[(int)location.getX()][(int)location.getY()] = glyphColor;
                 return true;
             }
         }
@@ -152,13 +157,14 @@ public class GlyphStackingEngine {
         return placableLocation;
     }
 
-    public Location getPlacableCipherLocation(Glyph color) {
+    public Location getPlacableCipherLocation(REVColorDistanceSensorController.color color) {
         Location placableLocation;
+        Glyph glyphColor = convertSensorColorToGlyphColor(color);
         if(wantedCipher != null) {
             ArrayList<Location> placesToExclude = new ArrayList<>();
             for(int y = 0; y < 4; y++) {
                 for(int x = 0; x < 3; x++) {
-                    if(wantedCipher[x][y] != color) {
+                    if(wantedCipher[x][y] != glyphColor) {
                         placesToExclude.add(new Location(x, y));
                     }
                 }
@@ -233,6 +239,17 @@ public class GlyphStackingEngine {
                 if(cryptobox[2][0] == Glyph.BROWN || cryptobox[2][0] == Glyph.NONE) wantedCipher = brownFrog;
                 else wantedCipher = grayFrog;
             }
+        }
+    }
+
+    public Glyph convertSensorColorToGlyphColor(REVColorDistanceSensorController.color color){
+        switch (color){
+            case GREY:
+                return Glyph.GRAY;
+            case BROWN:
+                return Glyph.BROWN;
+            default:
+                return Glyph.NONE;
         }
     }
 }
