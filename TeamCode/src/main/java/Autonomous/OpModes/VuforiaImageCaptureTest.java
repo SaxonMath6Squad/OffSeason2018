@@ -22,14 +22,14 @@ import Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor;
 public class VuforiaImageCaptureTest extends LinearOpMode{
 
     CryptoBoxColumnImageProcessor cryptoFinder;
-    final int IMAGE_PROCESS_WIDTH = 171;
-    final int IMAGE_PROCESS_HEIGHT = 224;
     @Override
     public void runOpMode() throws InterruptedException {
         int imageTaken = 0;
         CryptoBoxColumnImageProcessor.CRYPTOBOX_COLOR color = CryptoBoxColumnImageProcessor.CRYPTOBOX_COLOR.BLUE;
         /*To access the image: you need to iterate through the images of the frame object:*/
-        VuforiaHelper vuforia = new VuforiaHelper();telemetry.update();while (!opModeIsActive()) {
+        VuforiaHelper vuforia = new VuforiaHelper();
+        //wait for the op mode to start, this is the time to change teams
+        while (!opModeIsActive()) {
             if (gamepad1.start) {
                 if(color == CryptoBoxColumnImageProcessor.CRYPTOBOX_COLOR.BLUE) color = CryptoBoxColumnImageProcessor.CRYPTOBOX_COLOR.RED;
                 else color = CryptoBoxColumnImageProcessor.CRYPTOBOX_COLOR.BLUE;

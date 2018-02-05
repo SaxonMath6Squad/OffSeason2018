@@ -12,6 +12,7 @@ import java.util.ArrayList;
 
 /*
     A class to process images and mainly find the columns of the cryptobox
+
  */
 public class CryptoBoxColumnImageProcessor {
     public int imageWidth;
@@ -27,12 +28,33 @@ public class CryptoBoxColumnImageProcessor {
     public enum CRYPTOBOX_COLOR {BLUE,RED};
     CRYPTOBOX_COLOR colorToFind = CRYPTOBOX_COLOR.BLUE;
 
+
+    /**
+     * constructor for this class, you should not use this as you can not set the team's color to look for
+     *
+     * @param desiredHeight         this is an int of the image that will be processed. It is suggested that this is a rather
+     *                              small number to reduce the required processing time
+     * @param desiredWidth          like suggested above, keep this small to reduce processing time.
+     * @param percentColumnCheck    this is the minimum required percentage of one pixel column that must be the team's color to consider
+     * @param minColumnWidth        this is the minimum required number of columns to be of the required color next to each other before the algorithm concludes the columns to be a cryptobox column
+     */
+
     public CryptoBoxColumnImageProcessor(int desiredHeight, int desiredWidth, double percentColumnCheck, int minColumnWidth){
         imageHeight = desiredHeight;
         imageWidth = desiredWidth;
         percentRequiredInColumnToCheck = percentColumnCheck;
         minimumColumnWidth = minColumnWidth;
     }
+
+    /**
+     *
+     * @param desiredHeight         this is an int of the image that will be processed. It is suggested that this is a rather
+     *                              small number to reduce the required processing time
+     * @param desiredWidth          like suggested above, keep this small to reduce processing time.
+     * @param percentColumnCheck    this is the minimum required percentage of one pixel column that must be the team's color to consider
+     * @param minColumnWidth        this is the minimum required number of columns to be of the required color next to each other before the algorithm concludes the columns to be a cryptobox column
+     * @param color                 This is the team's color, which is also the color cryptobox the algorithm will be looking for
+     */
     public CryptoBoxColumnImageProcessor(int desiredHeight, int desiredWidth, double percentColumnCheck, int minColumnWidth, CRYPTOBOX_COLOR color){
         colorToFind = color;
         imageHeight = desiredHeight;
@@ -40,6 +62,12 @@ public class CryptoBoxColumnImageProcessor {
         percentRequiredInColumnToCheck = percentColumnCheck;
         minimumColumnWidth = minColumnWidth;
     }
+
+    /**
+     * this function sets the required minimum columns that need to be adjacent and of the same color before the algorithm concludes
+     * the adjacent columns are part of a cryptobox column
+     * @param percentOfWidthOfImage the minimum number of adjacent columns of the team's color before being called a cryptobox column
+     */
 
     public void setRequiredMinimumColumnWidth(double percentOfWidthOfImage){
         int widthInPixels = (int)(percentOfWidthOfImage*imageWidth + .5);
@@ -50,12 +78,24 @@ public class CryptoBoxColumnImageProcessor {
         minimumColumnWidth = widthInPixels;
     }
 
+    /**
+     * this function sets the minimum percentage of a column of the camera's image to be the team's color before deciding the column is of
+     * that color.
+     * @param percentOfImageHeight  the minimum percentage of a column to be the team's color before calling the column a cryptobox column
+     */
+
     public void setRequiredPercentOfImageColumnBlue(double percentOfImageHeight){
         if(percentOfImageHeight > 1){
             throw new RuntimeException("Wanted Column Height Percent Greater Than 1.0!");
         }
         percentRequiredInColumnToCheck = percentOfImageHeight;
     }
+
+    /**
+     * this function scales a Bitmap to the correct size
+     * @param bmp the Bitmap to scale
+     * @return a Bitmap at the right size
+     */
 
     public Bitmap scaleBmp(Bitmap bmp){
         bmp = Bitmap.createScaledBitmap(bmp,imageWidth,imageHeight,true);
@@ -86,6 +126,12 @@ public class CryptoBoxColumnImageProcessor {
         return interestingColumns;
     }
 
+    /**
+     * this function determines the bounds of the cryptobox in a image
+     * @param columnsWithRequiredBluePercent the indexes of columns determined to meet the minimum percentage of the team's color
+     * @return an ArrayList of the start and end of the columns of the image that correspond to the start and end of the cryptobox colored columns
+     */
+
     private ArrayList<Integer> getColumnBounds(ArrayList<Integer> columnsWithRequiredBluePercent){
         ArrayList<Integer> columnBounds = new ArrayList<Integer>();
         if(columnsWithRequiredBluePercent.size() > 0) {
@@ -110,6 +156,13 @@ public class CryptoBoxColumnImageProcessor {
         return columnBounds;
     }
 
+    /**
+     * this function determines the centers of the colored cryptobox columns. This can only be used if two columns are in the view of the camera.
+     * as this is typically not the case, it is suggested that you use the findColumnCenters function
+     * @param columnBounds the processed and determined bounds of cryptoboxes.
+     * @return an ArrayList of the centers of the cryptobox, where you would score a glyph
+     */
+
     private ArrayList<Integer> getColumnCenters(ArrayList<Integer> columnBounds) {
         ArrayList<Integer> columnCenters = new ArrayList<Integer>();
         for (int i = 0; i < columnBounds.size() / 2; i++) {
@@ -117,6 +170,13 @@ public class CryptoBoxColumnImageProcessor {
         }
         return columnCenters;
     }
+
+    /**
+     * This function returns the location of the colored cryptobox columns
+     * @param bmp the Bitmap from the camera
+     * @param shouldModifyImage whether the algorithm should modify the image as it processes it. Set this to true if you intend on saving the image
+     * @return an ArrayList of the columns, relative to the width of the Bitmap, of the location of all seen cryptobox columns
+     */
 
     public ArrayList<Integer> findColumnCenters(Bitmap bmp, boolean shouldModifyImage){
         ArrayList<Integer> columns = findColumns(bmp,shouldModifyImage);
@@ -126,6 +186,15 @@ public class CryptoBoxColumnImageProcessor {
         }
         return centers;
     }
+
+    /**
+     * This is the basis of the entire cryptobox processing image algorithm. This algorithm works by first determining all
+     * columns that are of the team's color. This is determined through comparing the percentage of the coloumn that are blue or red to the minimum required percentage.
+     * Then those columns that are blue or red are compared to columns adjacent to them to determine if there is a colored column or if it is noise.
+     * @param bmp
+     * @param shouldModifyImage
+     * @return
+     */
 
     public ArrayList<Integer> findColumns(Bitmap bmp, boolean shouldModifyImage){
         //Log.d("CF IMG ","Height: " + bmp.getHeight() + " Width: " + bmp.getWidth());
@@ -161,6 +230,10 @@ public class CryptoBoxColumnImageProcessor {
         return columnCenters;
     }
 
+    /**
+     * This function modifies the pixels to show where the center of the colored columns are
+     */
+
     private void showColumnCenters(int [] pixels, int height, int width, ArrayList<Integer> columnCenters, int colorToShowWith){
         for (int i = 0; i < columnCenters.size(); i++) {
             for (int r = 0; r < height; r++) {
@@ -169,6 +242,10 @@ public class CryptoBoxColumnImageProcessor {
         }
     }
 
+
+    /*
+        this function will show the blue pixels in an image
+     */
     public void showBluePixels(int [] pixels, int height, int width, int colorToReplaceWith){
         for (int c = 0; c < width; c++) {
             int numberOfBluePixels = 0;
@@ -189,6 +266,7 @@ public class CryptoBoxColumnImageProcessor {
         }
     }
 
+
     public void showRedPixels(int [] pixels, int height, int width, int colorToReplaceWith){
         for (int c = 0; c < width; c++) {
             int numberOfBluePixels = 0;
@@ -208,21 +286,6 @@ public class CryptoBoxColumnImageProcessor {
             }
         }
     }
-
-    public boolean isCentered(int desiredCenter, int imageCenter){
-        boolean centered = false;
-        if(imageCenter > desiredCenter){
-            if(imageCenter - desiredCenter <= 20){ //TODO: make the tolerance a constant
-                centered = true;
-            }
-        } else {
-            if(desiredCenter - imageCenter <= 20){
-                centered = true;
-            }
-        }
-        return centered;
-    }
-
 
     public int [] collapseVerticallyByBlueCount(int [] pixels, int imageWidth, int imageHeight){
         //collapse into a single, frequency based
@@ -248,21 +311,6 @@ public class CryptoBoxColumnImageProcessor {
                     toReturn[c] ++;
                 }
             }
-        }
-        return toReturn;
-    }
-
-    public double [] collapseVerticallyByBluePercent(int [] pixels, int imageWidth, int imageHeight){
-        //collapse into a single, frequency based
-        double [] toReturn = new double[imageWidth];
-        for(int c = 0; c < imageWidth; c ++){
-            for(int r = 0; r < imageHeight; r ++){
-                int color = pixels[r*imageWidth + c];
-                if(checkIfBlue(color)){
-                    toReturn[c] ++;
-                }
-            }
-            toReturn[c] = toReturn[c]/imageHeight;
         }
         return toReturn;
     }

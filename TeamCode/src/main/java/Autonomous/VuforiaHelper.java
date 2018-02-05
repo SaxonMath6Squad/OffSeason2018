@@ -26,6 +26,8 @@ import java.io.IOException;
 
 /*
     A class to help us use vuforia more easily
+    Keep in mind to call the loadCipherAssets function if you wish to use this for crypto-key image detection
+    The
  */
 public class VuforiaHelper {
 
@@ -54,6 +56,11 @@ public class VuforiaHelper {
         //vuLoc.
     }
 
+    /*
+        loadCipherAssets
+        tells vuforia to begin tracking cryptokeys
+     */
+
     public void loadCipherAssets(){
         relicTrackables = vuLoc.loadTrackablesFromAsset("RelicVuMark");
         relicTemplate = relicTrackables.get(0);
@@ -61,15 +68,22 @@ public class VuforiaHelper {
     }
 
 
-    public void threadVuMarkFinder(){
-
-    }
-
+    /*
+        getMark()
+        returns a RelicRecoveryVuMark based on what the camera sees
+     */
     public RelicRecoveryVuMark getMark(){
         RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.from(relicTemplate);
         return vuMark;
     }
 
+
+    /*
+        getImage
+        wantedWidth -- of the image to return
+        wantedHeight -- of the image to return
+        returns a Bitmap of what the camera sees
+     */
     public Bitmap getImage(int wantedWidth, int wantedHeight) {
         Image i = null;
         long timeStart = System.currentTimeMillis();
@@ -103,13 +117,22 @@ public class VuforiaHelper {
         return null;
     }
 
-
+    /*
+        convertImageToBmp
+        requires and Image of what to convert
+        returns the Bitmap of the Image
+     */
     private Bitmap convertImageToBmp(Image img){
         Bitmap bmp = Bitmap.createBitmap(img.getWidth(), img.getHeight(), Bitmap.Config.RGB_565);
         bmp.copyPixelsFromBuffer(img.getPixels());
         return bmp;
     }
 
+
+    /*
+        takeImage()
+        this function gets vuforia to return an Image of what it sees
+     */
     private Image takeImage() throws InterruptedException{
         Image img = null;
         VuforiaLocalizer.CloseableFrame frame = vuLoc.getFrameQueue().take(); //takes the frame at the head of the queue
@@ -124,6 +147,13 @@ public class VuforiaHelper {
         return img;
     }
 
+
+    /*
+        saveBMP
+        requires a Bitmap of what to save to the local storage
+
+        saves a BMP to the phone, you can find it in the root directory
+     */
     public void saveBMP(Bitmap bmp){
 
         FileOutputStream out = null;
