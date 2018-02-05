@@ -42,6 +42,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 
 import java.util.ArrayList;
+
+import Actions.JennyO1CRAD;
 import Actions.NewArialDepositor;
 import Actions.JewelJousterV2;
 import Autonomous.ImageAlignmentHelper;
@@ -84,6 +86,7 @@ public class RedTeam1GlyphAutonomous extends LinearOpMode {
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
     JennyNavigation navigation;
+    JennyO1CRAD rad;
     NewArialDepositor glyphSystem;
     JennySensorTelemetry sensorTelemetry;
     JewelJousterV2 jewelJouster;
@@ -106,6 +109,7 @@ public class RedTeam1GlyphAutonomous extends LinearOpMode {
             vuforia = new VuforiaHelper();
             cryptoBoxFinder = new CryptoBoxColumnImageProcessor(DESIRED_HEIGHT, DESIRED_WIDTH, CLOSE_UP_MIN_PERCENT_COLUMN_CHECK, CLOSE_UP_MIN_COLUMN_WIDTH, CryptoBoxColumnImageProcessor.CRYPTOBOX_COLOR.RED);
             cryptoBoxAligner = new ImageAlignmentHelper(DESIRED_WIDTH, navigation, this);
+            rad = new JennyO1CRAD(hardwareMap);
         }
         catch (Exception e){
             Log.e("Error!" , "Jenny Navigation: " + e.toString());
@@ -120,6 +124,7 @@ public class RedTeam1GlyphAutonomous extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
+        rad.activateStopper();
         jewelJouster.setJoustMode(JewelJousterV2.JEWEL_JOUSTER_POSITIONS.READ);
         sleep(DEFAULT_SLEEP_DELAY_MILLIS);
         for(int i = 0; i < 10; i++){
@@ -142,7 +147,7 @@ public class RedTeam1GlyphAutonomous extends LinearOpMode {
         jewelJouster.setJoustMode(JewelJousterV2.JEWEL_JOUSTER_POSITIONS.STORE);
         sleep(DEFAULT_SLEEP_DELAY_MILLIS);
         telemetry.update();
-        navigation.driveDistance(6, SOUTH, MED_SPEED_IN_PER_SEC, this);
+        navigation.turnToHeading(80, this);
         navigation.brake();
         sleep(DEFAULT_SLEEP_DELAY_MILLIS);
         long startTime = System.currentTimeMillis();
@@ -171,7 +176,8 @@ public class RedTeam1GlyphAutonomous extends LinearOpMode {
         }
         if(mark == RelicRecoveryVuMark.UNKNOWN) mark = RelicRecoveryVuMark.CENTER;
         telemetry.update();
-        navigation.driveDistance(22, SOUTH, SLOW_SPEED_IN_PER_SEC, this);
+        navigation.turnToHeading(EAST, this);
+        navigation.driveDistance(28, SOUTH, SLOW_SPEED_IN_PER_SEC, this);
         navigation.turnToHeading(NORTH, this);
         sleep(DEFAULT_SLEEP_DELAY_MILLIS);
         switch (mark) {
@@ -185,6 +191,8 @@ public class RedTeam1GlyphAutonomous extends LinearOpMode {
                 navigation.driveDistance(2, EAST, SLOW_SPEED_IN_PER_SEC, this);
                 break;
         }
+        navigation.driveDistance(2, SOUTH, SLOW_SPEED_IN_PER_SEC, this);
+        sleep(DEFAULT_DELAY_MILLIS);
         curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
         columns = cryptoBoxFinder.findColumns(curImage, false);
         while (!cryptoBoxAligner.centerOnCryptoBoxClosestToCenter(0, columns, EAST, WEST) && opModeIsActive()) {
@@ -197,7 +205,7 @@ public class RedTeam1GlyphAutonomous extends LinearOpMode {
         sleep(DEFAULT_SLEEP_DELAY_MILLIS);
         glyphSystem.startBelt();
         sleep(2000);
-        navigation.driveDistance(5, NORTH, SLOW_SPEED_IN_PER_SEC, this);
+        navigation.driveDistance(6, NORTH, SLOW_SPEED_IN_PER_SEC, this);
         glyphSystem.stopBelt();
         glyphSystem.goToGlyphLevel(NewArialDepositor.GLYPH_PLACEMENT_LEVEL.GROUND);
         while(opModeIsActive());

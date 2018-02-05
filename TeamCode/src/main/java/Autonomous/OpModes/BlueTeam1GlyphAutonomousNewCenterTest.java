@@ -43,6 +43,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 
 import java.util.ArrayList;
 
+import Actions.JennyO1CRAD;
 import Actions.NewArialDepositor;
 import Actions.JewelJousterV2;
 import Autonomous.ImageAlignmentHelper;
@@ -81,6 +82,7 @@ public class BlueTeam1GlyphAutonomousNewCenterTest extends LinearOpMode {
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
     JennyNavigation navigation;
+    JennyO1CRAD rad;
     NewArialDepositor glyphSystem;
     JennySensorTelemetry sensorTelemetry;
     JewelJousterV2 jewelJouster;
@@ -103,6 +105,7 @@ public class BlueTeam1GlyphAutonomousNewCenterTest extends LinearOpMode {
             vuforia = new VuforiaHelper();
             cryptoBoxFinder = new CryptoBoxColumnImageProcessor(DESIRED_HEIGHT, DESIRED_WIDTH, CLOSE_UP_MIN_PERCENT_COLUMN_CHECK, CLOSE_UP_MIN_COLUMN_WIDTH, CryptoBoxColumnImageProcessor.CRYPTOBOX_COLOR.BLUE);
             cryptoBoxAligner = new ImageAlignmentHelper(DESIRED_WIDTH, navigation, this);
+            rad = new JennyO1CRAD(hardwareMap);
         }
         catch (Exception e){
             Log.e("Error!" , "Jenny Navigation: " + e.toString());
@@ -117,6 +120,7 @@ public class BlueTeam1GlyphAutonomousNewCenterTest extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
+        rad.activateStopper();
         jewelJouster.setJoustMode(JewelJousterV2.JEWEL_JOUSTER_POSITIONS.READ);
         sleep(DEFAULT_SLEEP_DELAY_MILLIS);
         for(int i = 0; i < 10; i++){
@@ -196,7 +200,7 @@ public class BlueTeam1GlyphAutonomousNewCenterTest extends LinearOpMode {
         sleep(DEFAULT_SLEEP_DELAY_MILLIS);
         glyphSystem.startBelt();
         sleep(2000);
-        navigation.driveDistance(5, NORTH, SLOW_SPEED_IN_PER_SEC, this);
+        navigation.driveDistance(6, NORTH, SLOW_SPEED_IN_PER_SEC, this);
         glyphSystem.stopBelt();
         glyphSystem.goToGlyphLevel(NewArialDepositor.GLYPH_PLACEMENT_LEVEL.GROUND);
         while(opModeIsActive());
