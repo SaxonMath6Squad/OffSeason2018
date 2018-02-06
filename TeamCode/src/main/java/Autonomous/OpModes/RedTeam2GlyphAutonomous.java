@@ -185,22 +185,22 @@ public class RedTeam2GlyphAutonomous extends LinearOpMode {
         sleep(DEFAULT_SLEEP_DELAY_MILLIS);
         switch (mark) {
             case CENTER:
-                navigation.driveDistance(35, SOUTH, SLOW_SPEED_IN_PER_SEC, this);
+                navigation.driveDistance(39, SOUTH, SLOW_SPEED_IN_PER_SEC, this);
                 break;
             case LEFT:
-                navigation.driveDistance(41, SOUTH, SLOW_SPEED_IN_PER_SEC, this);
+                navigation.driveDistance(42, SOUTH, SLOW_SPEED_IN_PER_SEC, this);
                 break;
             case RIGHT:
-                navigation.driveDistance(29, SOUTH, SLOW_SPEED_IN_PER_SEC, this);
+                navigation.driveDistance(30, SOUTH, SLOW_SPEED_IN_PER_SEC, this);
                 break;
         }
         navigation.driveDistance(7, WEST, ADJUSTING_SPEED_IN_PER_SEC, this);
-        curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
-        columns = cryptoBoxFinder.findColumns(curImage, false);
-        while (!cryptoBoxAligner.centerOnCryptoBoxClosestToCenter(0, columns, SOUTH, NORTH) && opModeIsActive()) {
-            curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
-            columns = cryptoBoxFinder.findColumns(curImage, false);
-        }
+//        curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
+//        columns = cryptoBoxFinder.findColumns(curImage, false);
+//        while (!cryptoBoxAligner.centerOnCryptoBoxClosestToCenter(0, columns, SOUTH, NORTH) && opModeIsActive()) {
+//            curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
+//            columns = cryptoBoxFinder.findColumns(curImage, false);
+//        }
         navigation.brake();
         sleep(DEFAULT_SLEEP_DELAY_MILLIS);
         glyphSystem.goToGlyphLevel(NewArialDepositor.GLYPH_PLACEMENT_LEVEL.ROW1);

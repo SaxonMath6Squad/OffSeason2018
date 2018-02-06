@@ -45,7 +45,7 @@ public class JennyO1CRAD {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        RADExtender.setDirection(DcMotorSimple.Direction.REVERSE);
+        RADExtender.setDirection(DcMotorSimple.Direction.FORWARD);
         RADExtender.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         RADStopper.setServoRanges(RELEASE_RAD-1, STOP_RAD+1);
         RADStopper.setDegree(RELEASE_RAD);

@@ -389,7 +389,7 @@ public class JennyO1B extends LinearOpMode {
         driveVelocity *= leftJoystick.magnitude();
         //Log.d("DriveVelocity","" + driveVelocity);
         turnRps = (isSlowMode)? (.25 * rightJoystick.magnitude() * rightJoystick.x()/Math.abs(rightJoystick.x())):.7 *rightJoystick.magnitude() * rightJoystick.x()/Math.abs(rightJoystick.x());
-        navigation.driveOnHeadingWithTurning((paralaxedControl == 2)? (leftJoystick.angle() + 90)%360:(paralaxedControl == 0)? leftJoystick.angle(): (leftJoystick.angle() - 90)%360, driveVelocity, turnRps);
+        navigation.relativeDriveOnHeadingWithTurning((paralaxedControl == 2)? (leftJoystick.angle() + 90)%360:(paralaxedControl == 0)? leftJoystick.angle(): (leftJoystick.angle() - 90)%360, driveVelocity, turnRps);
 
     }
 

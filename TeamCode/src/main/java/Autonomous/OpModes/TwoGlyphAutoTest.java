@@ -83,7 +83,7 @@ import static DriveEngine.JennyNavigation.WEST;
 /*
     An opmode to test knocking off the correct jewel
  */
-@Autonomous(name="Blue Team 1 Glyph Test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
+@Autonomous(name="Two glyph test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
 //@Disabled
 public class TwoGlyphAutoTest extends LinearOpMode {
 
@@ -119,6 +119,7 @@ public class TwoGlyphAutoTest extends LinearOpMode {
             cryptoBoxAligner = new ImageAlignmentHelper(DESIRED_WIDTH, navigation, this);
             rad = new JennyO1CRAD(hardwareMap);
             glyphPicker = new JennyO1BGlyphPicker(hardwareMap);
+            cipherTracker = new GlyphStackingEngine();
         }
         catch (Exception e){
             Log.e("Error!" , "Jenny Navigation: " + e.toString());
@@ -139,7 +140,7 @@ public class TwoGlyphAutoTest extends LinearOpMode {
         navigation.driveDistance(30, WEST, HIGH_SPEED_IN_PER_SEC, this);
         while ((glyphColor == UNKNOWN || glyphColor == NOT_IN_RANGE) && opModeIsActive()){
             turnMagnitude = Math.sin((System.currentTimeMillis() - startTime / 1000.0)) * .25;
-            navigation.driveOnHeadingWithTurning(WEST, SLOW_SPEED_IN_PER_SEC, turnMagnitude);
+            navigation.relativeDriveOnHeadingWithTurning(WEST, SLOW_SPEED_IN_PER_SEC, turnMagnitude);
             glyphColor = glyphSystem.getColor(NewArialDepositor.REAR_GLYPH_SENSOR);
         }
         currentColor = glyphSystem.getColor(NewArialDepositor.REAR_GLYPH_SENSOR);
@@ -147,7 +148,6 @@ public class TwoGlyphAutoTest extends LinearOpMode {
         // drive back and center
         navigation.driveDistance(30, EAST, MED_SPEED_IN_PER_SEC, this);
         glyphPicker.pause();
-        navigation.driveDistance(5, EAST, SLOW_SPEED_IN_PER_SEC, this);
         glyphSystem.stopBelt();
         curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
         columns = cryptoBoxFinder.findColumns(curImage, false);
@@ -170,19 +170,19 @@ public class TwoGlyphAutoTest extends LinearOpMode {
         sleep(DEFAULT_DELAY_MILLIS);
 
         // get third glyph and go back
-        glyphPicker.grab();
-        glyphSystem.startBelt();
-        glyphColor = glyphSystem.getColor(NewArialDepositor.REAR_GLYPH_SENSOR);
-        navigation.driveDistance(30, WEST, HIGH_SPEED_IN_PER_SEC, this);
-        while ((glyphColor == UNKNOWN || glyphColor == NOT_IN_RANGE) && opModeIsActive()){
-            turnMagnitude = Math.sin((System.currentTimeMillis() - startTime / 1000.0)) * .25;
-            navigation.driveOnHeadingWithTurning(WEST, MED_SLEEP_DELAY_MILLIS, turnMagnitude);
-            glyphColor = glyphSystem.getColor(NewArialDepositor.REAR_GLYPH_SENSOR);
-        }
-        currentColor = glyphSystem.getColor(NewArialDepositor.REAR_GLYPH_SENSOR);
-        navigation.brake();
-        navigation.driveDistance(30, EAST, HIGH_SPEED_IN_PER_SEC, this);
-        glyphSystem.stopBelt();
-        glyphPicker.pause();
+//        glyphPicker.grab();
+//        glyphSystem.startBelt();
+//        glyphColor = glyphSystem.getColor(NewArialDepositor.REAR_GLYPH_SENSOR);
+//        navigation.driveDistance(30, WEST, HIGH_SPEED_IN_PER_SEC, this);
+//        while ((glyphColor == UNKNOWN || glyphColor == NOT_IN_RANGE) && opModeIsActive()){
+//            turnMagnitude = Math.sin((System.currentTimeMillis() - startTime / 1000.0)) * .25;
+//            navigation.driveOnHeadingWithTurning(WEST, MED_SLEEP_DELAY_MILLIS, turnMagnitude);
+//            glyphColor = glyphSystem.getColor(NewArialDepositor.REAR_GLYPH_SENSOR);
+//        }
+//        currentColor = glyphSystem.getColor(NewArialDepositor.REAR_GLYPH_SENSOR);
+//        navigation.brake();
+//        navigation.driveDistance(30, EAST, HIGH_SPEED_IN_PER_SEC, this);
+//        glyphSystem.stopBelt();
+//        glyphPicker.pause();
     }
 }

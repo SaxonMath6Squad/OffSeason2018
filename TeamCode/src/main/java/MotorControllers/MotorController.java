@@ -176,7 +176,7 @@ public class MotorController extends Thread {
             shouldRun = false;
             throw new RuntimeException(e);
         }
-        //Log.d("MotorPow", "" + getMotorPower() + " %");
+        Log.d("MotorPow", "" + getMotorPower() + " %");
 
     }
 
