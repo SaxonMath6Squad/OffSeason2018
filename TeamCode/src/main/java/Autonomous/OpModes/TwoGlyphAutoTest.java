@@ -104,8 +104,8 @@ public class TwoGlyphAutoTest extends LinearOpMode {
     public void runOpMode() {
         Bitmap curImage = null;
         ArrayList<Integer> columns = new ArrayList<>();
-        double turnMagnitude = 0;
-        REVColorDistanceSensorController.color glyphColor = UNKNOWN;
+
+
         REVColorDistanceSensorController.color currentColor = UNKNOWN;
         long startTime = System.currentTimeMillis();
 
@@ -138,17 +138,15 @@ public class TwoGlyphAutoTest extends LinearOpMode {
         glyphPicker.grab();
         glyphSystem.startBelt();
         navigation.driveDistance(30, WEST, HIGH_SPEED_IN_PER_SEC, this);
-        while ((glyphColor == UNKNOWN || glyphColor == NOT_IN_RANGE) && opModeIsActive()){
-            turnMagnitude = Math.sin((System.currentTimeMillis() - startTime / 1000.0)) * .25;
-            navigation.relativeDriveOnHeadingWithTurning(WEST, SLOW_SPEED_IN_PER_SEC, turnMagnitude);
-            glyphColor = glyphSystem.getColor(NewArialDepositor.REAR_GLYPH_SENSOR);
-        }
+        getSecondGlyph();
+
         currentColor = glyphSystem.getColor(NewArialDepositor.REAR_GLYPH_SENSOR);
 
         // drive back and center
         navigation.driveDistance(30, EAST, MED_SPEED_IN_PER_SEC, this);
         glyphPicker.pause();
         glyphSystem.stopBelt();
+        /*
         curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
         columns = cryptoBoxFinder.findColumns(curImage, false);
         while (!cryptoBoxAligner.centerOnCryptoBoxClosestToCenter(0, columns, NORTH, SOUTH) && opModeIsActive()){
@@ -168,7 +166,7 @@ public class TwoGlyphAutoTest extends LinearOpMode {
         glyphSystem.stopBelt();
         glyphSystem.goToGlyphLevel(NewArialDepositor.GLYPH_PLACEMENT_LEVEL.GROUND);
         sleep(DEFAULT_DELAY_MILLIS);
-
+*/
         // get third glyph and go back
 //        glyphPicker.grab();
 //        glyphSystem.startBelt();
@@ -184,5 +182,22 @@ public class TwoGlyphAutoTest extends LinearOpMode {
 //        navigation.driveDistance(30, EAST, HIGH_SPEED_IN_PER_SEC, this);
 //        glyphSystem.stopBelt();
 //        glyphPicker.pause();
+    }
+
+    public boolean getSecondGlyph(){
+        REVColorDistanceSensorController.color glyphColor = UNKNOWN;
+        double turnMagnitude = 0;
+        double driveMagnitude = 0;
+        long startTime = System.currentTimeMillis();
+        while ((glyphColor == UNKNOWN || glyphColor == NOT_IN_RANGE) && opModeIsActive()){
+            turnMagnitude = Math.sin((System.currentTimeMillis() - startTime / 1000.0)) * .25;
+            driveMagnitude = Math.sin((System.currentTimeMillis() - startTime / 1000.0)) * 10;
+            if(driveMagnitude < 0)
+                navigation.relativeDriveOnHeadingWithTurning(EAST, driveMagnitude, 0);
+            else
+                navigation.relativeDriveOnHeadingWithTurning(WEST, driveMagnitude, 0);
+            glyphColor = glyphSystem.getColor(NewArialDepositor.REAR_GLYPH_SENSOR);
+        }
+        return true;
     }
 }

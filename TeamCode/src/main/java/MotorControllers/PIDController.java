@@ -35,6 +35,7 @@ public class PIDController {
     public double getP(){return Kp;}
     public double getI(){return Ki;}
     public double getD(){return Kd;}
+    public double getI_Max(){return I_CAP;}
     public void setIMax(double cap) {I_CAP = cap;}
 
     public double getSp(){

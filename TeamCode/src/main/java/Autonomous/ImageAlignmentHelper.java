@@ -33,6 +33,38 @@ public class ImageAlignmentHelper {
         navigation = nav;
     }
 
+    public double getKp(){
+        return imagePid.getP();
+    }
+
+    public double getKi(){
+        return imagePid.getI();
+    }
+
+    public double getKd(){
+        return imagePid.getD();
+    }
+
+    public double getKiMax(){
+        return imagePid.getI_Max();
+    }
+
+    public void setKp(double kP){
+        imagePid.setP(kP);
+    }
+
+    public void setKi(double kI){
+        imagePid.setI(kI);
+    }
+
+    public void setKd(double Kd){
+        imagePid.setD(Kd);
+    }
+
+    public void setKiMax(double iMax){
+        imagePid.setIMax(iMax);
+    }
+
 
     public int findCryptoColumnClosestToDesired(ArrayList<Integer> columns, int desiredLocationOnScreen){
         if(columns.size() == 0){
@@ -67,6 +99,34 @@ public class ImageAlignmentHelper {
                 double distToColumn = columns.get(column) - CRYPTO_COLUMN_TARGET_POSITION;
                 double velocityCorrection = -imagePid.calculatePID(distToColumn);
                 Log.d("Seek Status","Found, moving at " + velocityCorrection);
+                double degreeToTravelPrimaryDir = navigation.getOrientation() + 90;
+                navigation.correctedDriveOnHeadingIMU((velocityCorrection < 0) ? degreeToTravelPrimaryDir : degreeToTravelPrimaryDir + 180.0, Math.abs(velocityCorrection), mode);
+            } else {
+                navigation.brake();
+                Log.d("Seek Status", "Obtained, delta Pixels:" + Math.abs(columns.get(targetColumnIndex) - CRYPTO_COLUMN_TARGET_POSITION));
+                return true;
+            }
+        }
+        return false;
+    }
+    /*
+    public boolean centerOnCryptoBoxClosestToCenter(int column, ArrayList<Integer> columns, int primaryDirection, int secondaryDirection){
+        Log.d("Seen columns", Integer.toString(columns.size()));
+        if(columns.size() == 0){
+            navigation.correctedDriveOnHeadingIMU(primaryDirection, SLOW_SPEED_IN_PER_SEC, 0, mode);
+            Log.d("Seek Status","Not found, moving in primary dir");
+            return false;
+        }
+        int targetColumnIndex = findCryptoColumnClosestToDesired(columns, CRYPTO_COLUMN_TARGET_POSITION);
+        if(targetColumnIndex != -1) {
+            if (Math.abs(columns.get(targetColumnIndex) - CRYPTO_COLUMN_TARGET_POSITION) > DESIRED_PIXEL_ACCURACY) {
+                Log.d("Delta Pixels","" + Math.abs(columns.get(targetColumnIndex) - CRYPTO_COLUMN_TARGET_POSITION));
+                //keep driving the hint
+                Log.d("Column location", columns.get(column).toString());
+                imagePid.setSp(0);
+                double distToColumn = columns.get(column) - CRYPTO_COLUMN_TARGET_POSITION;
+                double velocityCorrection = -imagePid.calculatePID(distToColumn);
+                Log.d("Seek Status","Found, moving at " + velocityCorrection);
                 navigation.correctedDriveOnHeadingIMU((velocityCorrection < 0) ? primaryDirection : secondaryDirection, Math.abs(velocityCorrection), mode);
             } else {
                 navigation.brake();
@@ -76,4 +136,5 @@ public class ImageAlignmentHelper {
         }
         return false;
     }
+     */
 }

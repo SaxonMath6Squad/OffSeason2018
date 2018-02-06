@@ -62,12 +62,11 @@ public class VuforiaImageCaptureTest extends LinearOpMode{
                     }
                 }
                 //save every tenth image 
-                if(imageTaken == 10) {
+                if(imageTaken == 50) {
                     vuforia.saveBMP(bmp); // save edited image
                     imageTaken = 0; 
                 }
                 imageTaken++;
-                
                 telemetry.addData("Loop Time", "" + (System.currentTimeMillis() - timeStart));
                 telemetry.update();
             }
