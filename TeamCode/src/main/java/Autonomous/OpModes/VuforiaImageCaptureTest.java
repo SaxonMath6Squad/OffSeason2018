@@ -38,28 +38,36 @@ public class VuforiaImageCaptureTest extends LinearOpMode{
             telemetry.addData("Color", color);
             telemetry.update();
         }
+        //initialize the image processor 
         cryptoFinder = new CryptoBoxColumnImageProcessor(CryptoBoxColumnImageProcessor.DESIRED_HEIGHT,CryptoBoxColumnImageProcessor.DESIRED_WIDTH,.1,1, color);
         telemetry.addData("Status","Initialized");
 
         waitForStart();
+        //storage variables 
         Bitmap bmp;
         ArrayList<Integer> columnLocations = new ArrayList<Integer>();
         while(opModeIsActive()){
             long timeStart = System.currentTimeMillis();
+            //get an image 
             bmp = vuforia.getImage(CryptoBoxColumnImageProcessor.DESIRED_WIDTH,CryptoBoxColumnImageProcessor.DESIRED_HEIGHT);
             if(bmp != null){
                 long algorithmStart = System.currentTimeMillis();
+                //find the columns 
                 columnLocations = cryptoFinder.findColumns(bmp,true);
                 telemetry.addData("Algorithm Time", "" + (System.currentTimeMillis() - algorithmStart));
+                //for every column seen, print its location 
                 if(columnLocations != null){
                     for(int i = 0; i < columnLocations.size(); i ++){
                         telemetry.addData("Column " + i, " " + columnLocations.get(i).intValue());
                     }
                 }
-                if(imageTaken == 0) {
+                //save every tenth image 
+                if(imageTaken == 10) {
                     vuforia.saveBMP(bmp); // save edited image
-                    imageTaken++;
+                    imageTaken = 0; 
                 }
+                imageTaken++;
+                
                 telemetry.addData("Loop Time", "" + (System.currentTimeMillis() - timeStart));
                 telemetry.update();
             }
