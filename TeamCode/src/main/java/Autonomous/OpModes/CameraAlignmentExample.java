@@ -39,19 +39,23 @@ public class CameraAlignmentExample extends LinearOpMode{
     @Override
     public void runOpMode() throws InterruptedException {
         int imageTaken = 0;
+        //set our team's color to blue 
         CryptoBoxColumnImageProcessor.CRYPTOBOX_COLOR color = CryptoBoxColumnImageProcessor.CRYPTOBOX_COLOR.BLUE;
-
+        //initialize our drive system 
         try {
             navigation = new JennyNavigation(hardwareMap, startLocations[BLUE_ALLIANCE_2], 0, "RobotConfig/JennyV2.json");
         } catch (Exception e){
             Log.e("Error!", "Jenny Navigation: " + e.toString());
             throw new RuntimeException("Navigation Cration Error! " + e.toString());
         }
+        //initalize VuforiaHelper
         VuforiaHelper vuforia = new VuforiaHelper();
+        //initalize the camera alignment 
         cameraAligner = new ImageAlignmentHelper(DESIRED_WIDTH, navigation, this);
 
         //wait for the op mode to start, this is the time to change teams
         while (!opModeIsActive()) {
+            //change the team's color until the start button is pressed 
             if (gamepad1.start) {
                 if(color == CryptoBoxColumnImageProcessor.CRYPTOBOX_COLOR.BLUE) color = CryptoBoxColumnImageProcessor.CRYPTOBOX_COLOR.RED;
                 else color = CryptoBoxColumnImageProcessor.CRYPTOBOX_COLOR.BLUE;
@@ -60,8 +64,10 @@ public class CameraAlignmentExample extends LinearOpMode{
             telemetry.addData("Color", color);
             telemetry.update();
         }
+        //storage variables for the alignment 
         Bitmap bmp;
         ArrayList<Integer> columnLocations = new ArrayList<Integer>();
+        //initalize the image processor
         cryptoFinder = new CryptoBoxColumnImageProcessor(CryptoBoxColumnImageProcessor.DESIRED_HEIGHT, DESIRED_WIDTH,.1,1, color);
         telemetry.addData("Status","Initialized");
 
@@ -69,9 +75,11 @@ public class CameraAlignmentExample extends LinearOpMode{
 
         telemetry.addData("Centering...", "");
         telemetry.update();
-        // take an image, process for columns and then try to center
+        // take an image with the correct size 
         bmp = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
+        //find the location of the colored columns, do not modify the image 
         columnLocations = cryptoFinder.findColumns(bmp, false);
+        //until aligned, keep trying to align 
         while (!cameraAligner.centerOnCryptoBoxClosestToCenter(0, columnLocations, WEST, EAST) && opModeIsActive()) {
             // keep updating your image and column locations until you are centered
             bmp = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
