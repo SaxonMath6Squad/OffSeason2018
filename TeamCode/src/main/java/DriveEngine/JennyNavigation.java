@@ -97,7 +97,7 @@ public class JennyNavigation extends Thread{
                     }
                     catch (Exception e){
                         shouldRun = false;
-                        throw e;
+                        throw new RuntimeException(e);
                     }
                     safetySleep(threadDelayMillis);
                 }
@@ -141,11 +141,12 @@ public class JennyNavigation extends Thread{
         double deltaX = robotMovementVector.x();
         double deltaY = robotMovementVector.y();
         myLocation.addXY(deltaX, deltaY);
-        //Log.d("Location","X:" + myLocation.getX() + " Y:" + myLocation.getY());
+        Log.d("Location","X:" + myLocation.getX() + " Y:" + myLocation.getY());
 
     }
 
     private void updateData(){
+
         updateHeading();
         wheelVectors = getWheelVectors();
         updateLocation();

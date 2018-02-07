@@ -27,7 +27,7 @@ import static DriveEngine.JennyNavigation.WEST;
 /*
     An opmode to test saving images using vuforia
  */
-@Autonomous(name="Camera Alignment Example", group="Linear Opmode")  // @Autonomous(...) is the other common choice
+@Autonomous(name="Camera Alignment Calibration", group="Linear Opmode")  // @Autonomous(...) is the other common choice
 //@Disabled
 public class CameraAlignmentCalibration extends LinearOpMode{
 
@@ -98,5 +98,6 @@ public class CameraAlignmentCalibration extends LinearOpMode{
         }
         telemetry.addData("Centered!", "");
         telemetry.update();
+        navigation.stopNavigation();
     }
 }

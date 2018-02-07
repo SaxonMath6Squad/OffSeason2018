@@ -146,7 +146,7 @@ public class TwoGlyphAutoTest extends LinearOpMode {
         navigation.driveDistance(30, EAST, MED_SPEED_IN_PER_SEC, this);
         glyphPicker.pause();
         glyphSystem.stopBelt();
-        /*
+
         curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
         columns = cryptoBoxFinder.findColumns(curImage, false);
         while (!cryptoBoxAligner.centerOnCryptoBoxClosestToCenter(0, columns, NORTH, SOUTH) && opModeIsActive()){
@@ -166,7 +166,7 @@ public class TwoGlyphAutoTest extends LinearOpMode {
         glyphSystem.stopBelt();
         glyphSystem.goToGlyphLevel(NewArialDepositor.GLYPH_PLACEMENT_LEVEL.GROUND);
         sleep(DEFAULT_DELAY_MILLIS);
-*/
+
         // get third glyph and go back
 //        glyphPicker.grab();
 //        glyphSystem.startBelt();
@@ -191,7 +191,7 @@ public class TwoGlyphAutoTest extends LinearOpMode {
         long startTime = System.currentTimeMillis();
         while ((glyphColor == UNKNOWN || glyphColor == NOT_IN_RANGE) && opModeIsActive()){
             turnMagnitude = Math.sin((System.currentTimeMillis() - startTime / 1000.0)) * .25;
-            driveMagnitude = Math.sin((System.currentTimeMillis() - startTime / 1000.0)) * 10;
+            driveMagnitude = Math.sin((System.currentTimeMillis() - startTime / 10000.0)) * 10;
             if(driveMagnitude < 0)
                 navigation.relativeDriveOnHeadingWithTurning(EAST, driveMagnitude, 0);
             else

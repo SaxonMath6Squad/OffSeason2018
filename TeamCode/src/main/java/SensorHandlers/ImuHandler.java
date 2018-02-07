@@ -49,6 +49,7 @@ public class ImuHandler extends Thread{
                         updateIMU();
                     } catch (Exception e){
                         shouldRun = false;
+                        throw e;
                     }
                     long timeLeft = updateDelay - (System.currentTimeMillis() - lastUpdateStart);
                     if(timeLeft > 0) safetySleep(timeLeft);

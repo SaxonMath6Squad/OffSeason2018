@@ -43,6 +43,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 
 import java.util.ArrayList;
 
+import Actions.JennyO1BGlyphPicker;
 import Actions.JennyO1CRAD;
 import Actions.NewArialDepositor;
 import Actions.JewelJousterV2;
@@ -58,13 +59,16 @@ import static Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor.CLOSE_UP_
 import static Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor.DESIRED_HEIGHT;
 import static Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor.DESIRED_WIDTH;
 import static Autonomous.REVColorDistanceSensorController.color.BLUE;
+import static Autonomous.REVColorDistanceSensorController.color.NOT_IN_RANGE;
 import static Autonomous.REVColorDistanceSensorController.color.RED;
+import static Autonomous.REVColorDistanceSensorController.color.UNKNOWN;
 import static Autonomous.RelicRecoveryField.BLUE_ALLIANCE_2;
 import static Autonomous.RelicRecoveryField.startLocations;
 import static DriveEngine.JennyNavigation.ADJUSTING_SPEED_IN_PER_SEC;
 import static DriveEngine.JennyNavigation.DEFAULT_DELAY_MILLIS;
 import static DriveEngine.JennyNavigation.DEFAULT_SLEEP_DELAY_MILLIS;
 import static DriveEngine.JennyNavigation.EAST;
+import static DriveEngine.JennyNavigation.HIGH_SPEED_IN_PER_SEC;
 import static DriveEngine.JennyNavigation.MED_SLEEP_DELAY_MILLIS;
 import static DriveEngine.JennyNavigation.MED_SPEED_IN_PER_SEC;
 import static DriveEngine.JennyNavigation.NORTH;
@@ -90,6 +94,7 @@ public class BlueTeam2GlyphAutonomousNewCenterTest extends LinearOpMode {
     RelicRecoveryVuMark mark;
     CryptoBoxColumnImageProcessor cryptoBoxFinder;
     ImageAlignmentHelper cryptoBoxAligner;
+    JennyO1BGlyphPicker glyphPicker;
     //ImuHandler imuHandler;
     @Override
     public void runOpMode() {
@@ -106,6 +111,7 @@ public class BlueTeam2GlyphAutonomousNewCenterTest extends LinearOpMode {
             cryptoBoxFinder = new CryptoBoxColumnImageProcessor(DESIRED_HEIGHT, DESIRED_WIDTH, CLOSE_UP_MIN_PERCENT_COLUMN_CHECK, CLOSE_UP_MIN_COLUMN_WIDTH, CryptoBoxColumnImageProcessor.CRYPTOBOX_COLOR.BLUE);
             cryptoBoxAligner = new ImageAlignmentHelper(DESIRED_WIDTH, navigation, this);
             rad = new JennyO1CRAD(hardwareMap);
+            glyphPicker = new JennyO1BGlyphPicker(hardwareMap);
         }
         catch (Exception e){
             Log.e("Error!" , "Jenny Navigation: " + e.toString());
@@ -172,21 +178,19 @@ public class BlueTeam2GlyphAutonomousNewCenterTest extends LinearOpMode {
         if(mark == RelicRecoveryVuMark.UNKNOWN) mark = RelicRecoveryVuMark.CENTER;
         telemetry.update();
         navigation.turnToHeading(WEST, this);
-        sleep(DEFAULT_SLEEP_DELAY_MILLIS);
-        navigation.driveDistance(22, SOUTH, MED_SPEED_IN_PER_SEC, this);
         switch (mark) {
             case CENTER:
-                navigation.driveDistance(14, SOUTH, SLOW_SPEED_IN_PER_SEC, this);
+                navigation.driveDistance(36, SOUTH, SLOW_SPEED_IN_PER_SEC, this);
                 break;
             case LEFT:
-                navigation.driveDistance(3, SOUTH, SLOW_SPEED_IN_PER_SEC, this);
+                navigation.driveDistance(29, SOUTH, SLOW_SPEED_IN_PER_SEC, this);
                 break;
             case RIGHT:
-                navigation.driveDistance(25, SOUTH, SLOW_SPEED_IN_PER_SEC, this);
+                navigation.driveDistance(41, SOUTH, SLOW_SPEED_IN_PER_SEC, this);
                 break;
         }
         sleep(DEFAULT_SLEEP_DELAY_MILLIS);
-        navigation.driveDistance(9, EAST, SLOW_SPEED_IN_PER_SEC, this);
+        navigation.driveDistance(7, EAST, SLOW_SPEED_IN_PER_SEC, this);
         curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
         columns = cryptoBoxFinder.findColumns(curImage, false);
         while (!cryptoBoxAligner.centerOnCryptoBoxClosestToCenter(0, columns, NORTH, SOUTH) && opModeIsActive()) {
@@ -203,10 +207,81 @@ public class BlueTeam2GlyphAutonomousNewCenterTest extends LinearOpMode {
         glyphSystem.stopBelt();
         glyphSystem.goToGlyphLevel(NewArialDepositor.GLYPH_PLACEMENT_LEVEL.GROUND);
 //        navigation.driveDistance(20, WEST, MED_SPEED_IN_PER_SEC, this);
+
+        glyphPicker.grab();
+        glyphSystem.startBelt();
+        navigation.driveDistance(30, WEST, HIGH_SPEED_IN_PER_SEC, this);
+        getSecondGlyph();
+        navigation.driveDistance(15, EAST, HIGH_SPEED_IN_PER_SEC, this);
+        navigation.turnToHeading(WEST, this);
+        navigation.driveDistance(10, EAST, MED_SPEED_IN_PER_SEC, this);
+        navigation.driveDistance(3, WEST, MED_SPEED_IN_PER_SEC, this);
+        glyphSystem.stopBelt();
+        glyphPicker.pause();
+        //navigation.driveDistance(5, WEST, SLOW_SPEED_IN_PER_SEC, this);
+        sleep(DEFAULT_DELAY_MILLIS);
+        curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
+        columns = cryptoBoxFinder.findColumns(curImage, false);
+        while (!cryptoBoxAligner.centerOnCryptoBoxClosestToCenter(0, columns, NORTH, SOUTH) && opModeIsActive()){
+            curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
+            columns = cryptoBoxFinder.findColumns(curImage, false);
+        }
+        navigation.brake();
+        sleep(DEFAULT_DELAY_MILLIS);
+        glyphSystem.goToGlyphLevel(NewArialDepositor.GLYPH_PLACEMENT_LEVEL.ROW2);
+        sleep(1000);
+        glyphSystem.startBelt();
+        sleep(2000);
+        navigation.driveDistance(5, WEST, SLOW_SPEED_IN_PER_SEC, this);
+        glyphSystem.stopBelt();
+        glyphSystem.goToGlyphLevel(NewArialDepositor.GLYPH_PLACEMENT_LEVEL.GROUND);
+
         while(opModeIsActive());
         navigation.stopNavigation();
         glyphSystem.kill();
         vuforia.kill();
 //        glyphSystem.stopNavigation();
+    }
+
+    public boolean getSecondGlyph(){
+        REVColorDistanceSensorController.color glyphColor = UNKNOWN;
+        double turnMagnitude = 0;
+        double driveMagnitude = 0;
+        long startTime = System.currentTimeMillis();
+        attemptGrab(EAST,500,400);
+        sleep(800);
+        navigation.brake();
+        glyphColor = glyphSystem.getColor(NewArialDepositor.REAR_GLYPH_SENSOR);
+        if(glyphColor != UNKNOWN && glyphColor != NOT_IN_RANGE){
+            return true;
+        }
+        navigation.turnToHeading(EAST + 10,this);
+        attemptGrab(EAST + 10,500, 400);
+        sleep(200);
+        navigation.brake();
+        glyphColor = glyphSystem.getColor(NewArialDepositor.REAR_GLYPH_SENSOR);
+        if(glyphColor != UNKNOWN && glyphColor != NOT_IN_RANGE){
+            return false;
+        }
+
+
+
+        //turnMagnitude = Math.sin((System.currentTimeMillis() - startTime / 1000.0)) * .25;
+        //driveMagnitude = Math.sin((System.currentTimeMillis() - startTime / 10000.0)) * 10;
+//            if(driveMagnitude < 0)
+//                navigation.relativeDriveOnHeadingWithTurning(EAST, driveMagnitude, 0);
+//            else
+//                navigation.relativeDriveOnHeadingWithTurning(WEST, driveMagnitude, 0);
+
+        //}
+        return true;
+    }
+
+    public void attemptGrab(int dir, long delayGoingIn, long goingOut){
+        navigation.relativeDriveOnHeadingWithTurning(dir,MED_SPEED_IN_PER_SEC,0);
+        sleep(delayGoingIn);
+        navigation.relativeDriveOnHeadingWithTurning((dir + 180)%360,MED_SPEED_IN_PER_SEC,0);
+        sleep(goingOut);
+        navigation.brake();
     }
 }

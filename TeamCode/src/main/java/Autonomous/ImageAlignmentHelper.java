@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import DriveEngine.JennyNavigation;
 import MotorControllers.PIDController;
 
-import static Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor.DESIRED_WIDTH;
 import static DriveEngine.JennyNavigation.SLOW_SPEED_IN_PER_SEC;
 
 /**
@@ -17,17 +16,17 @@ import static DriveEngine.JennyNavigation.SLOW_SPEED_IN_PER_SEC;
  */
 
 public class ImageAlignmentHelper {
-    private int CRYPTO_COLUMN_TARGET_POSITION = 40;
-    private double MOVEMENT_KP_UNSCALED = 10;
-    private double MOVEMENT_KI = 0;
-    private double MOVEMENT_KI_MAX = 0;
+    private int CRYPTO_COLUMN_TARGET_POSITION = 25;
+    private double MOVEMENT_KP = .2;
+    private double MOVEMENT_KI = .16;
+    private double MOVEMENT_KI_MAX = .65;
     private int DESIRED_PIXEL_ACCURACY = 3;
     private PIDController imagePid;
     private LinearOpMode mode;
     private JennyNavigation navigation;
 
     public ImageAlignmentHelper(int image_width, JennyNavigation nav, LinearOpMode m){
-        imagePid = new PIDController(MOVEMENT_KP_UNSCALED/image_width,MOVEMENT_KI,0);
+        imagePid = new PIDController(MOVEMENT_KP,MOVEMENT_KI,0);
         imagePid.setIMax(MOVEMENT_KI_MAX);
         mode = m;
         navigation = nav;
@@ -109,6 +108,7 @@ public class ImageAlignmentHelper {
         }
         return false;
     }
+
     /*
     public boolean centerOnCryptoBoxClosestToCenter(int column, ArrayList<Integer> columns, int primaryDirection, int secondaryDirection){
         Log.d("Seen columns", Integer.toString(columns.size()));

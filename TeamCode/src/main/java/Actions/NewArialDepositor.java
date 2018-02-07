@@ -104,7 +104,10 @@ public class NewArialDepositor implements ActionHandler {
     public void goToGlyphLevel(GLYPH_PLACEMENT_LEVEL level){
         switch(level){
             case GROUND:
-                goToLiftPosition(GROUND_LEVEL_PLACEMENT_HEIGHT);
+                while (!isPressed()) {
+                    liftMotor.retract();
+                }
+                liftMotor.pause();
                 break;
             case ROW1:
                 goToLiftPosition(ROW1_PLACEMENT_HEIGHT);

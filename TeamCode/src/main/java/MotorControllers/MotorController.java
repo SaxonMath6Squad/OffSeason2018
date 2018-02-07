@@ -174,7 +174,7 @@ public class MotorController extends Thread {
         } catch (Exception e){
             logError("Motorcontroller Error", "SetTicksPerSecondVelocity: " + e.toString());
             shouldRun = false;
-            throw new RuntimeException(e);
+            throw e;
         }
         Log.d("MotorPow", "" + getMotorPower() + " %");
 
