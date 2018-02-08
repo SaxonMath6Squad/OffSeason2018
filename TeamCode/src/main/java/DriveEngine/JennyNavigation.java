@@ -62,7 +62,7 @@ public class JennyNavigation extends Thread{
     private double orientationOffset = 0;
     private volatile boolean shouldRun = true;
 
-    private final double HEADING_THRESHOLD = 2;
+    private final double HEADING_THRESHOLD = 1;
     private final double WHEEL_BASE_RADIUS = 20;
     private final double FL_WHEEL_HEADING_OFFSET = 45;
     private final double FR_WHEEL_HEADING_OFFSET = 315;

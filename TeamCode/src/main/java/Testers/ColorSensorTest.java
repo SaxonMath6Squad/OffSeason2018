@@ -58,7 +58,7 @@ import Autonomous.REVColorDistanceSensorController;
     An opmode to test the REV color distance sensor with our ColorModeSensor class colors
  */
 @TeleOp(name = "REVColorDistanceSensorController Sensor Test", group = "Sensor")
-//@Disabled
+@Disabled
 public class ColorSensorTest extends LinearOpMode {
 
     /**

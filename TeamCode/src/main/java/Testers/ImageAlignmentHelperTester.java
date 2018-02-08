@@ -35,6 +35,7 @@ package Testers;
 import android.graphics.Bitmap;
 import android.util.Log;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -60,7 +61,7 @@ import static DriveEngine.JennyNavigation.SOUTH;
     An opmode to test if all our drive wheels are working correctly
  */
 @TeleOp(name="Image Alignment Helper Test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
-//@Disabled
+@Disabled
 public class ImageAlignmentHelperTester extends LinearOpMode {
 
     /* Declare OpMode members. */

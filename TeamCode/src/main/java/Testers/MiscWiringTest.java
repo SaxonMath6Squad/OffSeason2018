@@ -34,6 +34,7 @@ package Testers;
 
 import android.util.Log;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -44,7 +45,7 @@ import Actions.ArialDepositor;
     An opmode to test if all our drive wheels are working correctly
  */
 @TeleOp(name="Lift Encoder Test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
-//@Disabled
+@Disabled
 public class MiscWiringTest extends LinearOpMode {
 
     /* Declare OpMode members. */

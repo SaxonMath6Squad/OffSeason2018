@@ -34,6 +34,7 @@ package UserControlled;
 
 import android.util.Log;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -47,7 +48,7 @@ import static Autonomous.RelicRecoveryField.startLocations;
     An opmode for the User Controlled portion of the game
  */
 @TeleOp(name="Test bot drive", group="Linear Opmode")  // @Autonomous(...) is the other common choice
-//@Disabled
+@Disabled
 public class TestBotDrive extends LinearOpMode {
 
     /* Declare OpMode members. */

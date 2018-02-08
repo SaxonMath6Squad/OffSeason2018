@@ -124,10 +124,9 @@ public class RedTeam1GlyphAutonomous extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
-        rad.activateStopper();
         jewelJouster.setJoustMode(JewelJousterV2.JEWEL_JOUSTER_POSITIONS.READ);
         sleep(DEFAULT_SLEEP_DELAY_MILLIS);
-        for(int i = 0; i < 10; i++){
+        for(int i = 0; i < 7; i++){
             if(jewelJouster.getJewelColor() == BLUE) blueCount++;
             else if(jewelJouster.getJewelColor() == RED) redCount++;
         }
@@ -207,7 +206,10 @@ public class RedTeam1GlyphAutonomous extends LinearOpMode {
         sleep(2000);
         navigation.driveDistance(6, NORTH, SLOW_SPEED_IN_PER_SEC, this);
         glyphSystem.stopBelt();
-        glyphSystem.goToGlyphLevel(NewArialDepositor.GLYPH_PLACEMENT_LEVEL.GROUND);
+        while(!glyphSystem.isPressed() && opModeIsActive()){
+            glyphSystem.retract();
+        }
+        glyphSystem.stopLift();
         while(opModeIsActive());
         navigation.stopNavigation();
         glyphSystem.kill();

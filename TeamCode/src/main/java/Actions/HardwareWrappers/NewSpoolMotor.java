@@ -53,6 +53,8 @@ public class NewSpoolMotor extends MotorController implements ActionHandler{
         zeroPoint = getCurrentTick();
     }
 
+
+
     public void determineZeroPoint(){
         if (spoolLimit.isPressed()) {
             setMotorRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -85,9 +87,8 @@ public class NewSpoolMotor extends MotorController implements ActionHandler{
         setInchesPerSecondVelocity(0);
     }
 
-
-
     public void retract(double percentOfMaxSpeed){
+        if(getMotorRunMode() == DcMotor.RunMode.RUN_TO_POSITION)
         setMotorRunMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         if(shouldLimitRetraction) {
             if (!spoolLimit.isPressed())

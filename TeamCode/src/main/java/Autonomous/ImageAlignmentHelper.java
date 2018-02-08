@@ -20,7 +20,7 @@ public class ImageAlignmentHelper {
     private double MOVEMENT_KP = .2;
     private double MOVEMENT_KI = .16;
     private double MOVEMENT_KI_MAX = .65;
-    private int DESIRED_PIXEL_ACCURACY = 3;
+    private int DESIRED_PIXEL_ACCURACY = 1;
     private PIDController imagePid;
     private LinearOpMode mode;
     private JennyNavigation navigation;

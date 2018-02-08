@@ -4,6 +4,7 @@ package MotorControllers;
 
 import android.util.Log;
 
+import com.qualcomm.hardware.lynx.LynxNackException;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -88,7 +89,22 @@ public class MotorController extends Thread {
     }
 
     public void setMotorRunMode(DcMotor.RunMode mode){
-        motor.setMode(mode);
+        try {
+            if(getMotorRunMode() == DcMotor.RunMode.RUN_TO_POSITION){
+                if(motor.isBusy()){
+                    setMotorPower(0);
+                    Log.d("Motor issue" ,"Still busy....");
+                    motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                }
+            }
+            motor.setMode(mode);
+        } catch (Exception e){
+            Log.d("Error!", e.toString());
+        }
+    }
+
+    public int getTargetPosition(){
+        return motor.getTargetPosition();
     }
 
     private void safetySleep(long time){
@@ -109,7 +125,7 @@ public class MotorController extends Thread {
         } catch(Exception e){
             logError("MotorController Err",e.toString());
             shouldRun = false;
-            throw new RuntimeException(e);
+            throw e;
         }
         currentTicksPerSec = (long)(currentRPS * ticksPerRevolution + .5);
         //update position
@@ -176,7 +192,7 @@ public class MotorController extends Thread {
             shouldRun = false;
             throw e;
         }
-        Log.d("MotorPow", "" + getMotorPower() + " %");
+        //Log.d("MotorPow", "" + getMotorPower() + " %");
 
     }
 
@@ -190,10 +206,13 @@ public class MotorController extends Thread {
     }
 
     public void holdPosition(){
-        motor.setPower(0);
-        motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        motor.setTargetPosition(motor.getCurrentPosition());
-        motor.setPower(1);
+        if(getMotorRunMode() != DcMotor.RunMode.RUN_TO_POSITION){
+            motor.setPower(0);
+            motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            motor.setTargetPosition(motor.getCurrentPosition());
+            motor.setPower(1);
+        }
+
     }
 
     public double getWheelDiameterInInches(){
@@ -207,6 +226,8 @@ public class MotorController extends Thread {
     }
 
     public void brake(){
+        if(getMotorRunMode() == DcMotor.RunMode.RUN_TO_POSITION)
+            setMotorRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motor.setPower(0);
     }
 

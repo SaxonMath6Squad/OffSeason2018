@@ -126,7 +126,6 @@ public class BlueTeam2GlyphAutonomousNewCenterTest extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
-        rad.activateStopper();
         jewelJouster.setJoustMode(JewelJousterV2.JEWEL_JOUSTER_POSITIONS.READ);
         sleep(DEFAULT_SLEEP_DELAY_MILLIS);
         for(int i = 0; i < 10; i++){
@@ -208,17 +207,38 @@ public class BlueTeam2GlyphAutonomousNewCenterTest extends LinearOpMode {
         glyphSystem.goToGlyphLevel(NewArialDepositor.GLYPH_PLACEMENT_LEVEL.GROUND);
 //        navigation.driveDistance(20, WEST, MED_SPEED_IN_PER_SEC, this);
 
+        switch (mark){
+            case RIGHT:
+                navigation.driveDistance(6, NORTH, MED_SPEED_IN_PER_SEC, this);
+                break;
+            case LEFT:
+                navigation.driveDistance(6, SOUTH, MED_SPEED_IN_PER_SEC, this);
+                break;
+            default:
+                break;
+        }
         glyphPicker.grab();
         glyphSystem.startBelt();
         navigation.driveDistance(30, WEST, HIGH_SPEED_IN_PER_SEC, this);
         getSecondGlyph();
-        navigation.driveDistance(15, EAST, HIGH_SPEED_IN_PER_SEC, this);
         navigation.turnToHeading(WEST, this);
+        navigation.driveDistance(20, EAST, HIGH_SPEED_IN_PER_SEC, this);
+        glyphPicker.spit();
         navigation.driveDistance(10, EAST, MED_SPEED_IN_PER_SEC, this);
-        navigation.driveDistance(3, WEST, MED_SPEED_IN_PER_SEC, this);
         glyphSystem.stopBelt();
         glyphPicker.pause();
-        //navigation.driveDistance(5, WEST, SLOW_SPEED_IN_PER_SEC, this);
+        navigation.turnToHeading(WEST, this);
+        glyphSystem.goToGlyphLevel(NewArialDepositor.GLYPH_PLACEMENT_LEVEL.ROW2);
+        navigation.driveDistance(1.5, WEST, MED_SPEED_IN_PER_SEC, this);switch (mark){
+            case RIGHT:
+                navigation.driveDistance(6, SOUTH, MED_SPEED_IN_PER_SEC, this);
+                break;
+            case LEFT:
+                navigation.driveDistance(6, NORTH, MED_SPEED_IN_PER_SEC, this);
+                break;
+            default:
+                break;
+        }
         sleep(DEFAULT_DELAY_MILLIS);
         curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
         columns = cryptoBoxFinder.findColumns(curImage, false);
@@ -248,33 +268,39 @@ public class BlueTeam2GlyphAutonomousNewCenterTest extends LinearOpMode {
         double turnMagnitude = 0;
         double driveMagnitude = 0;
         long startTime = System.currentTimeMillis();
-        attemptGrab(EAST,500,400);
-        sleep(800);
-        navigation.brake();
-        glyphColor = glyphSystem.getColor(NewArialDepositor.REAR_GLYPH_SENSOR);
-        if(glyphColor != UNKNOWN && glyphColor != NOT_IN_RANGE){
-            return true;
-        }
-        navigation.turnToHeading(EAST + 10,this);
-        attemptGrab(EAST + 10,500, 400);
-        sleep(200);
-        navigation.brake();
-        glyphColor = glyphSystem.getColor(NewArialDepositor.REAR_GLYPH_SENSOR);
-        if(glyphColor != UNKNOWN && glyphColor != NOT_IN_RANGE){
-            return false;
-        }
+        if(opModeIsActive()) {
+            attemptGrab(EAST, 800, 200);
+            if(opModeIsActive())
+            sleep(800);
+            navigation.brake();
+            if(opModeIsActive()){
+
+            }
+            glyphColor = glyphSystem.getColor(NewArialDepositor.REAR_GLYPH_SENSOR);
+            if (glyphColor != UNKNOWN && glyphColor != NOT_IN_RANGE) {
+                return true;
+            }
+            navigation.turnToHeading(EAST + 10, this);
+            attemptGrab(EAST + 10, 400, 200);
+            sleep(200);
+            navigation.brake();
+            glyphColor = glyphSystem.getColor(NewArialDepositor.REAR_GLYPH_SENSOR);
+            if (glyphColor != UNKNOWN && glyphColor != NOT_IN_RANGE) {
+                return false;
+            }
 
 
-
-        //turnMagnitude = Math.sin((System.currentTimeMillis() - startTime / 1000.0)) * .25;
-        //driveMagnitude = Math.sin((System.currentTimeMillis() - startTime / 10000.0)) * 10;
+            //turnMagnitude = Math.sin((System.currentTimeMillis() - startTime / 1000.0)) * .25;
+            //driveMagnitude = Math.sin((System.currentTimeMillis() - startTime / 10000.0)) * 10;
 //            if(driveMagnitude < 0)
 //                navigation.relativeDriveOnHeadingWithTurning(EAST, driveMagnitude, 0);
 //            else
 //                navigation.relativeDriveOnHeadingWithTurning(WEST, driveMagnitude, 0);
 
-        //}
-        return true;
+            //}
+            return true;
+        }
+        return false;
     }
 
     public void attemptGrab(int dir, long delayGoingIn, long goingOut){

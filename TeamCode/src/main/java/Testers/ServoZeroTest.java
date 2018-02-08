@@ -34,6 +34,7 @@ package Testers;
 
 import android.util.Log;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -50,7 +51,7 @@ import static Autonomous.RelicRecoveryField.startLocations;
     An opmode to test if all our drive wheels are working correctly
  */
 @TeleOp(name="Servo Zero Test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
-//@Disabled
+@Disabled
 public class ServoZeroTest extends LinearOpMode {
 
     /* Declare OpMode members. */

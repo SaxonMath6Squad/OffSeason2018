@@ -36,6 +36,7 @@ import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -84,7 +85,7 @@ import static DriveEngine.JennyNavigation.WEST;
     An opmode to test knocking off the correct jewel
  */
 @Autonomous(name="Two glyph test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
-//@Disabled
+@Disabled
 public class TwoGlyphAutoTest extends LinearOpMode {
 
     /* Declare OpMode members. */

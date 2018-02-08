@@ -98,28 +98,14 @@ public class RADTester extends LinearOpMode {
                 frontPosition--;
                 while (gamepad1.b);
             }
-            if(gamepad1.x){
-                backPosition++;
-                while (gamepad1.x);
-            }
-            else if(gamepad1.y){
-                backPosition--;
-                while (gamepad1.y);
-            }
-            if(gamepad1.dpad_up){
-                rad.activateStopper();
-            }
-            else if(gamepad1.dpad_down) {
-                rad.deactivateStopper();
-            }
+
 
 //            frontPosition = Math.abs(frontPosition)%180;
 //            backPosition = Math.abs(backPosition)%180;
 //            rotatePosition = Math.abs(rotatePosition)%180;
 
             rad.setFrontGrabberPosition(frontPosition);
-            rad.setBackGrabberPosition(backPosition);
-            rad.setRotationDegree(rotatePosition);
+
 
             telemetry.addData("Front position", frontPosition);
             telemetry.addData("Back position", backPosition);

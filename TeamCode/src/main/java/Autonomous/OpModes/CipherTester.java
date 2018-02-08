@@ -1,6 +1,7 @@
 package Autonomous.OpModes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
@@ -12,7 +13,7 @@ import Autonomous.VuforiaHelper;
  * Created by robotics on 1/10/18.
  */
 @Autonomous(name = "Cipher Tester", group = "visual autonomous")
-
+@Disabled
 public class CipherTester extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {

@@ -18,9 +18,6 @@ import MotorControllers.MotorController;
  */
 public class JennyO1CRAD {
     ServoHandler frontRelicGrabber;
-    ServoHandler backRelicGrabber;
-    ServoHandler relicRotator;
-    ServoHandler RADStopper;
     SpoolMotor RADExtender;
     HardwareMap hardwareMap;
     final double RELEASE_FRONT = 179;
@@ -36,9 +33,8 @@ public class JennyO1CRAD {
     public JennyO1CRAD(HardwareMap hw) throws InterruptedException {
         hardwareMap = hw;
         frontRelicGrabber = new ServoHandler("frontRelicGrabber", hardwareMap);
-        backRelicGrabber = new ServoHandler("backRelicGrabber", hardwareMap);
-        relicRotator = new ServoHandler("relicRotator", hardwareMap);
-        RADStopper = new ServoHandler("RADStopper", hardwareMap);
+
+
         try {
             RADExtender = new SpoolMotor(new MotorController("RADExtender", "ActionConfig/RelicExtender.json", hardwareMap),
                     35, 5, 100, hardwareMap);
@@ -47,14 +43,9 @@ public class JennyO1CRAD {
         }
         RADExtender.setDirection(DcMotorSimple.Direction.FORWARD);
         RADExtender.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        RADStopper.setServoRanges(RELEASE_RAD-1, STOP_RAD+1);
-        RADStopper.setDegree(RELEASE_RAD);
         frontRelicGrabber.setServoRanges(GRAB_FRONT-1, RELEASE_FRONT+1);
         frontRelicGrabber.setDegree(GRAB_FRONT);
-        backRelicGrabber.setServoRanges(RELEASE_BACK-1, GRAB_BACK+1);
-        backRelicGrabber.setDegree(RELEASE_BACK);
-        relicRotator.setServoRanges(ZERO_ROTATION-1, FLIP_ROTATION+1);
-        relicRotator.setDegree(ZERO_ROTATION);
+
     }
 
     public int extendRAD(){
@@ -87,60 +78,9 @@ public class JennyO1CRAD {
         return 0;
     }
 
-    public int grabBackRelic(){
-        backRelicGrabber.setDegree(GRAB_BACK);
-        return 0;
-    }
-
-    public int releaseBackRelic(){
-        backRelicGrabber.setDegree(RELEASE_BACK);
-        return 0;
-    }
-
-    public int setBackGrabberPosition(double positionInDeg){
-        backRelicGrabber.setDegree(positionInDeg);
-        return 0;
-    }
-
-    public int zeroRotation(){
-        relicRotator.setDegree(ZERO_ROTATION);
-        return 0;
-    }
-
-    public int flipRotation(){
-        relicRotator.setDegree(FLIP_ROTATION);
-        return 0;
-    }
-
-    public int perpendicularRotation(){
-        relicRotator.setDegree(PERPENDICULAR_ROTATION);
-        return 0;
-    }
-
-    public int setRotationDegree(double positionInDeg){
-        relicRotator.setDegree(positionInDeg);
-        return 0;
-    }
-
-    public int activateStopper(){
-        RADStopper.setDegree(STOP_RAD);
-        return 0;
-    }
-
-    public int deactivateStopper(){
-        RADStopper.setDegree(RELEASE_RAD);
-        return 0;
-    }
-
-    public int setStopperDegree(double positionInDeg){
-        RADStopper.setDegree(positionInDeg);
-        return 0;
-    }
-
     public int kill(){
         RADExtender.kill();
         frontRelicGrabber.setPosition(frontRelicGrabber.getPosition());
-        backRelicGrabber.setPosition(backRelicGrabber.getPosition());
         return 0;
     }
 }

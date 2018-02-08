@@ -120,7 +120,6 @@ public class BlueTeam1GlyphAutonomousNewCenterTest extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
-        rad.activateStopper();
         jewelJouster.setJoustMode(JewelJousterV2.JEWEL_JOUSTER_POSITIONS.READ);
         sleep(DEFAULT_SLEEP_DELAY_MILLIS);
         for(int i = 0; i < 10; i++){

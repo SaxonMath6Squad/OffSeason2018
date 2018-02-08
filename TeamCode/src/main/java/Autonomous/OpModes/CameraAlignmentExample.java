@@ -5,6 +5,7 @@ import android.net.wifi.WifiEnterpriseConfig;
 import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ import static DriveEngine.JennyNavigation.WEST;
     An opmode to test saving images using vuforia
  */
 @Autonomous(name="Camera Alignment Example", group="Linear Opmode")  // @Autonomous(...) is the other common choice
-//@Disabled
+@Disabled
 public class CameraAlignmentExample extends LinearOpMode{
 
     CryptoBoxColumnImageProcessor cryptoFinder;

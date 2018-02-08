@@ -36,12 +36,12 @@ public class NewArialDepositor implements ActionHandler {
 
     public enum GLYPH_PLACEMENT_LEVEL{GROUND,ROW1,ROW2,ROW3,ROW4,ROW1_AND_2,ROW3_AND_4};
     public final static double GROUND_LEVEL_PLACEMENT_HEIGHT = 0;
-    public final static double ROW1_PLACEMENT_HEIGHT = 10.0;
+    public final static double ROW1_PLACEMENT_HEIGHT = 6.0;
     public final static double ROW2_PLACEMENT_HEIGHT = 14.8;
-    public final static double ROW3_PLACEMENT_HEIGHT = 23.3;
-    public final static double ROW4_PLACEMENT_HEIGHT = 30.7;
-    public final static double ROW1_AND_2_PLACEMENT_HEIGHT = 14.5;
-    public final static double ROW3_AND_4_PLACEMENT_HEIGHT = 30.5;
+    public final static double ROW3_PLACEMENT_HEIGHT = 16.5;
+    public final static double ROW4_PLACEMENT_HEIGHT = 21.0;
+    public final static double ROW1_AND_2_PLACEMENT_HEIGHT = 10.5;
+    public final static double ROW3_AND_4_PLACEMENT_HEIGHT = 22.0;
 
     public NewArialDepositor(HardwareMap hw) throws Exception{
         hardwareMap = hw;
@@ -69,6 +69,7 @@ public class NewArialDepositor implements ActionHandler {
     }
 
     public void retract(){
+
         liftMotor.retract();
     }
 
@@ -82,11 +83,25 @@ public class NewArialDepositor implements ActionHandler {
     }
 
     public void stopLift(){
-        liftMotor.brake();
+        //liftMotor.brake();
+        if(liftMotor.getMotorRunMode() == DcMotor.RunMode.RUN_TO_POSITION){
+            if(liftMotor.getTargetPosition() <= liftMotor.getCurrentTick()){
+                if(isPressed()) {
+                    liftMotor.brake();
+                } else
+                    liftMotor.holdPosition();
+            }
+        }
+        else {
+            if (isPressed()) {
+                liftMotor.brake();
+            } else liftMotor.holdPosition();
+        }
     }
 
     public void goToLiftPosition(double positionInInches){
         liftMotor.setMotorRunMode(DcMotor.RunMode.RUN_TO_POSITION);
+        while(liftMotor.getMotorRunMode() != DcMotor.RunMode.RUN_TO_POSITION);
         //double liftPositionOffsetInches = (double)liftPositionOffsetTicks/TICKS_PER_REV*Math.PI*EXTENDOTRON_DIAMETER_INCHES;
         //long tick = (long)(positionInInches/(Math.PI*EXTENDOTRON_DIAMETER_INCHES)*TICKS_PER_REV);
 //        Log.d("Offset inch", Double.toString(liftPositionOffsetInches));

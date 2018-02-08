@@ -36,6 +36,7 @@ import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -72,7 +73,7 @@ import static DriveEngine.JennyNavigation.WEST;
     An opmode to test knocking off the correct jewel
  */
 @Autonomous(name="Blue Team 1 Glyph", group="Linear Opmode")  // @Autonomous(...) is the other common choice
-//@Disabled
+@Disabled
 public class BlueTeam1GlyphAutonomous extends LinearOpMode {
 
     /* Declare OpMode members. */
