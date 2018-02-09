@@ -234,7 +234,7 @@ public class RedTeam2GlyphAutonomousTest extends LinearOpMode {
         if(opModeIsActive()) glyphPicker.pause();
 
 
-        if(opModeIsActive()) navigation.driveDistance(3.5, EAST, SLOW_SPEED_IN_PER_SEC, this);
+        if(opModeIsActive()) navigation.driveDistance(4, EAST, SLOW_SPEED_IN_PER_SEC, this);
         if(opModeIsActive()) navigation.turnToHeading(EAST, this);
         if(opModeIsActive()) switch (mark){
             case RIGHT:
@@ -266,9 +266,10 @@ public class RedTeam2GlyphAutonomousTest extends LinearOpMode {
 //        if(opModeIsActive()) sleep(DEFAULT_DELAY_MILLIS);
 //        if(opModeIsActive()) glyphSystem.goToGlyphLevel(NewArialDepositor.GLYPH_PLACEMENT_LEVEL.ROW2);
 //        if(opModeIsActive()) sleep(1000);
-        if(opModeIsActive()) sleep(2000);
+        //if(opModeIsActive()) sleep(2000);
+        sleep(DEFAULT_SLEEP_DELAY_MILLIS);
         if(opModeIsActive()) glyphSystem.startBelt();
-        if(opModeIsActive()) sleep(2000);
+        if(opModeIsActive()) sleep(1500);
         if(opModeIsActive()) navigation.driveDistance(5, EAST, SLOW_SPEED_IN_PER_SEC, this);
         if(opModeIsActive()) glyphSystem.stopBelt();
         if(opModeIsActive()) glyphSystem.goToGlyphLevel(NewArialDepositor.GLYPH_PLACEMENT_LEVEL.GROUND);
@@ -287,8 +288,8 @@ public class RedTeam2GlyphAutonomousTest extends LinearOpMode {
         double turnMagnitude = 0;
         double driveMagnitude = 0;
         long startTime = System.currentTimeMillis();
-        attemptGrab(EAST,600,500);
-        sleep(800);
+        attemptGrab(NORTH,600,500);
+        sleep(200);
         navigation.brake();
 //        glyphColor = glyphSystem.getColor(NewArialDepositor.REAR_GLYPH_SENSOR);
 //        if(glyphColor != UNKNOWN && glyphColor != NOT_IN_RANGE){
@@ -317,11 +318,13 @@ public class RedTeam2GlyphAutonomousTest extends LinearOpMode {
     }
 
     public void attemptGrab(int dir, long delayGoingIn, long goingOut){
-        navigation.relativeDriveOnHeadingWithTurning(dir,MED_SPEED_IN_PER_SEC,0);
-        sleep(delayGoingIn);
-        navigation.turnToHeading(navigation.getOrientation() + 20, this);
-        navigation.relativeDriveOnHeadingWithTurning((dir + 180)%360,MED_SPEED_IN_PER_SEC,0);
-        sleep(goingOut);
+        navigation.driveDistanceNonCorrected(4,dir,HIGH_SPEED_IN_PER_SEC,this);
+        //navigation.relativeDriveOnHeadingWithTurning(dir,MED_SPEED_IN_PER_SEC,0);
+        //sleep(delayGoingIn);
+        //navigation.turnToHeading(navigation.getOrientation() + 20, this);
+        //navigation.relativeDriveOnHeadingWithTurning((dir + 180)%360,MED_SPEED_IN_PER_SEC,0);
+        navigation.driveDistanceNonCorrected(4,(dir + 180)%360,MED_SPEED_IN_PER_SEC,this);
+        //sleep(goingOut);
         navigation.brake();
     }
 }

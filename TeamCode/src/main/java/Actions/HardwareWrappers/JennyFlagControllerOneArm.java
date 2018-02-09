@@ -13,8 +13,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
  */
 public class JennyFlagControllerOneArm extends Thread{
     ServoHandler flagWaver;
-    public static final int[] FLAG_WAVER_MIN_MAX_DEG = {20,160};
-    public final long PERIOD = 1000;
+    public static final int[] FLAG_WAVER_MIN_MAX_DEG = {10,120};
+    public final long PERIOD = 500;
     volatile boolean shouldRun = true;
     volatile boolean flagShouldMove = false;
     HardwareMap hardwareMap;
@@ -22,7 +22,8 @@ public class JennyFlagControllerOneArm extends Thread{
     public JennyFlagControllerOneArm(HardwareMap hw){
         hardwareMap = hw;
         flagWaver = new ServoHandler("flagWaver", hardwareMap);
-
+        flagWaver.setServoRanges(FLAG_WAVER_MIN_MAX_DEG[0]-1, FLAG_WAVER_MIN_MAX_DEG[1]+1);
+        flagWaver.setPosition(FLAG_WAVER_MIN_MAX_DEG[0]);
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -34,7 +35,7 @@ public class JennyFlagControllerOneArm extends Thread{
     }
 
     private void moveFlag(){
-        double waver = FLAG_WAVER_MIN_MAX_DEG[0] + (FLAG_WAVER_MIN_MAX_DEG[1] - FLAG_WAVER_MIN_MAX_DEG[0])*(.5+Math.cos(System.currentTimeMillis()/1000.0) * (1000.0/PERIOD));
+        double waver = FLAG_WAVER_MIN_MAX_DEG[0] + (FLAG_WAVER_MIN_MAX_DEG[1] - FLAG_WAVER_MIN_MAX_DEG[0])*(.5+.5*Math.cos((double)System.currentTimeMillis()/(double)PERIOD));
         Log.d("Waver deg","" + waver);
         flagWaver.setDegree(waver);
     }
@@ -55,6 +56,9 @@ public class JennyFlagControllerOneArm extends Thread{
 
     public void stopFlag(){
         flagShouldMove = false;
+    }
+
+    public void killFlag(){
         shouldRun = false;
     }
 }

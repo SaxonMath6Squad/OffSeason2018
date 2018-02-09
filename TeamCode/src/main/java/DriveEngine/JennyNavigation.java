@@ -361,6 +361,46 @@ public class JennyNavigation extends Thread{
         brake();
     }
 
+    public void driveDistanceNonCorrected(double distanceInInches, double heading, double desiredVelocity, LinearOpMode mode){
+        //double [] velocities = determineMotorVelocitiesToDriveOnHeading(heading, desiredVelocity);
+        distanceInInches = Math.abs(distanceInInches);
+        double distanceTraveled = 0;
+        double [] motorPositionsInches = getMotorPositionsInches();
+        double [] startPositionsInches = motorPositionsInches;
+        double [] deltaInches;
+        double averagePosition = 0;
+        while(distanceTraveled < distanceInInches && mode.opModeIsActive()){
+            //from our motor position, determine location
+            driveOnHeading((int)(heading + .5),desiredVelocity);
+            motorPositionsInches = getMotorPositionsInches();
+            deltaInches = new double[4];
+            averagePosition = 0;
+            if(heading == 45 || heading == 225){
+                deltaInches[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR] = Math.abs(motorPositionsInches[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR] - startPositionsInches[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR]);
+                deltaInches[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR] = Math.abs(motorPositionsInches[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR] - startPositionsInches[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR]);
+                averagePosition += deltaInches[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR] + deltaInches[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR];
+                averagePosition /= 2;
+                distanceTraveled = averagePosition;
+            } else if(heading == 135 || heading == 315){
+                deltaInches[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR] = Math.abs(motorPositionsInches[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR] - startPositionsInches[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR]);
+                deltaInches[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR] = Math.abs(motorPositionsInches[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR] - startPositionsInches[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR]);
+                averagePosition += deltaInches[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR] + deltaInches[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR];
+                averagePosition /= 2;
+                distanceTraveled = averagePosition;
+            } else {
+                for (int i = 0; i < motorPositionsInches.length; i++) {
+                    deltaInches[i] = Math.abs(motorPositionsInches[i] - startPositionsInches[i]);
+                }
+                for (double i : deltaInches) {
+                    averagePosition += i;
+                }
+                averagePosition /= (double) deltaInches.length;
+                distanceTraveled = averagePosition / Math.sin(Math.toRadians(45));
+            }
+        }
+        brake();
+    }
+
     long [] getMotorPositionsTicks(){
         long [] positions = new long[4];
         positions[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR] = driveMotors[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR].getCurrentTick();

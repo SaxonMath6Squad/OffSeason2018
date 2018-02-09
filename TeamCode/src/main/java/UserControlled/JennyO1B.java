@@ -384,7 +384,7 @@ public class JennyO1B extends LinearOpMode {
         RAD.kill();
         sensorTelemetry.stopTelemetryLogging();
         glyphPicker.kill();
-        flag.stopFlag();
+        flag.killFlag();
         jouster.kill();
         vuforia.kill();
     }

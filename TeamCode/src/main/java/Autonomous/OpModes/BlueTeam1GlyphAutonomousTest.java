@@ -60,7 +60,8 @@ import static Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor.DESIRED_H
 import static Autonomous.ImageProcessing.CryptoBoxColumnImageProcessor.DESIRED_WIDTH;
 import static Autonomous.REVColorDistanceSensorController.color.BLUE;
 import static Autonomous.REVColorDistanceSensorController.color.RED;
-import static Autonomous.REVColorDistanceSensorController.color.UNKNOWN;
+import static Autonomous.RelicRecoveryField.BLUE_ALLIANCE_1;
+import static Autonomous.RelicRecoveryField.BLUE_ALLIANCE_2;
 import static Autonomous.RelicRecoveryField.RED_ALLIANCE_1;
 import static Autonomous.RelicRecoveryField.startLocations;
 import static DriveEngine.JennyNavigation.DEFAULT_DELAY_MILLIS;
@@ -77,9 +78,9 @@ import static DriveEngine.JennyNavigation.WEST;
 /*
     An opmode to test knocking off the correct jewel
  */
-@Autonomous(name="Red Team 1 Double Glyph Test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
+@Autonomous(name="Blue Team 1 Double Glyph Test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
 //@Disabled
-public class RedTeam1GlyphAutonomousTest extends LinearOpMode {
+public class BlueTeam1GlyphAutonomousTest extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
@@ -101,12 +102,12 @@ public class RedTeam1GlyphAutonomousTest extends LinearOpMode {
         int blueCount = 0;
         REVColorDistanceSensorController.color jewelColor;
         try {
-            navigation = new JennyNavigation(hardwareMap, startLocations[RED_ALLIANCE_1], EAST, "RobotConfig/JennyV2.json");
+            navigation = new JennyNavigation(hardwareMap, startLocations[BLUE_ALLIANCE_1], WEST, "RobotConfig/JennyV2.json");
             glyphSystem = new NewArialDepositor(hardwareMap);
             sensorTelemetry = new JennySensorTelemetry(hardwareMap, 0, 0);
             jewelJouster = new JewelJousterV2("jewelJoust", "jewelJoustTurn", this, hardwareMap);
             vuforia = new VuforiaHelper();
-            cryptoBoxFinder = new CryptoBoxColumnImageProcessor(DESIRED_HEIGHT, DESIRED_WIDTH, CLOSE_UP_MIN_PERCENT_COLUMN_CHECK, CLOSE_UP_MIN_COLUMN_WIDTH, CryptoBoxColumnImageProcessor.CRYPTOBOX_COLOR.RED);
+            cryptoBoxFinder = new CryptoBoxColumnImageProcessor(DESIRED_HEIGHT, DESIRED_WIDTH, CLOSE_UP_MIN_PERCENT_COLUMN_CHECK, CLOSE_UP_MIN_COLUMN_WIDTH, CryptoBoxColumnImageProcessor.CRYPTOBOX_COLOR.BLUE);
             cryptoBoxAligner = new ImageAlignmentHelper(DESIRED_WIDTH, navigation, this);
             rad = new JennyO1CRAD(hardwareMap);
             glyphPicker = new JennyO1BGlyphPicker(hardwareMap);
@@ -131,14 +132,14 @@ public class RedTeam1GlyphAutonomousTest extends LinearOpMode {
             else if(jewelJouster.getJewelColor() == RED) redCount++;
         }
         jewelColor = (blueCount > redCount) ? BLUE:RED;
-        if(jewelColor == BLUE){
+        if(jewelColor == RED){
             jewelJouster.setJoustMode(JewelJousterV2.JEWEL_JOUSTER_POSITIONS.HIT_LEFT);
-            telemetry.addData("Jewel Color","BLUE");
+            telemetry.addData("Jewel Color","RED");
         }
         else {
             //navigation.driveDistance(2, NORTH, ADJUSTING_SPEED_IN_PER_SEC, this);
             jewelJouster.setJoustMode(JewelJousterV2.JEWEL_JOUSTER_POSITIONS.HIT_RIGHT);
-            telemetry.addData("Jewel Color","RED");
+            telemetry.addData("Jewel Color","BLUE");
             //sleep(DEFAULT_SLEEP_DELAY_MILLIS);
         }
         telemetry.update();
@@ -146,7 +147,7 @@ public class RedTeam1GlyphAutonomousTest extends LinearOpMode {
         jewelJouster.setJoustMode(JewelJousterV2.JEWEL_JOUSTER_POSITIONS.STORE);
         sleep(DEFAULT_SLEEP_DELAY_MILLIS);
         telemetry.update();
-        navigation.turnToHeading(80, this);
+        navigation.turnToHeading(250, this);
         navigation.brake();
         sleep(DEFAULT_SLEEP_DELAY_MILLIS);
         long startTime = System.currentTimeMillis();
@@ -175,9 +176,9 @@ public class RedTeam1GlyphAutonomousTest extends LinearOpMode {
         }
         if(mark == RelicRecoveryVuMark.UNKNOWN) mark = RelicRecoveryVuMark.CENTER;
         telemetry.update();
-        navigation.turnToHeading(EAST, this);
-        navigation.driveDistance(30,EAST,HIGH_SPEED_IN_PER_SEC,this);
-        navigation.turnToHeading(NORTH + 45,this);
+        navigation.turnToHeading(WEST, this);
+        navigation.driveDistance(30,WEST,HIGH_SPEED_IN_PER_SEC,this);
+        navigation.turnToHeading(WEST + 45,this);
         if(opModeIsActive()) glyphPicker.grab();
         if(opModeIsActive()) glyphSystem.startBelt();
         //navigation.driveDistance(3,NORTH + 45,SLOW_SPEED_IN_PER_SEC,this);
@@ -192,13 +193,13 @@ public class RedTeam1GlyphAutonomousTest extends LinearOpMode {
         if(opModeIsActive()) glyphPicker.pause();
         switch (mark) {
             case CENTER:
-                navigation.driveDistance(16.5, WEST, SLOW_SPEED_IN_PER_SEC, this);
+                navigation.driveDistance(16.5, EAST, SLOW_SPEED_IN_PER_SEC, this);
                 break;
             case LEFT:
-                navigation.driveDistance(10.5, WEST, SLOW_SPEED_IN_PER_SEC, this);
+                navigation.driveDistance(20, EAST, SLOW_SPEED_IN_PER_SEC, this);
                 break;
             case RIGHT:
-                navigation.driveDistance(22.5, WEST, SLOW_SPEED_IN_PER_SEC, this);
+                navigation.driveDistance(10.5, EAST, SLOW_SPEED_IN_PER_SEC, this);
                 break;
         }
         navigation.brake();
@@ -219,7 +220,7 @@ public class RedTeam1GlyphAutonomousTest extends LinearOpMode {
         curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
         columns = cryptoBoxFinder.findColumns(curImage, false);
         sleep(DEFAULT_SLEEP_DELAY_MILLIS);
-        while (!cryptoBoxAligner.centerOnCryptoBoxClosestToCenter(0, columns, EAST, WEST) && opModeIsActive()) {
+        while (!cryptoBoxAligner.centerOnCryptoBoxClosestToCenter(0, columns, WEST, EAST) && opModeIsActive()) {
             curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
             columns = cryptoBoxFinder.findColumns(curImage, false);
         }
@@ -253,12 +254,12 @@ public class RedTeam1GlyphAutonomousTest extends LinearOpMode {
     }
 
     public void attemptGrab(int dir){
-        navigation.driveDistanceNonCorrected(10,dir,HIGH_SPEED_IN_PER_SEC,this);
+        navigation.driveDistanceNonCorrected(11.5,dir,HIGH_SPEED_IN_PER_SEC,this);
 //        navigation.relativeDriveOnHeadingWithTurning(dir,MED_SPEED_IN_PER_SEC,0);
         //sleep(delayGoingIn);
   //navigation.turnToHeading(navigation.getOrientation() - 20, this);
 //        navigation.relativeDriveOnHeadingWithTurning((dir + 180)%360,MED_SPEED_IN_PER_SEC,0);
-        navigation.driveDistanceNonCorrected(8,(dir + 180)%360,MED_SPEED_IN_PER_SEC,this);
+        navigation.driveDistanceNonCorrected(11.5,(dir + 180)%360,MED_SPEED_IN_PER_SEC,this);
 //        sleep(goingOut);
         navigation.brake();
     }
