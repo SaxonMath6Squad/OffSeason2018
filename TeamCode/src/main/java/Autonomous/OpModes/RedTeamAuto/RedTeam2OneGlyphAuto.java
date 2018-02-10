@@ -30,7 +30,7 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
 TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package Autonomous.OpModes;
+package Autonomous.OpModes.RedTeamAuto;
 
 import android.graphics.Bitmap;
 import android.util.Log;
@@ -85,9 +85,9 @@ import static DriveEngine.JennyNavigation.WEST;
 /*
     An opmode to test knocking off the correct jewel
  */
-@Autonomous(name="Red Team 2 Glyph Test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
+@Autonomous(name="Red Team 2 One Glyph", group="One Glyph Visual")  // @Autonomous(...) is the other common choice
 //@Disabled
-public class RedTeam2GlyphAutonomous extends LinearOpMode {
+public class RedTeam2OneGlyphAuto extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
@@ -132,10 +132,10 @@ public class RedTeam2GlyphAutonomous extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
-        /*
+
         jewelJouster.setJoustMode(JewelJousterV2.JEWEL_JOUSTER_POSITIONS.READ);
         sleep(DEFAULT_SLEEP_DELAY_MILLIS);
-        for(int i = 0; i < 10; i++){
+        for(int i = 0; i < 5; i++){
             if(jewelJouster.getJewelColor() == BLUE) blueCount++;
             else if(jewelJouster.getJewelColor() == RED) redCount++;
         }
@@ -154,7 +154,7 @@ public class RedTeam2GlyphAutonomous extends LinearOpMode {
         sleep(MED_SLEEP_DELAY_MILLIS);
         jewelJouster.setJoustMode(JewelJousterV2.JEWEL_JOUSTER_POSITIONS.STORE);
         sleep(DEFAULT_SLEEP_DELAY_MILLIS);
-        */
+
         telemetry.update();
         navigation.turnToHeading(80, this);
         navigation.brake();
@@ -217,62 +217,7 @@ public class RedTeam2GlyphAutonomous extends LinearOpMode {
         if(opModeIsActive()) navigation.driveDistance(5, EAST, MED_SPEED_IN_PER_SEC, this);
         if(opModeIsActive()) glyphSystem.stopBelt();
         if(opModeIsActive()) glyphSystem.goToGlyphLevel(NewArialDepositor.GLYPH_PLACEMENT_LEVEL.GROUND);
-        //sleep(DEFAULT_DELAY_MILLIS);
 
-        if(opModeIsActive()) switch (mark){
-            case RIGHT:
-                navigation.driveDistance(6, SOUTH, MED_SPEED_IN_PER_SEC, this);
-                break;
-            case LEFT:
-                navigation.driveDistance(6, NORTH, MED_SPEED_IN_PER_SEC, this);
-                break;
-            default:
-                break;
-        }
-        if(opModeIsActive()) glyphPicker.grab();
-        if(opModeIsActive()) glyphSystem.startBelt();
-        if(opModeIsActive()) navigation.driveDistance(30, EAST, HIGH_SPEED_IN_PER_SEC, this);
-        if(opModeIsActive()) getSecondGlyph();
-        if(opModeIsActive()) navigation.turnToHeading(EAST, this);
-        if(opModeIsActive()) navigation.driveDistance(20, WEST, HIGH_SPEED_IN_PER_SEC, this);
-        if(opModeIsActive()) glyphPicker.spit();
-        if(opModeIsActive()) navigation.driveDistance(10, WEST, MED_SPEED_IN_PER_SEC, this);
-        if(opModeIsActive()) glyphSystem.stopBelt();
-        if(opModeIsActive()) glyphPicker.pause();
-
-        if(opModeIsActive()) glyphSystem.goToGlyphLevel(NewArialDepositor.GLYPH_PLACEMENT_LEVEL.ROW2);
-        if(opModeIsActive()) navigation.driveDistance(1.5, EAST, SLOW_SPEED_IN_PER_SEC, this);
-        if(opModeIsActive()) navigation.turnToHeading(EAST, this);
-        if(opModeIsActive()) switch (mark){
-            case RIGHT:
-                navigation.driveDistance(6, NORTH, MED_SPEED_IN_PER_SEC, this);
-                break;
-            case LEFT:
-                navigation.driveDistance(6, SOUTH, MED_SPEED_IN_PER_SEC, this);
-                break;
-            default:
-                break;
-        }
-        //navigation.driveDistance(5, WEST, SLOW_SPEED_IN_PER_SEC, this);
-        if(opModeIsActive()) sleep(DEFAULT_DELAY_MILLIS);
-        if(opModeIsActive()) curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
-        if(opModeIsActive()) columns = cryptoBoxFinder.findColumns(curImage, false);
-        while (!cryptoBoxAligner.centerOnCryptoBoxClosestToCenter(0, columns, NORTH, SOUTH) && opModeIsActive()){
-            curImage = vuforia.getImage(DESIRED_WIDTH, DESIRED_HEIGHT);
-            columns = cryptoBoxFinder.findColumns(curImage, false);
-        }
-        if(opModeIsActive()) navigation.brake();
-//        if(opModeIsActive()) sleep(DEFAULT_DELAY_MILLIS);
-//        if(opModeIsActive()) glyphSystem.goToGlyphLevel(NewArialDepositor.GLYPH_PLACEMENT_LEVEL.ROW2);
-//        if(opModeIsActive()) sleep(1000);
-        if(opModeIsActive()) glyphSystem.startBelt();
-        if(opModeIsActive()) sleep(2000);
-        if(opModeIsActive()) navigation.driveDistance(5, EAST, SLOW_SPEED_IN_PER_SEC, this);
-        if(opModeIsActive()) glyphSystem.stopBelt();
-        if(opModeIsActive()) glyphSystem.goToGlyphLevel(NewArialDepositor.GLYPH_PLACEMENT_LEVEL.GROUND);
-        //sleep(DEFAULT_DELAY_MILLIS);
-
-//        navigation.driveDistance(20, EAST, MED_SPEED_IN_PER_SEC, this);
         while(opModeIsActive());
         navigation.stopNavigation();
         glyphSystem.kill();

@@ -77,9 +77,10 @@ import static SensorHandlers.JennySensorTelemetry.RAD_LIMIT;
     Limited autonomous, no ciphers on red team, glyphs close but not always scored.
     We won 1st place
  */
-@TeleOp(name="Jenny O1B User Controlled", group="Linear Opmode")  // @Autonomous(...) is the other common choice
+
+@TeleOp(name="Jenny O1C User Controlled", group="User Controlled")  // @Autonomous(...) is the other common choice
 //@Disabled
-public class JennyO1B extends LinearOpMode {
+public class JennyO1C extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
@@ -179,116 +180,19 @@ public class JennyO1B extends LinearOpMode {
         while (opModeIsActive()) {
             loopStartTime = System.currentTimeMillis();
             jouster.setJoustMode(JewelJousterV2.JEWEL_JOUSTER_POSITIONS.STORE_WITHOUT_PAUSE);
-            driveStart = System.currentTimeMillis();
+            //driveStart = System.currentTimeMillis();
             handleDriveControl();
-            telemetry.addData("Drive time","" + (System.currentTimeMillis() - driveStart));
-            pickStart = System.currentTimeMillis();
+            //telemetry.addData("Drive time","" + (System.currentTimeMillis() - driveStart));
+            //pickStart = System.currentTimeMillis();
             handlePickSystem();
-            telemetry.addData("Pick time","" + (System.currentTimeMillis() - pickStart));
-            aerialStart = System.currentTimeMillis();
+            //telemetry.addData("Pick time","" + (System.currentTimeMillis() - pickStart));
+            //aerialStart = System.currentTimeMillis();
             handleAerialLift();
-            telemetry.addData("aerial time","" + (System.currentTimeMillis() - aerialStart));
-            radStart = System.currentTimeMillis();
+            //telemetry.addData("aerial time","" + (System.currentTimeMillis() - aerialStart));
+            //radStart = System.currentTimeMillis();
             if(radMode) handleRAD();
-            telemetry.addData("rad time","" + (System.currentTimeMillis() - radStart));
+            //telemetry.addData("rad time","" + (System.currentTimeMillis() - radStart));
 
-            //GLYPH LIFT
-
-            //GLYPH LIFT
-            //long glyphLiftStart = System.currentTimeMillis();
-
-            /*
-            else {
-                if (gamepad1.right_trigger > 0.1 || (gamepad2.right_trigger > .1 && gamepad1.right_trigger < .1)) {
-                    position++;
-                    while (gamepad1.right_trigger > 0.1 || (gamepad2.right_trigger > .1 && gamepad1.right_trigger < .1)) ;
-                }
-                else if (gamepad1.right_bumper || (gamepad2.right_bumper && !gamepad1.right_bumper) && !glyphLift.isPressed()) {
-                    position--;
-                    while (gamepad1.right_bumper || (gamepad2.right_bumper && !gamepad1.right_bumper) && !glyphLift.isPressed()) ;
-                }
-
-                if (position <= 0) position = 0;
-                if (position >= liftPosition.length - 1) position = liftPosition.length - 1;
-                if(position == 0) {
-                    while (opModeIsActive() && !glyphLift.isPressed() && !gamepad1.dpad_up && !gamepad1.a && !gamepad1.b) {
-                        glyphLift.slowRetract();
-                    }
-                    glyphLift.stopLift();
-                    glyphLift.setLiftRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                } else glyphLift.goToGlyphLevel(liftPosition[position]);
-            }
-            /*
-            long glyphLiftStart = System.currentTimeMillis();
-            if (!autoLiftPositionMode) {
-                if (gamepad1.right_trigger > 0.1) {
-                    if(!isSlowMode){
-                        glyphLift.extend();
-                    }
-                    else{
-                        glyphLift.slowExtend();
-                    }
-                }
-                else if (gamepad1.right_bumper && !gamepad1.left_bumper && !glyphLift.isPressed()){
-                    if(!isSlowMode){
-                        glyphLift.retract();
-                    }
-                    else{
-                        glyphLift.slowRetract();
-                    }
-                }
-                else if (gamepad2.right_trigger > 0.1 && gamepad1.right_trigger < 0.1 && gamepad1.left_trigger < 0.1 && !gamepad1.right_bumper && !gamepad1.left_bumper){
-                    if(!isSlowMode){
-                        glyphLift.extend();
-                    }
-                    else {
-                        glyphLift.slowExtend();
-                    }
-                }
-
-                else if (gamepad2.right_bumper && gamepad1.right_trigger < 0.1 && gamepad1.left_trigger < 0.1 && !gamepad1.right_bumper && !gamepad1.left_bumper && !glyphLift.isPressed()){
-                    if(!isSlowMode){
-                        glyphLift.retract();
-                    }
-                    else{
-                        glyphLift.slowRetract();
-                    }
-                }
-                else if(!glyphLift.isPressed()) {
-                    glyphLift.stopLift();
-                }
-                else
-                    glyphLift.setLiftPower(0);
-            } else {
-                if (gamepad1.right_trigger > 0.1) {
-                    position++;
-                    while (gamepad1.right_trigger > 0.1) ;
-                }
-                if (gamepad1.right_bumper) {
-                    position--;
-                    while (gamepad1.right_bumper) ;
-                }
-                if (gamepad2.right_trigger > 0.1 && gamepad1.right_trigger < 0.1 && gamepad1.left_trigger < 0.1 && !gamepad1.right_bumper && !gamepad1.left_bumper) {
-                    position++;
-                    while (gamepad2.right_trigger > 0.1) ;
-                }
-
-                if (gamepad2.right_bumper && gamepad1.right_trigger < 0.1 && gamepad1.left_trigger < 0.1 && !gamepad1.right_bumper && !gamepad1.left_bumper) {
-                    position--;
-                    while (gamepad2.right_bumper) ;
-                }
-
-                if (position <= 0) position = 0;
-                if (position >= liftPosition.length - 1) position = liftPosition.length - 1;
-                if(position == 0) {
-                    while (opModeIsActive() && !glyphLift.isPressed() && !gamepad1.dpad_up && !gamepad1.a && !gamepad1.b) {
-                        glyphLift.slowRetract();
-                    }
-                    glyphLift.stopLift();
-                    glyphLift.setLiftRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                } else glyphLift.goToGlyphLevel(liftPosition[position]);
-            }
-            */
             if(gamepad2.x && gamepad2.y) {
                 autoLiftPositionMode = !autoLiftPositionMode;
                 while (gamepad2.x && gamepad2.y);
@@ -307,7 +211,7 @@ public class JennyO1B extends LinearOpMode {
             if(gamepad1.right_stick_button){
                 navigation.turnToHeading(NORTH, this);
             }
-            else if(gamepad1.left_stick_button){
+            else if(gamepad1.left_stick_button && gamepad1.y){
                 navigation.setOrientationOffset(360 - navigation.getOrientation());
             }
 
@@ -346,14 +250,6 @@ public class JennyO1B extends LinearOpMode {
                     handleAerialLift();
                 }
             }
-            /*
-            if(gamepad2.left_stick_button && !gamepad2.right_stick_button){
-                if(flagOn) flagController.pauseFlag();
-                else flagController.startFlag();
-                flagOn = !flagOn;
-                while (gamepad2.left_stick_button);
-            }
-            */
             if(gamepad2.left_stick_button && gamepad2.right_stick_button) {
                 radMode = !radMode;
                 while (gamepad2.left_stick_button && gamepad2.right_stick_button);

@@ -30,7 +30,7 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
 TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package Autonomous.OpModes;
+package Autonomous.OpModes.RedTeamAuto;
 
 import android.graphics.Bitmap;
 import android.util.Log;
@@ -78,9 +78,9 @@ import static DriveEngine.JennyNavigation.WEST;
 /*
     An opmode to test knocking off the correct jewel
  */
-@Autonomous(name="Red Team 2 Double Glyph", group="Linear Opmode")  // @Autonomous(...) is the other common choice
+@Autonomous(name="Red Team 2 Double Glyph", group="Two Glyph Visual")  // @Autonomous(...) is the other common choice
 //@Disabled
-public class RedTeam2GlyphAutonomousTest extends LinearOpMode {
+public class RedTeam2DoubleGlyphAuto extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
@@ -319,10 +319,13 @@ public class RedTeam2GlyphAutonomousTest extends LinearOpMode {
 
     public void attemptGrab(int dir, long delayGoingIn, long goingOut){
         navigation.driveDistanceNonCorrected(4,dir,HIGH_SPEED_IN_PER_SEC,this);
-        //navigation.relativeDriveOnHeadingWithTurning(dir,MED_SPEED_IN_PER_SEC,0);
-        //sleep(delayGoingIn);
-        //navigation.turnToHeading(navigation.getOrientation() + 20, this);
-        //navigation.relativeDriveOnHeadingWithTurning((dir + 180)%360,MED_SPEED_IN_PER_SEC,0);
+        navigation.driveDistanceNonCorrected(4,(dir + 180)%360,MED_SPEED_IN_PER_SEC,this);
+        if(opModeIsActive()) navigation.turnToHeading(EAST, this);
+        if(opModeIsActive()) navigation.driveDistance(3, SOUTH, MED_SPEED_IN_PER_SEC, this);
+        navigation.driveDistanceNonCorrected(4,dir,HIGH_SPEED_IN_PER_SEC,this);
+        sleep(delayGoingIn);
+        if(opModeIsActive()) glyphPicker.spit();
+        navigation.driveDistanceNonCorrected(4,(dir + 180)%360,HIGH_SPEED_IN_PER_SEC,this);
         navigation.driveDistanceNonCorrected(4,(dir + 180)%360,MED_SPEED_IN_PER_SEC,this);
         //sleep(goingOut);
         navigation.brake();
