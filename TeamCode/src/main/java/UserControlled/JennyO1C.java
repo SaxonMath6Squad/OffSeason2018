@@ -213,6 +213,7 @@ public class JennyO1C extends LinearOpMode {
             }
             else if(gamepad1.left_stick_button && gamepad1.y){
                 navigation.setOrientationOffset(360 - navigation.getOrientation());
+
             }
 
             if(gamepad1.x){
