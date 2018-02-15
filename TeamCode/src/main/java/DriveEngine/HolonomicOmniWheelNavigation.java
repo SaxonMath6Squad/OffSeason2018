@@ -17,7 +17,6 @@ import MotorControllers.PIDController;
 import SensorHandlers.ImuHandler;
 
 
-
 /**
  * Created by Jeremy on 8/23/2017.
  */
@@ -25,7 +24,7 @@ import SensorHandlers.ImuHandler;
 /*
     The base class for every opmode --- it sets up our drive system and contains all it's funcitons
  */
-public class JennyNavigation extends Thread{
+public class HolonomicOmniWheelNavigation extends Thread{
     public MotorController[] driveMotors = new MotorController[4];
     public static final int FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR = 0;
     public static final int FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR = 1;
@@ -54,7 +53,7 @@ public class JennyNavigation extends Thread{
     private double acceleration = 0;
     private HardwareMap hardwareMap;
 
-    public JennyNavigation(HardwareMap hw, Location startLocation, double robotOrientationOffset, String configFile) throws Exception{
+    public HolonomicOmniWheelNavigation(HardwareMap hw, Location startLocation, double robotOrientationOffset, String configFile) throws Exception{
         hardwareMap = hw;
         initializeUsingConfigFile(configFile);
         orientationOffset = robotOrientationOffset;
@@ -234,7 +233,7 @@ public class JennyNavigation extends Thread{
         double deltaVelocity = headingController.calculatePID(distanceFromSetPoint + headingController.getSp()); //isue with this line...
         if(distanceFromHeading < 0) distanceFromHeading += 360;
         else if(distanceFromHeading > 360) distanceFromHeading -= 360;
-        double [] velocities = determineMotorVelocitiesToDriveOnHeading(heading - curOrientation,desiredVelocity);
+        double [] velocities = calculateMotorPowersForDriveOnHeading(heading - curOrientation,desiredVelocity);
 
         if(distanceFromHeading > 315 || distanceFromHeading <= 45){
             velocities[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR] -= deltaVelocity;
@@ -365,22 +364,22 @@ public class JennyNavigation extends Thread{
         return inches;
     }
 
-    double [] determineMotorVelocitiesToDriveOnHeading(double heading, double desiredVelocity) {
+    double [] calculateMotorPowersForDriveOnHeading(double heading, double desiredMovementPower) {
         double[] velocities = new double[4];
-        velocities[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR] = desiredVelocity * Math.sin(Math.toRadians(heading + 45));
-        velocities[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR] = desiredVelocity * Math.cos(Math.toRadians(heading + 45));
-        velocities[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR] = desiredVelocity * Math.sin(Math.toRadians(heading + 45));
-        velocities[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR] = desiredVelocity * Math.cos(Math.toRadians(heading + 45));
+        velocities[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR] = desiredMovementPower * Math.sin(Math.toRadians(heading + 45));
+        velocities[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR] = desiredMovementPower * Math.cos(Math.toRadians(heading + 45));
+        velocities[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR] = desiredMovementPower * Math.sin(Math.toRadians(heading + 45));
+        velocities[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR] = desiredMovementPower * Math.cos(Math.toRadians(heading + 45));
         return velocities;
     }
 
-    public void driveOnHeading(double heading, double desiredVelocity) {
-        applyMotorVelocities(determineMotorVelocitiesToDriveOnHeading(heading, desiredVelocity));
+    public void driveOnHeading(double heading, double desiredMovementPower) {
+        applyMotorVelocities(calculateMotorPowersForDriveOnHeading(heading, desiredMovementPower));
     }
 
     public void driveOnHeadingWithTurning(double heading, double driveVelocity, double magnitudeOfTurn){
         double [] turnVelocities =  calculateTurnVelocitiesRelativeToMax(magnitudeOfTurn);
-        double [] headingVelocities = determineMotorVelocitiesToDriveOnHeading(heading,driveVelocity);
+        double [] headingVelocities = calculateMotorPowersForDriveOnHeading(heading,driveVelocity);
         double [] finalVelocities = new double[4];
         for(int i = 0; i < finalVelocities.length; i ++){
             finalVelocities[i] = turnVelocities[i] + headingVelocities[i];
@@ -447,7 +446,7 @@ public class JennyNavigation extends Thread{
         else if(distanceFromSetPoint > 180) distanceFromSetPoint -= 360;
         if(distanceFromHeading < 0) distanceFromHeading += 360;
         else if(distanceFromHeading > 360) distanceFromHeading -= 360;
-        double [] headingVelocities = determineMotorVelocitiesToDriveOnHeading(heading - curOrientation,driveVelocity);
+        double [] headingVelocities = calculateMotorPowersForDriveOnHeading(heading - curOrientation,driveVelocity);
         //real quick, make distance from heading always positive
         double [] turnVelocities =  calculateTurnVelocitiesRelativeToMax(magnitudeOfTurn);
         double [] finalVelocities = new double[4];
