@@ -65,9 +65,15 @@ public class JoystickHandler {
 
     private void calculateAngle(){
         angle = Math.toDegrees(Math.atan2(xValue, yValue));
+        if(Double.isNaN(angle)) angle = 0;
     }
 
     private void calculateMagnitude(){
         magnitude = Math.sqrt(Math.pow(xValue,2) + Math.pow(yValue,2));
+        if(Double.isNaN(magnitude)) magnitude = 0;
+    }
+
+    public String toString(){
+        return "X:" + x() + " Y:" + y() + "Angle:" + angle() + "Mag:" + magnitude();
     }
 }

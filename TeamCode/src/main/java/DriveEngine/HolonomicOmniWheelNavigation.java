@@ -418,9 +418,6 @@ public class HolonomicOmniWheelNavigation extends Thread{
         applyMotorVelocities(finalVelocities);
     }
 
-    private void normalizeMotorOutputs(){
-
-    }
 
     public void relativeDriveOnHeadingWithTurning(double heading, double driveVelocity, double magnitudeOfTurn){
         driveVelocity = Math.abs(driveVelocity);

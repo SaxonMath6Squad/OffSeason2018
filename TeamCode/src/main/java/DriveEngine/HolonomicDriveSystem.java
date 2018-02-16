@@ -32,7 +32,7 @@ public class HolonomicDriveSystem {
     private double orientationOffset = 0;
     private volatile boolean shouldRun = true;
     private final double HEADING_THRESHOLD = 1;
-    private final double WHEEL_BASE_RADIUS = 20;
+    private double wheelBase = 0;
     private final double FL_WHEEL_HEADING_OFFSET = 45;
     private final double FR_WHEEL_HEADING_OFFSET = 315;
     private final double BR_WHEEL_HEADING_OFFSET = 45;
@@ -46,6 +46,12 @@ public class HolonomicDriveSystem {
     public HolonomicDriveSystem(HardwareMap hw, String configFile){
         hardwareMap = hw;
         readConfigAndInitialize(configFile);
+        double avg = 0;
+        for(int i = 0; i < driveMotors.length; i ++){
+            avg += driveMotors[i].getMaxSpeed();
+        }
+        avg /= driveMotors.length;
+        maxMotorVelocity = avg;
     }
 
     public HolonomicDriveSystem(HardwareMap hw, Location startLocation, String configFile){
@@ -132,6 +138,52 @@ public class HolonomicDriveSystem {
         }
     }
 
+
+    /**
+     * simplest way to drive the robot. This is not a heading corrected drive
+     * @param heading heading relative to the front of the robot
+     * @param desiredPower power from 0 to 1 representing power
+     */
+    public void driveOnHeadingRelativeToRobot(double heading, double desiredPower){
+        double [] powers = calculatePowersToDriveOnHeading(heading, desiredPower);
+        applyMotorPowers(powers);
+    }
+
+    /**
+     * way to drive the robot and turn at same time. This is not a heading corrected drive
+     * @param heading
+     * @param movementPower
+     * @param turnPower
+     */
+
+    public void driveOnHeadingWithTurning(double heading, double movementPower, double turnPower){
+        double [] movementPowers = calculatePowersToDriveOnHeading(heading, movementPower);
+        double [] turningPowers = calculatePowersToTurn(turnPower);
+        double [] total = new double[4];
+        for(int i = 0; i < movementPowers.length; i ++){
+            total[i] = movementPowers[i] + turningPowers[i];
+        }
+        normalizePowers(total);
+        applyMotorPowers(total);
+    }
+
+    /**
+     * turns the robot at the desired proportion of max
+     * @param percentOfMaxTurnRate value from -1 to 1 corresponding to the max turn rate
+     */
+    public void turn(double percentOfMaxTurnRate) {
+        double[] velocities = calculatePowersToTurn(percentOfMaxTurnRate);
+        applyMotorVelocities(velocities);
+    }
+
+
+    /**
+     * brakes the robot
+     */
+    public void brake(){
+        applyMotorPowers(new double[] {0,0,0,0});
+    }
+
     /**
      * normalizes all powers to -1 and 1, scales appropriately
      * @param toNormalize an array of doubles that have a wanted value of -1 to 1
@@ -158,7 +210,7 @@ public class HolonomicDriveSystem {
     /**
      * calculates the powers required to make the robot move on a heading
      * @param heading from 0 to 360, represents the desired heading of the robot relative to the front of the robot
-     * @param desiredPower from -1 to 1 that represents the desired proportion of max velocity for the robot to move at
+     * @param desiredPower from 0 to 1 that represents the desired proportion of max velocity for the robot to move at
      * @return a double array with the calculated motor powers for each wheel
      */
     private double [] calculatePowersToDriveOnHeading(double heading, double desiredPower){
@@ -192,6 +244,7 @@ public class HolonomicDriveSystem {
         normalizePowers(powers);
         double [] velocities = new double[4];
         for(int i = 0; i < powers.length; i ++){
+            Log.d("Motor " + i + "Power", "" + powers[i]);
             velocities[i] = powers[i]*maxMotorVelocity;
         }
         applyMotorVelocities(velocities);
@@ -210,16 +263,37 @@ public class HolonomicDriveSystem {
 
 
     /**
-     * brakes the robot
-      */
-    private void brake(){
-        applyMotorPowers(new double[] {0,0,0,0});
+     * calculates the distance between two angle. For example, if curAngle was 350 deg and target was 45 deg, 55 degs would be returned
+     * @param curAngle current or base angle to compare from. Should be a value from 0 to 360
+     * @param targetAngle angle to compare to, should be a value from 0 to 360;
+     * @return the distance from the curAngle to the target angle. Is + if target angle is to the Right, - if to the left
+     */
+    public double calculateDistanceFromHeading(double curAngle, double targetAngle){
+        double distanceFromHeading = targetAngle - curAngle;
+        return normalizeAngle(distanceFromHeading);
     }
+
+
+    /**
+     * normalizes a degree to a value between -180 and 180
+     * @param angle angle to normalize, can be any degree
+     * @return the normalized angle value from -180 to 180
+     */
+    private double normalizeAngle(double angle){
+        angle %= 360;
+        if(angle > 180) angle = 360 - angle;
+        else if(angle < -180) angle += 360;
+        return angle;
+    }
+
 
     /**
      * kills all parts of the robot for a safe shutdown
      */
     public void kill(){
-
+        shouldRun = false;
+        for(int i =0; i < driveMotors.length; i ++){
+            driveMotors[i].killMotorController();
+        }
     }
 }
