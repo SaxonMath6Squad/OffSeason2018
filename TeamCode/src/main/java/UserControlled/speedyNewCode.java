@@ -25,8 +25,8 @@ public class speedyNewCode extends LinearOpMode {
 
         while(opModeIsActive()){
              movementPower = movementScale * leftStick.magnitude();
-             turningPower = turningScale * rightStick.magnitude() * Math.abs(rightStick.y())/rightStick.y();
-            driveSystem.driveOnHeadingWithTurning(leftStick.angle(), leftStick.magnitude(), turningPower);
+             turningPower = turningScale * Math.abs(rightStick.magnitude()) * Math.abs(rightStick.x())/rightStick.x();
+            driveSystem.driveOnHeadingWithTurning(leftStick.angle(), Math.abs(leftStick.magnitude()), turningPower);
             telemetry.addData("Gamepad1 left Joystick",leftStick.toString());
             telemetry.addData("Gamepad1 right Joystick", rightStick.toString());
             telemetry.update();

@@ -70,75 +70,6 @@ public class HolonomicDriveSystem {
         orientation.setOrientationOffset(robotOrientationOffset);
     }
 
-
-    /**
-     * reads the robot config file and initializes all motors using applicable data
-     * @param file
-     */
-    public void readConfigAndInitialize(String file){
-        InputStream stream = null;
-        try {
-            stream = hardwareMap.appContext.getAssets().open(file);
-        }
-        catch(Exception e){
-            Log.d("Drive Engine Error: ",e.toString());
-            throw new RuntimeException("Drive Engine Open Config File Fail: " + e.toString());
-        }
-        JsonConfigReader reader = new JsonConfigReader(stream);
-        try{
-            driveMotors[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR] = new MotorController(reader.getString("FRONT_LEFT_MOTOR_NAME"), "MotorConfig/DriveMotors/NewHolonomicDriveMotorConfig.json", hardwareMap);
-            driveMotors[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR] = new MotorController(reader.getString("FRONT_RIGHT_MOTOR_NAME"), "MotorConfig/DriveMotors/NewHolonomicDriveMotorConfig.json", hardwareMap);
-            driveMotors[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR] = new MotorController(reader.getString("BACK_LEFT_MOTOR_NAME"), "MotorConfig/DriveMotors/NewHolonomicDriveMotorConfig.json", hardwareMap);
-            driveMotors[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR] = new MotorController(reader.getString("BACK_RIGHT_MOTOR_NAME"), "MotorConfig/DriveMotors/NewHolonomicDriveMotorConfig.json", hardwareMap);
-            for (int i = 0; i < driveMotors.length; i++) {
-                driveMotors[i].setMotorRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            }
-            if(reader.getString("DRIVE_MOTOR_BRAKING_MODE").equals("BRAKE")){
-                for (int i = 0; i < driveMotors.length; i++) {
-                    driveMotors[i].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                }
-            }
-            else if(reader.getString("DRIVE_MOTOR_BRAKING_MODE").equals("FLOAT")){
-                for (int i = 0; i < driveMotors.length; i++) {
-                    driveMotors[i].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-                }
-            }
-            if(reader.getString("FRONT_LEFT_MOTOR_DIRECTION").equals("REVERSE")) {
-                driveMotors[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR].setMotorDirection(DcMotorSimple.Direction.REVERSE);
-            }
-            else if(reader.getString("FRONT_LEFT_MOTOR_DIRECTION").equals("FORWARD")) {
-                driveMotors[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR].setMotorDirection(DcMotorSimple.Direction.FORWARD);
-            }
-            if(reader.getString("FRONT_RIGHT_MOTOR_DIRECTION").equals("REVERSE")) {
-                driveMotors[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR].setMotorDirection(DcMotorSimple.Direction.REVERSE);
-            }
-            else if(reader.getString("FRONT_RIGHT_MOTOR_DIRECTION").equals("FORWARD")) {
-                driveMotors[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR].setMotorDirection(DcMotorSimple.Direction.FORWARD);
-            }
-            if(reader.getString("BACK_RIGHT_MOTOR_DIRECTION").equals("REVERSE")) {
-                driveMotors[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR].setMotorDirection(DcMotorSimple.Direction.REVERSE);
-            }
-            else if(reader.getString("BACK_RIGHT_MOTOR_DIRECTION").equals("FORWARD")) {
-                driveMotors[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR].setMotorDirection(DcMotorSimple.Direction.FORWARD);
-            }
-            if(reader.getString("BACK_LEFT_MOTOR_DIRECTION").equals("REVERSE")) {
-                driveMotors[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR].setMotorDirection(DcMotorSimple.Direction.REVERSE);
-            }
-            else if(reader.getString("BACK_LEFT_MOTOR_DIRECTION").equals("FORWARD")) {
-                driveMotors[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR].setMotorDirection(DcMotorSimple.Direction.FORWARD);
-            }
-            headingController = new PIDController(reader.getDouble("HEADING_Kp"), reader.getDouble("HEADING_Ki"), reader.getDouble("HEADING_Kd"));
-            headingController.setIMax(reader.getDouble("HEADING_Ki_MAX"));
-            turnController = new PIDController(reader.getDouble("TURN_Kp"), reader.getDouble("TURN_Ki"), reader.getDouble("TURN_Kd"));
-            turnController.setIMax(reader.getDouble("TURN_Ki_MAX"));
-
-        } catch(Exception e){
-            Log.e(" Drive Engine Error", "Config File Read Fail: " + e.toString());
-            throw new RuntimeException("Drive Engine Config Read Failed!:" + e.toString());
-        }
-    }
-
-
     /**
      * simplest way to drive the robot. This is not a heading corrected drive
      * @param heading heading relative to the front of the robot
@@ -149,13 +80,25 @@ public class HolonomicDriveSystem {
         applyMotorPowers(powers);
     }
 
+
+    /**
+     * way to drive the robot using cartesian driving
+     * @param heading the desired heading of the robot with 0 being north
+     * @param movementPower power from 0 to 1 representing desired movement power
+     * @param turnPower power from -1 to 1 representing desired turning power
+     */
+    public void cartesianDriveOnHeadingWithTurning(double heading, double movementPower, double turnPower){
+        double distanceToHeading = calculateDistanceFromHeading(orientation.getOrientation(),heading);
+        Log.d("Dist To Head","" + distanceToHeading);
+        driveOnHeadingWithTurning(distanceToHeading, movementPower,turnPower);
+    }
+
     /**
      * way to drive the robot and turn at same time. This is not a heading corrected drive
-     * @param heading
-     * @param movementPower
-     * @param turnPower
+     * @param heading heading relative to the front of the robot
+     * @param movementPower power from 0 to 1 representing the movement speed
+     * @param turnPower power from -1 to 1 representing the turning speed
      */
-
     public void driveOnHeadingWithTurning(double heading, double movementPower, double turnPower){
         double [] movementPowers = calculatePowersToDriveOnHeading(heading, movementPower);
         double [] turningPowers = calculatePowersToTurn(turnPower);
@@ -215,10 +158,17 @@ public class HolonomicDriveSystem {
      */
     private double [] calculatePowersToDriveOnHeading(double heading, double desiredPower){
         double[] powers = new double[4];
+        if(desiredPower == 0){
+            for(int i = 0; i < powers.length; i ++){
+                powers[i] = 0;
+            }
+            return powers;
+        }
         powers[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR] = desiredPower * Math.sin(Math.toRadians(heading + 45));
         powers[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR] = desiredPower * Math.cos(Math.toRadians(heading + 45));
         powers[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR] = desiredPower * Math.sin(Math.toRadians(heading + 45));
         powers[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR] = desiredPower * Math.cos(Math.toRadians(heading + 45));
+        //Log.d("MotorPow","" + powers[0]);
         return powers;
     }
 
@@ -229,10 +179,19 @@ public class HolonomicDriveSystem {
      */
     private double [] calculatePowersToTurn(double desiredTurnRateOfMax){
         double[] powers = new double[4];
+        if(desiredTurnRateOfMax == 0){
+            for(int i = 0; i < powers.length; i ++){
+                powers[i] = 0;
+            }
+            return powers;
+        }
         powers[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR] = desiredTurnRateOfMax;
         powers[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR] = -desiredTurnRateOfMax;
         powers[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR] = desiredTurnRateOfMax;
         powers[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR] = -desiredTurnRateOfMax;
+        for(int i = 0; i < powers.length; i ++){
+            if(Double.isNaN(powers[i])) powers[i] = 0;
+        }
         return powers;
     }
 
@@ -244,7 +203,7 @@ public class HolonomicDriveSystem {
         normalizePowers(powers);
         double [] velocities = new double[4];
         for(int i = 0; i < powers.length; i ++){
-            Log.d("Motor " + i + "Power", "" + powers[i]);
+            //Log.d("Motor " + i + "Power", "" + powers[i]);
             velocities[i] = powers[i]*maxMotorVelocity;
         }
         applyMotorVelocities(velocities);
@@ -292,8 +251,75 @@ public class HolonomicDriveSystem {
      */
     public void kill(){
         shouldRun = false;
-        for(int i =0; i < driveMotors.length; i ++){
-            driveMotors[i].killMotorController();
+        for (MotorController driveMotor : driveMotors) {
+            driveMotor.killMotorController();
+        }
+    }
+
+    /**
+     * reads the robot config file and initializes all motors using applicable data
+     * @param file the location of the robot config file, in the assets folder
+     */
+    private void readConfigAndInitialize(String file){
+        InputStream stream = null;
+        try {
+            stream = hardwareMap.appContext.getAssets().open(file);
+        }
+        catch(Exception e){
+            Log.d("Drive Engine Error: ",e.toString());
+            throw new RuntimeException("Drive Engine Open Config File Fail: " + e.toString());
+        }
+        JsonConfigReader reader = new JsonConfigReader(stream);
+        try{
+            driveMotors[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR] = new MotorController(reader.getString("FRONT_LEFT_MOTOR_NAME"), "MotorConfig/DriveMotors/NewHolonomicDriveMotorConfig.json", hardwareMap);
+            driveMotors[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR] = new MotorController(reader.getString("FRONT_RIGHT_MOTOR_NAME"), "MotorConfig/DriveMotors/NewHolonomicDriveMotorConfig.json", hardwareMap);
+            driveMotors[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR] = new MotorController(reader.getString("BACK_LEFT_MOTOR_NAME"), "MotorConfig/DriveMotors/NewHolonomicDriveMotorConfig.json", hardwareMap);
+            driveMotors[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR] = new MotorController(reader.getString("BACK_RIGHT_MOTOR_NAME"), "MotorConfig/DriveMotors/NewHolonomicDriveMotorConfig.json", hardwareMap);
+            for (int i = 0; i < driveMotors.length; i++) {
+                driveMotors[i].setMotorRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            }
+            if(reader.getString("DRIVE_MOTOR_BRAKING_MODE").equals("BRAKE")){
+                for (int i = 0; i < driveMotors.length; i++) {
+                    driveMotors[i].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                }
+            }
+            else if(reader.getString("DRIVE_MOTOR_BRAKING_MODE").equals("FLOAT")){
+                for (int i = 0; i < driveMotors.length; i++) {
+                    driveMotors[i].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+                }
+            }
+            if(reader.getString("FRONT_LEFT_MOTOR_DIRECTION").equals("REVERSE")) {
+                driveMotors[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR].setMotorDirection(DcMotorSimple.Direction.REVERSE);
+            }
+            else if(reader.getString("FRONT_LEFT_MOTOR_DIRECTION").equals("FORWARD")) {
+                driveMotors[FRONT_LEFT_HOLONOMIC_DRIVE_MOTOR].setMotorDirection(DcMotorSimple.Direction.FORWARD);
+            }
+            if(reader.getString("FRONT_RIGHT_MOTOR_DIRECTION").equals("REVERSE")) {
+                driveMotors[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR].setMotorDirection(DcMotorSimple.Direction.REVERSE);
+            }
+            else if(reader.getString("FRONT_RIGHT_MOTOR_DIRECTION").equals("FORWARD")) {
+                driveMotors[FRONT_RIGHT_HOLONOMIC_DRIVE_MOTOR].setMotorDirection(DcMotorSimple.Direction.FORWARD);
+            }
+            if(reader.getString("BACK_RIGHT_MOTOR_DIRECTION").equals("REVERSE")) {
+                driveMotors[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR].setMotorDirection(DcMotorSimple.Direction.REVERSE);
+            }
+            else if(reader.getString("BACK_RIGHT_MOTOR_DIRECTION").equals("FORWARD")) {
+                driveMotors[BACK_RIGHT_HOLONOMIC_DRIVE_MOTOR].setMotorDirection(DcMotorSimple.Direction.FORWARD);
+            }
+            if(reader.getString("BACK_LEFT_MOTOR_DIRECTION").equals("REVERSE")) {
+                driveMotors[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR].setMotorDirection(DcMotorSimple.Direction.REVERSE);
+            }
+            else if(reader.getString("BACK_LEFT_MOTOR_DIRECTION").equals("FORWARD")) {
+                driveMotors[BACK_LEFT_HOLONOMIC_DRIVE_MOTOR].setMotorDirection(DcMotorSimple.Direction.FORWARD);
+            }
+            headingController = new PIDController(reader.getDouble("HEADING_Kp"), reader.getDouble("HEADING_Ki"), reader.getDouble("HEADING_Kd"));
+            headingController.setIMax(reader.getDouble("HEADING_Ki_MAX"));
+            turnController = new PIDController(reader.getDouble("TURN_Kp"), reader.getDouble("TURN_Ki"), reader.getDouble("TURN_Kd"));
+            turnController.setIMax(reader.getDouble("TURN_Ki_MAX"));
+
+        } catch(Exception e){
+            Log.e(" Drive Engine Error", "Config File Read Fail: " + e.toString());
+            throw new RuntimeException("Drive Engine Config Read Failed!:" + e.toString());
         }
     }
 }

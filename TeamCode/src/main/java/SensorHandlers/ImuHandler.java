@@ -140,7 +140,7 @@ public class ImuHandler extends Thread{
     /*
         returns the heading of the robot, 0 to 359 degrees
      */
-    public double getHeading(){
+    public double getHeadingFromVelocity(){
         //cannot use z heading as it represents the orientation, not the heading
         //couple of options.... use accelerometers to determine the headingvimu.getAngularVelocity(); //we'll see if this works
         //turn the robot to always face forward
