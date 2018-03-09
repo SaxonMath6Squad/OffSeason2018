@@ -34,9 +34,10 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name="Competition1", group="Linear Opmode")
+
+@TeleOp(name="Ram Slam Jam Sam", group="Linear Opmode")
 //@Disabled
-public class Competition1 extends LinearOpMode {
+public class RamSlamJamSam extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
@@ -56,21 +57,8 @@ public class Competition1 extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
-        driveEngine.drive(.5);
-        sleep(150);
-        driveEngine.brake();
-        driveEngine.turn(.25);
-        sleep(850);
-        driveEngine.drive(.3);
-        sleep(850);
-        driveEngine.turn(-.25);
-        sleep(750);
-        driveEngine.drive(.3);
-        sleep(700);
-        driveEngine.turn(-.25);
-        sleep(550);
-        driveEngine.drive(.3);
-        sleep(750);
+        driveEngine.drive(1);
+        sleep(5000);
         driveEngine.brake();
     }
 }

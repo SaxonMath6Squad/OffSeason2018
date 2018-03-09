@@ -12,7 +12,7 @@ public class DriveEngine {
     DcMotor leftMotor;
     DcMotor rightMotor;
     HardwareMap hardwareMap;
-
+    private final int TICKS_PER_REV = 560;
 
     public DriveEngine(HardwareMap hw){
         hardwareMap = hw;
@@ -37,6 +37,15 @@ public class DriveEngine {
     public void brake(){
         leftMotor.setPower(0);
         rightMotor.setPower(0);
+    }
+    public void driveDistance(int tick){
+        leftMotor.setTargetPosition(tick);
+        rightMotor.setTargetPosition(tick);
+        leftMotor.setPower(1);
+        rightMotor.setPower(1);
+    }
+    public void driveDistance(double distanceInInches, double power){
+        int targetDistance = 0;
     }
 //    public void turn(double speed, double heading){
 //        double distFromHeading = bloop-heading;
