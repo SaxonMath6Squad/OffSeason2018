@@ -75,7 +75,7 @@ public class Competition1 extends LinearOpMode {
         driveEngine.turn(-0.4);
         sleep(3000);
         driveEngine.drive(0.8);
-        sleep(1);
+        sleep(1000);
         driveEngine.brake();
     }
 }
