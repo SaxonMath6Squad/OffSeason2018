@@ -73,7 +73,7 @@ public class Competition1 extends LinearOpMode {
         runtime.reset();
         long startTime = System.currentTimeMillis();
         driveEngine.turn(-0.4);
-        sleep(3000);
+        sleep(1500);
         driveEngine.drive(0.8);
         sleep(1000);
         driveEngine.brake();
