@@ -34,7 +34,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name="Competition1", group="Linear Opmode")
+@TeleOp(name="Competition1", group="Competition Code")
 //@Disabled
 public class Competition1 extends LinearOpMode {
 

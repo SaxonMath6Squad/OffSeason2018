@@ -32,33 +32,38 @@ package org.firstinspires.ftc;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.GyroSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-
-@TeleOp(name="Ram Slam Jam Sam", group="Fun Code")
+@TeleOp(name="Gyro Tester", group="Testers")
 //@Disabled
-public class RamSlamJamSam extends LinearOpMode {
+public class GyroTester extends LinearOpMode {
 
-    // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
-
-    private DriveEngine driveEngine;
-
+    GyroSensor gyro;
 
     @Override
     public void runOpMode() {
-        driveEngine = new DriveEngine(hardwareMap);
+        gyro = hardwareMap.gyroSensor.get("gyro");
+        gyro.calibrate();
+        while (gyro.isCalibrating()) {
+            telemetry.addData("Gyro", "Calibrating...");
+            telemetry.update();
+        }
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-        driveEngine.brake();
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
 
-        driveEngine.drive(1);
-        sleep(5000);
-        driveEngine.brake();
+        // run until the end of the match (driver presses STOP)
+        while (opModeIsActive()) {
+
+            telemetry.addData("Status", "Run Time: " + runtime.toString());
+            telemetry.addData("Heading", gyro.getHeading());
+            telemetry.update();
+        }
     }
 }
