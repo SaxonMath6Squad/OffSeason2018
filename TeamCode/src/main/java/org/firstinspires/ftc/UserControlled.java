@@ -29,15 +29,13 @@
 
 package org.firstinspires.ftc;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@Autonomous(name="Competition1", group="Competition Code")
+@TeleOp(name="UserControlled", group="Fun Code")
 //@Disabled
-public class Competition1 extends LinearOpMode {
+public class UserControlled extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
@@ -56,22 +54,10 @@ public class Competition1 extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
+        while (opModeIsActive()){
+            driveEngine.driveAndTurn(-gamepad1.left_stick_y, gamepad1.right_stick_x);
 
-        driveEngine.drive(.5);
-        sleep(150);
-        driveEngine.brake();
-        driveEngine.turn(.25);
-        sleep(850);
-        driveEngine.drive(.3);
-        sleep(850);
-        driveEngine.turn(-.25);
-        sleep(750);
-        driveEngine.drive(.3);
-        sleep(700);
-        driveEngine.turn(-.25);
-        sleep(550);
-        driveEngine.drive(.3);
-        sleep(750);
-        driveEngine.brake();
+            telemetry.update();
+        }
     }
 }

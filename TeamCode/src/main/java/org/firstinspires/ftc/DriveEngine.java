@@ -18,7 +18,7 @@ public class DriveEngine {
     GyroSensor orientation;
     PIDController turnController;
     HardwareMap hardwareMap;
-    private final int TICKS_PER_REV = 560;
+    private final int TICKS_PER_REV = 1120; // 20:1 - 560, 40:1 - 1120
     private final double DRIVE_WHEEL_DIAMETER_INCHES = 4.0;
     private final double HEADING_THRESHOLD = 2.0;
     private final double TURN_KP = 0.05; // gain * error
@@ -33,26 +33,38 @@ public class DriveEngine {
         leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-        rightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     public void drive(double power){
-        leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftMotor.setPower(power);
         rightMotor.setPower(power);
     }
     public void turn(double percentPower){
-        leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftMotor.setPower(percentPower);
         rightMotor.setPower(-percentPower);
     }
+    public void driveAndTurn(double drivePower, double turnPower){
+        double leftPower = drivePower - turnPower;
+        double rightPower = drivePower + turnPower;
+        if(leftPower > 1) leftPower = 1;
+        else if(leftPower < -1) leftPower = -1;
+        if(rightPower > 1) rightPower = 1;
+        else if(rightPower < -1) rightPower = -1;
+        leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftMotor.setPower(leftPower);
+        rightMotor.setPower(rightPower);
+    }
     public void brake(){
-        leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftMotor.setPower(0);
         rightMotor.setPower(0);
     }
@@ -65,7 +77,7 @@ public class DriveEngine {
         rightMotor.setPower(1);
     }
     public void driveDistance(double distanceInInches, double power){
-        int targetDistanceTicks = (int)(TICKS_PER_REV*distanceInInches/ DRIVE_WHEEL_DIAMETER_INCHES +0.5);
+        int targetDistanceTicks = (int)(TICKS_PER_REV*distanceInInches/ (DRIVE_WHEEL_DIAMETER_INCHES*Math.PI) +0.5);
         Log.d("Target Distance Inches", Double.toString(distanceInInches));
         Log.d("Target Distance Ticks", Integer.toString(targetDistanceTicks));
         leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);

@@ -30,14 +30,13 @@
 package org.firstinspires.ftc;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@Autonomous(name="Competition1", group="Competition Code")
+@Autonomous(name="Competition2", group="Competition Code")
 //@Disabled
-public class Competition1 extends LinearOpMode {
+public class Competition2 extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
@@ -58,20 +57,7 @@ public class Competition1 extends LinearOpMode {
         runtime.reset();
 
         driveEngine.drive(.5);
-        sleep(150);
-        driveEngine.brake();
-        driveEngine.turn(.25);
-        sleep(850);
-        driveEngine.drive(.3);
-        sleep(850);
-        driveEngine.turn(-.25);
-        sleep(750);
-        driveEngine.drive(.3);
-        sleep(700);
-        driveEngine.turn(-.25);
-        sleep(550);
-        driveEngine.drive(.3);
-        sleep(750);
+        sleep(5000);
         driveEngine.brake();
     }
 }
